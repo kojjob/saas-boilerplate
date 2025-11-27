@@ -47,7 +47,18 @@ FactoryBot.define do
       end
     end
 
+    # Site-wide admin (can access /admin dashboard)
     trait :admin do
+      site_admin { true }
+
+      after(:create) do |user|
+        account = create(:account)
+        create(:membership, :owner, user: user, account: account)
+      end
+    end
+
+    # Account-level admin role (admin of a specific account, not site-wide)
+    trait :account_admin do
       after(:create) do |user|
         account = create(:account)
         create(:membership, :admin, user: user, account: account)

@@ -2,13 +2,19 @@
 
 class User < ApplicationRecord
   include Discard::Model
+  include Cacheable
 
   has_secure_password
+
+  # Audit logging - exclude sensitive fields
+  audited except: %i[password_digest password reset_password_token confirmation_token]
 
   # Associations
   has_many :memberships, dependent: :destroy
   has_many :accounts, through: :memberships
   has_many :sessions, dependent: :destroy
+  has_many :api_tokens, dependent: :destroy
+  has_many :notifications, dependent: :destroy
 
   # Validations
   validates :first_name, presence: true
@@ -81,6 +87,11 @@ class User < ApplicationRecord
 
   def member_of?(account)
     membership_for(account).present?
+  end
+
+  # Site-wide admin check (separate from account membership roles)
+  def site_admin?
+    site_admin == true
   end
 
   private

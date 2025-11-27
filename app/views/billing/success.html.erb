@@ -1,0 +1,21 @@
+<div class="max-w-lg mx-auto px-4 py-16 text-center">
+  <div class="rounded-full bg-green-100 p-3 mx-auto w-fit">
+    <svg class="h-12 w-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+    </svg>
+  </div>
+
+  <h1 class="mt-6 text-3xl font-bold text-gray-900">Payment Successful!</h1>
+
+  <p class="mt-4 text-lg text-gray-600">
+    Thank you for your subscription. Your account has been upgraded and you now have access to all your new features.
+  </p>
+
+  <div class="mt-8 space-x-4">
+    <%= link_to "Go to Dashboard", dashboard_path,
+        class: "inline-flex items-center px-6 py-3 border border-transparent text-base font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+
+    <%= link_to "View Billing", billing_path,
+        class: "inline-flex items-center px-6 py-3 border border-gray-300 text-base font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
+  </div>
+</div>

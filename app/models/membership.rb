@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Membership < ApplicationRecord
+  # Audit logging - exclude invitation tokens for security
+  audited except: %i[invitation_token]
+
   # Associations
   belongs_to :user, optional: true # Optional for pending invitations
   belongs_to :account

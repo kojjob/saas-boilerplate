@@ -2,10 +2,18 @@
 
 class Account < ApplicationRecord
   include Discard::Model
+  include Cacheable
+
+  # Audit logging
+  audited
+
+  # Pay gem integration for billing
+  pay_customer default_payment_processor: :stripe
 
   # Associations
   has_many :memberships, dependent: :destroy
   has_many :users, through: :memberships
+  belongs_to :plan, optional: true
 
   # Validations
   validates :name, presence: true, length: { maximum: 100 }
@@ -54,6 +62,43 @@ class Account < ApplicationRecord
 
   def admins
     users.joins(:memberships).where(memberships: { role: %w[owner admin] })
+  end
+
+  # Billing methods
+  def current_plan
+    plan || Plan.free.first
+  end
+
+  def subscribed?
+    plan.present? && %w[active trialing].include?(subscription_status)
+  end
+
+  def on_trial?
+    subscription_status == "trialing" && trial_ends_at.present? && trial_ends_at > Time.current
+  end
+
+  def can_access_feature?(feature_name)
+    return false unless subscribed? && current_plan.present?
+
+    current_plan.feature_list.include?(feature_name.to_s)
+  end
+
+  def within_limit?(resource, current_count)
+    return true unless subscribed? && current_plan.present?
+
+    limit = current_plan.limit_for(resource)
+    return true if limit.nil? || limit == -1 # nil or -1 means unlimited
+
+    current_count < limit
+  end
+
+  def billing_email
+    owner&.email
+  end
+
+  # Pay gem requires an email method for the billable model
+  def email
+    billing_email
   end
 
   private

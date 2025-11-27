@@ -1,8 +1,13 @@
 # frozen_string_literal: true
 
 class OauthCallbacksController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [ :google_oauth2, :github, :failure ]
-  before_action :redirect_if_signed_in, only: [ :google_oauth2, :github ]
+  skip_before_action :verify_authenticity_token, only: [ :create, :google_oauth2, :github, :failure ]
+  before_action :redirect_if_signed_in, only: [ :create, :google_oauth2, :github ]
+
+  # Unified OAuth callback handler (used with auth/:provider/callback route)
+  def create
+    handle_oauth_callback
+  end
 
   def google_oauth2
     handle_oauth_callback

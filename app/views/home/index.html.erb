@@ -2,6 +2,10 @@
   <%= stylesheet_link_tag "landing", "data-turbo-track": "reload" %>
 <% end %>
 
+<%# Hide the shared navbar and footer since landing page has its own custom designs %>
+<% content_for :hide_navbar, true %>
+<% content_for :hide_footer, true %>
+
 <div class="relative overflow-hidden bg-gradient-to-br from-[#0f0c29] via-[#302b63] to-[#24243e]">
   <!-- Mesh Gradient Orbs -->
   <div class="mesh-orb mesh-orb-1"></div>

@@ -1,0 +1,64 @@
+# Solid Queue Configuration
+#
+# Queue priorities (lower = higher priority):
+#   critical: 1 - Real-time user-facing operations
+#   default: 5 - Standard background operations
+#   mailers: 5 - Email delivery
+#   exports: 10 - Data exports and reports
+#   maintenance: 15 - Cleanup and maintenance tasks
+#
+# Worker configuration:
+#   queues: Queue names to process (* for all)
+#   threads: Number of threads per process
+#   processes: Number of worker processes
+#   polling_interval: Seconds between queue checks
+
+default: &default
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+  workers:
+    - queues: "*"
+      threads: 3
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 1) %>
+      polling_interval: 0.1
+
+development:
+  <<: *default
+  workers:
+    - queues: "*"
+      threads: 2
+      processes: 1
+      polling_interval: 0.5
+
+test:
+  <<: *default
+  workers:
+    - queues: "*"
+      threads: 1
+      processes: 1
+      polling_interval: 0.1
+
+production:
+  dispatchers:
+    - polling_interval: 1
+      batch_size: 500
+      concurrency_maintenance_interval: 30
+
+  workers:
+    # High priority worker for critical jobs
+    - queues:
+        - critical
+        - default
+        - mailers
+      threads: 5
+      processes: <%= ENV.fetch("JOB_CONCURRENCY", 2) %>
+      polling_interval: 0.1
+
+    # Low priority worker for background tasks
+    - queues:
+        - exports
+        - maintenance
+      threads: 2
+      processes: 1
+      polling_interval: 1
