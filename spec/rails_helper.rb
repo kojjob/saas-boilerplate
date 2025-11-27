@@ -11,6 +11,7 @@ require 'capybara/rspec'
 require 'webmock/rspec'
 require 'vcr'
 require 'database_cleaner/active_record'
+require 'with_model'
 
 # Start SimpleCov for code coverage
 require 'simplecov'
@@ -60,6 +61,9 @@ RSpec.configure do |config|
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
 
+  # Include ActiveSupport TimeHelpers for travel_to, freeze_time, etc.
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # Include Devise test helpers (when we add authentication)
   # config.include Devise::Test::IntegrationHelpers, type: :request
   # config.include Devise::Test::ControllerHelpers, type: :controller
@@ -67,8 +71,12 @@ RSpec.configure do |config|
   # Include Pundit test helpers
   config.include Pundit::Matchers
 
+  # Include WithModel for dynamic model testing
+  config.extend WithModel
+
   # Configure request specs to include helpers
   config.include ActionDispatch::TestProcess::FixtureFile
+
 
   # Add Capybara DSL to system specs
   config.include Capybara::DSL, type: :system

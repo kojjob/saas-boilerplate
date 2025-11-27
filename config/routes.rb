@@ -1,6 +1,45 @@
 Rails.application.routes.draw do
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
+  # ==================================
+  # Authentication Routes
+  # ==================================
+  get "sign_in", to: "sessions#new", as: :sign_in
+  post "sign_in", to: "sessions#create"
+  delete "sign_out", to: "sessions#destroy", as: :sign_out
+
+  get "sign_up", to: "registrations#new", as: :sign_up
+  post "sign_up", to: "registrations#create"
+
+  # Password reset
+  resources :password_resets, only: [ :new, :create, :edit, :update ], param: :token
+
+  # Email confirmation
+  get "confirm_email/:token", to: "confirmations#show", as: :confirm_email
+  resources :confirmations, only: [ :new, :create ]
+
+  # OAuth callbacks
+  get "auth/:provider/callback", to: "oauth_callbacks#create"
+  get "auth/failure", to: "oauth_callbacks#failure"
+
+  # ==================================
+  # Account Management Routes
+  # ==================================
+  resource :account, only: [ :show, :edit, :update ] do
+    member do
+      get :billing
+      post :switch, to: "accounts#switch"
+    end
+  end
+
+  # ==================================
+  # Dashboard
+  # ==================================
+  get "dashboard", to: "dashboard#show", as: :dashboard
+
+  # ==================================
+  # Health Check
+  # ==================================
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
   # Can be used by load balancers and uptime monitors to verify that the app is live.
   get "up" => "rails/health#show", as: :rails_health_check
@@ -10,5 +49,5 @@ Rails.application.routes.draw do
   # get "service-worker" => "rails/pwa#service_worker", as: :pwa_service_worker
 
   # Defines the root path route ("/")
-  # root "posts#index"
+  root "home#index"
 end

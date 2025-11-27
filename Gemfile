@@ -105,6 +105,7 @@ group :development, :test do
   gem "faker"
   gem "shoulda-matchers"
   gem "pundit-matchers"
+  gem "with_model"  # For testing dynamic model concerns
 end
 
 group :test do

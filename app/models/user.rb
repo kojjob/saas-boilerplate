@@ -43,6 +43,10 @@ class User < ApplicationRecord
     update!(confirmed_at: Time.current, confirmation_token: nil)
   end
 
+  def regenerate_confirmation_token!
+    update!(confirmation_token: SecureRandom.urlsafe_base64(32))
+  end
+
   def generate_password_reset_token!
     update!(
       reset_password_token: SecureRandom.urlsafe_base64(32),
