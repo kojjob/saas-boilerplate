@@ -55,7 +55,7 @@ gem "acts_as_tenant", "~> 1.0"
 gem "pundit", "~> 2.4"
 
 # Billing - Stripe subscription management
-gem "pay", "~> 8.0"
+gem "pay", "~> 11.4"
 gem "stripe", "~> 13.0"
 
 # Audit logging - Version tracking for models
@@ -64,7 +64,7 @@ gem "stripe", "~> 13.0"
 gem "audited", "~> 5.6"
 
 # Pagination
-gem "pagy", "~> 9.0"
+gem "pagy", "~> 43.1"
 
 # OAuth providers
 gem "omniauth", "~> 2.1"
@@ -100,7 +100,7 @@ group :development, :test do
   gem "rubocop-rails-omakase", require: false
 
   # Testing framework
-  gem "rspec-rails", "~> 7.0"
+  gem "rspec-rails", "~> 8.0"
   gem "factory_bot_rails"
   gem "faker"
   gem "shoulda-matchers"
