@@ -1,0 +1,25 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(git -C /Users/kojo/.claude-worktrees/Deployable/nostalgic-varahamihira log --oneline -10)",
+      "Bash(ruby --version:*)",
+      "Bash(rails:*)",
+      "Bash(rbenv versions:*)",
+      "Bash(asdf list:*)",
+      "Bash(rvm list:*)",
+      "Bash(/opt/homebrew/bin/rbenv versions)",
+      "Bash(/usr/local/bin/rbenv versions:*)",
+      "Bash(~/.rbenv/bin/rbenv versions)",
+      "Bash(export PATH=\"$HOME/.rbenv/shims:$HOME/.rbenv/bin:$PATH\")",
+      "Bash(gem list:*)",
+      "Bash(export PATH=\"$HOME/.rbenv/shims:/opt/homebrew/bin:$PATH\")",
+      "Bash(bin/rails tailwindcss:build:*)",
+      "Bash(bin/rails:*)",
+      "Bash(bin/rails db:create:*)",
+      "Bash(git checkout:*)",
+      "Bash(bundle install:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
