@@ -7,11 +7,14 @@ class InvitationsController < ApplicationController
   before_action :set_invitation, only: [ :destroy, :resend ]
 
   def new
+    authorize Membership, :invite?
     @invitation = Membership.new
     @available_roles = available_roles
   end
 
   def create
+    authorize Membership, :invite?
+
     email = invitation_params[:invitation_email]&.downcase&.strip
 
     # Check for existing membership
@@ -61,6 +64,8 @@ class InvitationsController < ApplicationController
   end
 
   def destroy
+    authorize @invitation, :cancel_invitation?
+
     email = @invitation.invitation_email
     @invitation.destroy
 
@@ -68,6 +73,8 @@ class InvitationsController < ApplicationController
   end
 
   def resend
+    authorize @invitation, :resend_invitation?
+
     if @invitation.invitation_expired?
       @invitation.resend_invitation!
     end

@@ -7,7 +7,8 @@ class MembersController < ApplicationController
   before_action :authorize_member_management, only: [ :update, :destroy ]
 
   def index
-    @memberships = @account.memberships.includes(:user, :invited_by).order(created_at: :asc)
+    authorize Membership
+    @memberships = policy_scope(Membership).includes(:user, :invited_by).order(created_at: :asc)
     @current_membership = @account.memberships.find_by(user: current_user)
   end
 
@@ -72,6 +73,9 @@ class MembersController < ApplicationController
       redirect_to account_members_path, alert: "Account owners cannot leave. Transfer ownership first."
       return
     end
+
+    # Use policy to check if user can leave (destroy their own membership)
+    authorize membership, :destroy?
 
     membership.destroy
 
