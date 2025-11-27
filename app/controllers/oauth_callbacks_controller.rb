@@ -1,8 +1,8 @@
 # frozen_string_literal: true
 
 class OauthCallbacksController < ApplicationController
-  skip_before_action :verify_authenticity_token, only: [:google_oauth2, :github, :failure]
-  before_action :redirect_if_signed_in, only: [:google_oauth2, :github]
+  skip_before_action :verify_authenticity_token, only: [ :google_oauth2, :github, :failure ]
+  before_action :redirect_if_signed_in, only: [ :google_oauth2, :github ]
 
   def google_oauth2
     handle_oauth_callback
@@ -13,24 +13,24 @@ class OauthCallbacksController < ApplicationController
   end
 
   def failure
-    error_message = params[:message] || 'Authentication failed'
+    error_message = params[:message] || "Authentication failed"
     redirect_to sign_in_path, alert: "OAuth authentication failed: #{error_message}"
   end
 
   private
 
   def handle_oauth_callback
-    auth = request.env['omniauth.auth']
+    auth = request.env["omniauth.auth"]
 
     # Handle invalid credentials or failure
     if auth.nil? || auth == :invalid_credentials
-      return redirect_to sign_in_path, alert: 'OAuth authentication failed. Please try again.'
+      return redirect_to sign_in_path, alert: "OAuth authentication failed. Please try again."
     end
 
     # Validate email presence (required for GitHub)
     email = auth.info&.email
     if email.blank?
-      return redirect_to sign_in_path, alert: 'Could not retrieve email from your account. Please ensure your email is public or use a different sign-in method.'
+      return redirect_to sign_in_path, alert: "Could not retrieve email from your account. Please ensure your email is public or use a different sign-in method."
     end
 
     # Find or create user
@@ -38,7 +38,7 @@ class OauthCallbacksController < ApplicationController
 
     if result[:success]
       sign_in(result[:user])
-      redirect_to dashboard_path, notice: 'Successfully signed in with your account!'
+      redirect_to dashboard_path, notice: "Successfully signed in with your account!"
     else
       redirect_to sign_in_path, alert: result[:error]
     end
@@ -96,7 +96,7 @@ class OauthCallbacksController < ApplicationController
       Membership.create!(
         user: user,
         account: account,
-        role: 'owner',
+        role: "owner",
         accepted_at: Time.current
       )
 
@@ -113,14 +113,14 @@ class OauthCallbacksController < ApplicationController
 
     # Fallback: parse name field
     if first_name.blank? || last_name.blank?
-      full_name = auth.info.name || auth.info.nickname || 'User'
-      name_parts = full_name.split(' ')
+      full_name = auth.info.name || auth.info.nickname || "User"
+      name_parts = full_name.split(" ")
 
-      first_name = name_parts.first || 'User'
-      last_name = name_parts[1..].join(' ').presence || 'Account'
+      first_name = name_parts.first || "User"
+      last_name = name_parts[1..].join(" ").presence || "Account"
     end
 
-    [first_name, last_name]
+    [ first_name, last_name ]
   end
 
   def generate_unique_slug(name)

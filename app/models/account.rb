@@ -11,7 +11,7 @@ class Account < ApplicationRecord
   validates :name, presence: true, length: { maximum: 100 }
   validates :slug, presence: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 50 }
   validates :subdomain, uniqueness: { case_sensitive: false }, allow_nil: true,
-                        format: { with: /\A[a-z0-9]+\z/i, message: 'can only contain letters and numbers' }
+                        format: { with: /\A[a-z0-9]+\z/i, message: "can only contain letters and numbers" }
   validate :subdomain_not_reserved
 
   # Callbacks
@@ -27,29 +27,29 @@ class Account < ApplicationRecord
 
   # Scopes
   scope :active, -> { where(subscription_status: %w[trialing active]) }
-  scope :trialing, -> { where(subscription_status: 'trialing') }
-  scope :paying, -> { where(subscription_status: 'active') }
+  scope :trialing, -> { where(subscription_status: "trialing") }
+  scope :paying, -> { where(subscription_status: "active") }
 
   # Instance methods
   def trial_expired?
-    subscription_status == 'trialing' && trial_ends_at.present? && trial_ends_at < Time.current
+    subscription_status == "trialing" && trial_ends_at.present? && trial_ends_at < Time.current
   end
 
   def active?
-    return true if subscription_status == 'active'
-    return true if subscription_status == 'trialing' && !trial_expired?
+    return true if subscription_status == "active"
+    return true if subscription_status == "trialing" && !trial_expired?
 
     false
   end
 
   def days_remaining_in_trial
-    return 0 unless subscription_status == 'trialing' && trial_ends_at.present?
+    return 0 unless subscription_status == "trialing" && trial_ends_at.present?
 
-    [(trial_ends_at.to_date - Date.current).to_i, 0].max
+    [ (trial_ends_at.to_date - Date.current).to_i, 0 ].max
   end
 
   def owner
-    memberships.find_by(role: 'owner')&.user
+    memberships.find_by(role: "owner")&.user
   end
 
   def admins
@@ -73,12 +73,12 @@ class Account < ApplicationRecord
 
   def set_trial_period
     self.trial_ends_at ||= 14.days.from_now
-    self.subscription_status ||= 'trialing'
+    self.subscription_status ||= "trialing"
   end
 
   def subdomain_not_reserved
     return unless subdomain.present? && RESERVED_SUBDOMAINS.include?(subdomain.downcase)
 
-    errors.add(:subdomain, 'is reserved')
+    errors.add(:subdomain, "is reserved")
   end
 end
