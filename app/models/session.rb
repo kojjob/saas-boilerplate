@@ -7,7 +7,7 @@ class Session < ApplicationRecord
   before_create :set_last_active
 
   # Scopes
-  scope :active, -> { where('created_at > ?', 30.days.ago) }
+  scope :active, -> { where("created_at > ?", 30.days.ago) }
   scope :recent, -> { order(created_at: :desc) }
 
   def touch_last_active!
@@ -19,43 +19,43 @@ class Session < ApplicationRecord
   end
 
   def device_info
-    return 'Unknown' if user_agent.blank?
+    return "Unknown" if user_agent.blank?
 
     # Simple device detection
     case user_agent
     when /iPhone/i
-      'iPhone'
+      "iPhone"
     when /iPad/i
-      'iPad'
+      "iPad"
     when /Android/i
-      'Android'
+      "Android"
     when /Mac/i
-      'Mac'
+      "Mac"
     when /Windows/i
-      'Windows'
+      "Windows"
     when /Linux/i
-      'Linux'
+      "Linux"
     else
-      'Unknown'
+      "Unknown"
     end
   end
 
   def browser_info
-    return 'Unknown' if user_agent.blank?
+    return "Unknown" if user_agent.blank?
 
     case user_agent
     when /Chrome/i
-      'Chrome'
+      "Chrome"
     when /Firefox/i
-      'Firefox'
+      "Firefox"
     when /Safari/i
-      'Safari'
+      "Safari"
     when /Edge/i
-      'Edge'
+      "Edge"
     when /Opera/i
-      'Opera'
+      "Opera"
     else
-      'Unknown'
+      "Unknown"
     end
   end
 

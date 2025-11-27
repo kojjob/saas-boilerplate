@@ -1,0 +1,14 @@
+{
+  "ignored_warnings": [
+    {
+      "fingerprint": "2c865b9b02ebec25f5b09b39077268b93fa532f488fe4f3dc142fd0cedbd975b",
+      "note": "Role assignment is protected by Pundit authorization (authorize Membership, :invite?) and explicit role validation in available_roles method which restricts roles based on user's own role"
+    },
+    {
+      "fingerprint": "4220909bae83041c1aacf284c71e09e813cec1e5f47125d038ba18eee93f883e",
+      "note": "Role update is protected by Pundit authorization (authorize @membership) and explicit owner role prevention check (new_role == 'owner' returns 422)"
+    }
+  ],
+  "updated": "2024-11-27",
+  "brakeman_version": "7.0.0"
+}

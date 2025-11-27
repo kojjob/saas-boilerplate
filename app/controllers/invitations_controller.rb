@@ -4,7 +4,7 @@ class InvitationsController < ApplicationController
   before_action :authenticate_user!
   before_action :set_account
   before_action :authorize_invitation_management
-  before_action :set_invitation, only: [:destroy, :resend]
+  before_action :set_invitation, only: [ :destroy, :resend ]
 
   def new
     @invitation = Membership.new
@@ -17,7 +17,7 @@ class InvitationsController < ApplicationController
     # Check for existing membership
     existing_user = User.find_by(email: email)
     if existing_user && @account.memberships.exists?(user: existing_user)
-      flash.now[:alert] = 'This user is already a member of this account.'
+      flash.now[:alert] = "This user is already a member of this account."
       @invitation = Membership.new(invitation_params)
       @available_roles = available_roles
       render :new, status: :unprocessable_entity
@@ -26,7 +26,7 @@ class InvitationsController < ApplicationController
 
     # Check for pending invitation
     if @account.memberships.pending.exists?(invitation_email: email)
-      flash.now[:alert] = 'An invitation has already been sent to this email address.'
+      flash.now[:alert] = "An invitation has already been sent to this email address."
       @invitation = Membership.new(invitation_params)
       @available_roles = available_roles
       render :new, status: :unprocessable_entity
@@ -36,7 +36,7 @@ class InvitationsController < ApplicationController
     # Validate role
     role = invitation_params[:role]
     unless available_roles.include?(role)
-      flash.now[:alert] = 'Invalid role selected.'
+      flash.now[:alert] = "Invalid role selected."
       @invitation = Membership.new(invitation_params)
       @available_roles = available_roles
       render :new, status: :unprocessable_entity
@@ -54,7 +54,7 @@ class InvitationsController < ApplicationController
 
     redirect_to account_members_path, notice: "Invitation sent to #{email}."
   rescue ActiveRecord::RecordInvalid => e
-    flash.now[:alert] = e.record.errors.full_messages.join(', ')
+    flash.now[:alert] = e.record.errors.full_messages.join(", ")
     @invitation = Membership.new(invitation_params)
     @available_roles = available_roles
     render :new, status: :unprocessable_entity
@@ -94,7 +94,7 @@ class InvitationsController < ApplicationController
   def authorize_invitation_management
     membership = @account.memberships.find_by(user: current_user)
     unless membership&.can_manage_members?
-      redirect_to dashboard_path, alert: 'You do not have permission to manage invitations.'
+      redirect_to dashboard_path, alert: "You do not have permission to manage invitations."
     end
   end
 

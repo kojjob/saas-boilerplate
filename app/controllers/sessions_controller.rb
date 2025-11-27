@@ -2,7 +2,7 @@
 
 class SessionsController < ApplicationController
   skip_before_action :set_current_tenant_from_subdomain
-  before_action :redirect_if_signed_in, only: [:new, :create]
+  before_action :redirect_if_signed_in, only: [ :new, :create ]
 
   def new
     # Render sign in form
@@ -15,21 +15,21 @@ class SessionsController < ApplicationController
       sign_in(user)
       set_tenant_for_user(user)
       session[:current_account_id] = current_account&.id
-      redirect_to stored_location_or(dashboard_path), notice: 'Signed in successfully.'
+      redirect_to stored_location_or(dashboard_path), notice: "Signed in successfully."
     else
-      flash.now[:alert] = 'Invalid email or password.'
+      flash.now[:alert] = "Invalid email or password."
       render :new, status: :unprocessable_entity
     end
   end
 
   def destroy
     sign_out
-    redirect_to root_path, notice: 'Signed out successfully.'
+    redirect_to root_path, notice: "Signed out successfully."
   end
 
   private
 
   def redirect_if_signed_in
-    redirect_to dashboard_path, notice: 'You are already signed in.' if signed_in?
+    redirect_to dashboard_path, notice: "You are already signed in." if signed_in?
   end
 end
