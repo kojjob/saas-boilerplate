@@ -55,7 +55,7 @@ gem "acts_as_tenant", "~> 1.0"
 gem "pundit", "~> 2.4"
 
 # Billing - Stripe subscription management
-gem "pay", "~> 8.0"
+gem "pay", "~> 11.4"
 gem "stripe", "~> 13.0"
 
 # Audit logging - Version tracking for models
