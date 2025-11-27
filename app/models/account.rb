@@ -3,6 +3,9 @@
 class Account < ApplicationRecord
   include Discard::Model
 
+  # Audit logging
+  audited
+
   # Pay gem integration for billing
   pay_customer default_payment_processor: :stripe
 

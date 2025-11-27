@@ -5,6 +5,9 @@ class User < ApplicationRecord
 
   has_secure_password
 
+  # Audit logging - exclude sensitive fields
+  audited except: %i[password_digest password reset_password_token confirmation_token]
+
   # Associations
   has_many :memberships, dependent: :destroy
   has_many :accounts, through: :memberships
