@@ -53,6 +53,18 @@ Rails.application.routes.draw do
   post "invitations/:token/accept", to: "invitation_acceptances#create"
 
   # ==================================
+  # Billing Routes
+  # ==================================
+  get "billing", to: "billing#index", as: :billing
+  get "billing/portal", to: "billing#portal", as: :billing_portal
+  post "billing/checkout", to: "billing#checkout", as: :billing_checkout
+  get "billing/success", to: "billing#success", as: :billing_success
+  get "billing/cancel", to: "billing#cancel", as: :billing_cancel
+
+  # Pay webhook for Stripe events
+  post "pay/webhooks/stripe", to: "pay/webhooks/stripe#create"
+
+  # ==================================
   # Dashboard
   # ==================================
   get "dashboard", to: "dashboard#show", as: :dashboard

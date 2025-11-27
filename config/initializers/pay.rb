@@ -1,0 +1,30 @@
+# frozen_string_literal: true
+
+Pay.setup do |config|
+  # For use in the receipt/refund/renewal mailers
+  config.business_name = "SaaS Boilerplate"
+  config.business_address = "123 Main Street"
+  config.application_name = "SaaS Boilerplate"
+  config.support_email = "support@example.com"
+
+  # Stripe configuration
+  config.default_product_name = "SaaS Boilerplate"
+  config.default_plan_name = "default"
+
+  # Enable or disable specific payment processors
+  config.enabled_processors = [:stripe]
+
+  # Send emails for receipts/invoices
+  config.send_emails = false # Disable emails in development/test
+end
+
+# Register webhook handlers for subscription events
+# These handlers update our Account model when Stripe subscription status changes
+Rails.application.config.to_prepare do
+  subscription_handler = Pay::Webhooks::SubscriptionHandler.new
+
+  Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.created", subscription_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.updated", subscription_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.deleted", subscription_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.trial_will_end", subscription_handler)
+end
