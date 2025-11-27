@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html class="h-full">
   <head>
     <title><%= content_for(:title) || "Deployable" %></title>
     <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -23,9 +23,28 @@
     <%= javascript_importmap_tags %>
   </head>
 
-  <body>
-    <main class="">
+  <body class="min-h-full flex flex-col bg-slate-50 text-slate-900 antialiased">
+    <%# Skip to main content link for accessibility %>
+    <a href="#main-content" class="sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:px-4 focus:py-2 focus:bg-indigo-600 focus:text-white focus:rounded-lg">
+      Skip to main content
+    </a>
+
+    <%# Flash messages %>
+    <%= render "shared/flash" %>
+
+    <%# Navigation - conditionally render based on layout type %>
+    <% unless content_for?(:hide_navbar) %>
+      <%= render "shared/navbar" %>
+    <% end %>
+
+    <%# Main content area %>
+    <main id="main-content" class="flex-1">
       <%= yield %>
     </main>
+
+    <%# Footer - conditionally render based on layout type %>
+    <% unless content_for?(:hide_footer) %>
+      <%= render "shared/footer" %>
+    <% end %>
   </body>
 </html>
