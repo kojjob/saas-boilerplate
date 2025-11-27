@@ -8,6 +8,7 @@ module TenantScoping
   included do
     set_current_tenant_through_filter
     before_action :set_current_tenant_from_subdomain, if: :subdomain_request?
+    before_action :set_current_tenant_from_session, unless: :subdomain_request?
     helper_method :current_account
   end
 
@@ -26,6 +27,13 @@ module TenantScoping
     set_current_tenant(account) if account
   end
 
+  def set_current_tenant_from_session
+    return unless session[:current_account_id]
+
+    account = Account.find_by(id: session[:current_account_id])
+    set_current_tenant(account) if account
+  end
+
   # Allow setting tenant for authenticated users who belong to multiple accounts
   def set_tenant_for_user(user, account = nil)
     return unless user
@@ -34,6 +42,7 @@ module TenantScoping
     return unless target_account && user.accounts.include?(target_account)
 
     set_current_tenant(target_account)
+    session[:current_account_id] = target_account.id
   end
 
   # Verify user has access to current tenant

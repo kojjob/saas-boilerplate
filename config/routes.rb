@@ -33,6 +33,12 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Public Invitation Acceptance
+  # ==================================
+  get "invitations/:token/accept", to: "invitation_acceptances#show", as: :accept_invitation
+  post "invitations/:token/accept", to: "invitation_acceptances#create"
+
+  # ==================================
   # Dashboard
   # ==================================
   get "dashboard", to: "dashboard#show", as: :dashboard
