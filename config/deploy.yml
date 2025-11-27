@@ -1,0 +1,150 @@
+# Kamal 2.0 Deployment Configuration for SaaS Boilerplate
+#
+# Documentation: https://kamal-deploy.org
+#
+# This configuration supports:
+# - Rails 8 with Solid Queue for background jobs
+# - PostgreSQL database as accessory
+# - Multi-server deployment (web + jobs)
+# - SSL with Let's Encrypt
+# - Asset bridging for zero-downtime deploys
+
+service: saas-boilerplate
+
+# Docker image name (update with your registry/username)
+image: your-registry/saas-boilerplate
+
+# Deploy servers
+servers:
+  web:
+    hosts:
+      - 192.168.1.1  # Replace with your web server IP
+    labels:
+      traefik.http.routers.saas-boilerplate.rule: Host(`app.example.com`)
+    options:
+      memory: 512m
+
+  # Background job worker (Solid Queue)
+  job:
+    hosts:
+      - 192.168.1.1  # Replace with your job server IP
+    cmd: bin/jobs
+    options:
+      memory: 256m
+
+# SSL and proxy configuration via Kamal Proxy
+proxy:
+  ssl: true
+  host: app.example.com  # Replace with your domain
+  app_port: 3000
+  healthcheck:
+    path: /up
+    interval: 3
+    timeout: 3
+
+# Container registry credentials
+registry:
+  server: ghcr.io  # GitHub Container Registry (or docker.io, registry.digitalocean.com, etc.)
+  username:
+    - KAMAL_REGISTRY_USERNAME
+  password:
+    - KAMAL_REGISTRY_PASSWORD
+
+# Build configuration
+builder:
+  arch: amd64
+  cache:
+    type: registry
+    options: mode=max
+  args:
+    RUBY_VERSION: "3.4"
+    BUNDLER_VERSION: "2.5"
+
+# Environment variables
+env:
+  clear:
+    RAILS_ENV: production
+    RAILS_LOG_TO_STDOUT: true
+    RAILS_SERVE_STATIC_FILES: true
+    WEB_CONCURRENCY: 2
+    SOLID_QUEUE_IN_PUMA: false
+    # Database will connect via DATABASE_URL secret
+  secret:
+    - RAILS_MASTER_KEY
+    - DATABASE_URL
+    - REDIS_URL
+    - SECRET_KEY_BASE
+    - DEFAULT_FROM_EMAIL
+    - DEFAULT_FROM_NAME
+    - GOOGLE_CLIENT_ID
+    - GOOGLE_CLIENT_SECRET
+    - STRIPE_PUBLISHABLE_KEY
+    - STRIPE_SECRET_KEY
+    - STRIPE_WEBHOOK_SECRET
+
+# Persistent storage volumes
+volumes:
+  - "saas_storage:/rails/storage"
+  - "saas_logs:/rails/log"
+
+# Asset bridging for zero-downtime deploys
+asset_path: /rails/public/assets
+
+# Rolling deploy configuration
+boot:
+  limit: 1  # Deploy one container at a time
+  wait: 5   # Wait 5 seconds between restarts
+
+# SSH configuration
+ssh:
+  user: deploy  # Non-root user for security
+  # keys:
+  #   - ~/.ssh/id_rsa
+
+# Accessory services
+accessories:
+  # PostgreSQL database
+  db:
+    image: postgres:16-alpine
+    host: 192.168.1.1  # Replace with your database server IP
+    port: 5432
+    env:
+      clear:
+        POSTGRES_DB: saas_production
+        POSTGRES_USER: saas
+      secret:
+        - POSTGRES_PASSWORD
+    directories:
+      - data:/var/lib/postgresql/data
+    options:
+      memory: 512m
+
+  # Redis for Action Cable (optional, remove if using Solid Cable)
+  # redis:
+  #   image: redis:7-alpine
+  #   host: 192.168.1.1
+  #   port: 6379
+  #   directories:
+  #     - data:/data
+  #   options:
+  #     memory: 128m
+  #     cpus: 0.5
+
+# Useful aliases
+aliases:
+  console: app exec --interactive --reuse "bin/rails console"
+  shell: app exec --interactive --reuse "bash"
+  logs: app logs
+  dbconsole: app exec --interactive --reuse "bin/rails dbconsole"
+  migrate: app exec "bin/rails db:migrate"
+  seed: app exec "bin/rails db:seed"
+
+# Health check configuration
+healthcheck:
+  path: /up
+  port: 3000
+  max_attempts: 10
+  interval: 20s
+
+# Retain previous releases for quick rollback
+retain_containers: 3

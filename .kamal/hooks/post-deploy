@@ -1,0 +1,47 @@
+#!/bin/bash
+
+# Post-deploy hook - Verify deployment and send notifications
+# This runs after the deployment is complete
+
+set -e
+
+echo "=== Post-deploy Hook ==="
+echo "Version: $KAMAL_VERSION"
+echo "Performer: $KAMAL_PERFORMER"
+echo "Recorded at: $KAMAL_RECORDED_AT"
+
+# Wait for the health check to pass
+echo "Waiting for health check to pass..."
+sleep 5
+
+# Get deployment info
+DEPLOY_TIME=$(date -u +"%Y-%m-%dT%H:%M:%SZ")
+GIT_SHA=$(git rev-parse --short HEAD 2>/dev/null || echo "unknown")
+GIT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "unknown")
+
+echo "Deployment completed successfully!"
+echo "  - Time: $DEPLOY_TIME"
+echo "  - Git SHA: $GIT_SHA"
+echo "  - Branch: $GIT_BRANCH"
+echo "  - Version: $KAMAL_VERSION"
+
+# Optional: Send Slack notification
+# Uncomment and configure if using Slack
+# if [ -n "$SLACK_WEBHOOK_URL" ]; then
+#   curl -s -X POST "$SLACK_WEBHOOK_URL" \
+#     -H "Content-Type: application/json" \
+#     -d "{
+#       \"text\": \"Deployment completed\",
+#       \"blocks\": [
+#         {
+#           \"type\": \"section\",
+#           \"text\": {
+#             \"type\": \"mrkdwn\",
+#             \"text\": \"*Deployment Successful* :rocket:\n*Version:* $KAMAL_VERSION\n*SHA:* $GIT_SHA\n*Branch:* $GIT_BRANCH\n*Deployed by:* $KAMAL_PERFORMER\"
+#           }
+#         }
+#       ]
+#     }"
+# fi
+
+echo "Post-deploy hook completed successfully"
