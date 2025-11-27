@@ -1,1 +1,144 @@
 @import "tailwindcss";
+
+/* ============================================
+   Custom Component Styles for UI Partials
+   ============================================ */
+
+/* Navigation Links */
+@utility nav-link {
+  @apply flex items-center gap-2 px-3 py-2 text-sm font-medium text-slate-600 rounded-lg hover:text-slate-900 hover:bg-slate-100 transition-colors duration-150;
+}
+
+/* Mobile Navigation Links */
+@utility mobile-nav-link {
+  @apply flex items-center gap-3 px-3 py-2.5 text-base font-medium text-slate-700 rounded-lg hover:bg-slate-100 transition-colors duration-150;
+}
+
+/* Dropdown Menu Items */
+@utility dropdown-item {
+  @apply flex items-center gap-2 px-4 py-2 text-sm text-slate-700 hover:bg-slate-50 transition-colors duration-150;
+}
+
+/* Footer Links */
+@utility footer-link {
+  @apply text-sm text-slate-400 hover:text-white transition-colors duration-200;
+}
+
+/* Social Link Icons */
+@utility social-link {
+  @apply w-9 h-9 flex items-center justify-center rounded-lg bg-slate-800 text-slate-400 hover:bg-slate-700 hover:text-white transition-all duration-200;
+}
+
+/* Primary Button */
+@utility btn-primary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg shadow-md hover:from-indigo-600 hover:to-purple-700 hover:shadow-lg transition-all duration-200;
+}
+
+/* Secondary Button */
+@utility btn-secondary {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-200 rounded-lg hover:bg-slate-50 hover:border-slate-300 transition-all duration-200;
+}
+
+/* ============================================
+   Animations
+   ============================================ */
+
+/* Slide in from right animation */
+@keyframes slide-in {
+  from {
+    opacity: 0;
+    transform: translateX(100%);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@utility animate-slide-in {
+  animation: slide-in 0.3s ease-out forwards;
+}
+
+/* Progress bar shrink animation */
+@keyframes progress-shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+@utility animate-progress-shrink {
+  animation: progress-shrink linear forwards;
+}
+
+/* Fade in up animation */
+@keyframes fade-in-up {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@utility animate-fade-in-up {
+  animation: fade-in-up 0.2s ease-out forwards;
+}
+
+/* ============================================
+   Additional utility classes
+   ============================================ */
+
+/* Gradient text */
+@utility text-gradient {
+  @apply bg-gradient-to-r from-indigo-500 to-purple-600 bg-clip-text text-transparent;
+}
+
+/* Glass effect */
+@utility glass {
+  @apply bg-white/80 backdrop-blur-lg border border-white/20;
+}
+
+/* Card with shadow */
+@utility card {
+  @apply bg-white rounded-xl shadow-sm border border-slate-200;
+}
+
+/* Form input styles */
+@utility form-input {
+  @apply block w-full px-4 py-2.5 text-slate-900 bg-white border border-slate-300 rounded-lg shadow-sm placeholder:text-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-colors duration-150;
+}
+
+/* Form label styles */
+@utility form-label {
+  @apply block text-sm font-medium text-slate-700 mb-1.5;
+}
+
+/* Badge styles */
+@utility badge {
+  @apply inline-flex items-center px-2.5 py-0.5 text-xs font-medium rounded-full;
+}
+
+@utility badge-success {
+  @apply badge bg-emerald-100 text-emerald-700;
+}
+
+@utility badge-warning {
+  @apply badge bg-amber-100 text-amber-700;
+}
+
+@utility badge-error {
+  @apply badge bg-red-100 text-red-700;
+}
+
+@utility badge-info {
+  @apply badge bg-blue-100 text-blue-700;
+}
+
+@utility badge-neutral {
+  @apply badge bg-slate-100 text-slate-700;
+}
