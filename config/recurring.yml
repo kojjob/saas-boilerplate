@@ -1,0 +1,44 @@
+# Solid Queue Recurring Jobs Configuration
+#
+# Schedule format examples:
+#   every second
+#   every 2 seconds
+#   every minute
+#   every 5 minutes
+#   every hour
+#   every day at 3am
+#   every Monday at 5pm
+#   at 5am every day
+#
+# Job configuration:
+#   class: The job class name (e.g., CleanupExpiredSessionsJob)
+#   command: Raw Ruby command to execute (alternative to class)
+#   queue: Queue name (defaults to job's configured queue)
+#   args: Arguments to pass to the job
+#   priority: Job priority (lower = higher priority)
+#   schedule: When to run
+
+# Development and test environments don't run recurring jobs automatically
+development: {}
+
+test: {}
+
+production:
+  # Clean up expired user sessions daily at 3am
+  cleanup_expired_sessions:
+    class: CleanupExpiredSessionsJob
+    queue: maintenance
+    args:
+      expiry_days: 30
+    schedule: every day at 3am
+
+  # Clear finished Solid Queue jobs hourly
+  clear_solid_queue_finished_jobs:
+    command: "SolidQueue::Job.clear_finished_in_batches(sleep_between_batches: 0.3)"
+    schedule: every hour at minute 12
+
+  # Clean up old audit logs monthly (keep 1 year)
+  cleanup_old_audits:
+    command: "Audited::Audit.where('created_at < ?', 1.year.ago).in_batches(of: 1000).delete_all"
+    queue: maintenance
+    schedule: at 2am on the 1st of every month
