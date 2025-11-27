@@ -1,13 +1,178 @@
 <!DOCTYPE html>
-<html>
-  <head>
-    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-    <style>
-      /* Email styles need to be inline */
-    </style>
-  </head>
+<html lang="en" xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml" xmlns:o="urn:schemas-microsoft-com:office:office">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="x-apple-disable-message-reformatting">
+  <meta name="format-detection" content="telephone=no, date=no, address=no, email=no">
+  <title><%= @subject || company_name %></title>
+  <!--[if mso]>
+  <noscript>
+    <xml>
+      <o:OfficeDocumentSettings>
+        <o:PixelsPerInch>96</o:PixelsPerInch>
+      </o:OfficeDocumentSettings>
+    </xml>
+  </noscript>
+  <![endif]-->
+  <style type="text/css">
+    /* Reset styles */
+    body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+    table, td { mso-table-lspace: 0pt; mso-table-rspace: 0pt; }
+    img { -ms-interpolation-mode: bicubic; border: 0; height: auto; line-height: 100%; outline: none; text-decoration: none; }
+    body { margin: 0; padding: 0; width: 100%; height: 100%; }
 
-  <body>
-    <%= yield %>
-  </body>
+    /* Base styles */
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+      font-size: 16px;
+      line-height: 1.625;
+      color: #374151;
+      background-color: #f3f4f6;
+    }
+
+    /* Link styles */
+    a {
+      color: #4F46E5;
+      text-decoration: underline;
+    }
+    a:hover {
+      color: #4338CA;
+    }
+
+    /* Responsive styles */
+    @media screen and (max-width: 600px) {
+      .email-wrapper {
+        width: 100% !important;
+        padding: 12px !important;
+      }
+      .email-content {
+        padding: 24px !important;
+      }
+      .email-body {
+        padding: 0 !important;
+      }
+      .button-td,
+      .button-a {
+        display: block !important;
+        width: 100% !important;
+        text-align: center !important;
+      }
+    }
+
+    /* Dark mode support */
+    @media (prefers-color-scheme: dark) {
+      body {
+        background-color: #1f2937 !important;
+      }
+      .email-body {
+        background-color: #111827 !important;
+      }
+      .email-content {
+        background-color: #111827 !important;
+      }
+      h1, h2, h3, h4, h5, h6 {
+        color: #f9fafb !important;
+      }
+      p, td {
+        color: #d1d5db !important;
+      }
+      .email-footer {
+        background-color: #1f2937 !important;
+      }
+      .footer-text {
+        color: #9ca3af !important;
+      }
+    }
+  </style>
+</head>
+<body style="margin: 0; padding: 0; background-color: #f3f4f6;">
+  <!-- Preview text (hidden in email body) -->
+  <div style="display: none; max-height: 0; overflow: hidden;">
+    <%= @preview_text || "" %>
+    &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847; &#847;
+  </div>
+
+  <!-- Email wrapper -->
+  <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #f3f4f6;">
+    <tr>
+      <td align="center" valign="top" style="padding: 24px 16px;">
+        <!-- Email container -->
+        <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" class="email-wrapper" style="max-width: 600px; margin: 0 auto;">
+
+          <!-- Header -->
+          <tr>
+            <td align="center" style="padding: 24px 0;">
+              <a href="<%= root_url rescue '#' %>" target="_blank" style="text-decoration: none;">
+                <img src="<%= app_logo_url %>" alt="<%= company_name %>" width="150" height="50" style="display: block; max-width: 150px; height: auto;">
+              </a>
+            </td>
+          </tr>
+
+          <!-- Email body -->
+          <tr>
+            <td class="email-body" style="padding: 0;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%" style="background-color: #ffffff; border-radius: 12px; box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);">
+                <tr>
+                  <td class="email-content" style="padding: 40px;">
+                    <%= yield %>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+          <!-- Footer -->
+          <tr>
+            <td class="email-footer" style="padding: 32px 24px;">
+              <table role="presentation" cellspacing="0" cellpadding="0" border="0" width="100%">
+                <tr>
+                  <td align="center" style="padding-bottom: 16px;">
+                    <!-- Social links (optional) -->
+                    <table role="presentation" cellspacing="0" cellpadding="0" border="0">
+                      <tr>
+                        <td style="padding: 0 8px;">
+                          <a href="#" target="_blank" style="text-decoration: none;">
+                            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/twitter.svg" alt="Twitter" width="24" height="24" style="display: block; filter: invert(50%);">
+                          </a>
+                        </td>
+                        <td style="padding: 0 8px;">
+                          <a href="#" target="_blank" style="text-decoration: none;">
+                            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/linkedin.svg" alt="LinkedIn" width="24" height="24" style="display: block; filter: invert(50%);">
+                          </a>
+                        </td>
+                        <td style="padding: 0 8px;">
+                          <a href="#" target="_blank" style="text-decoration: none;">
+                            <img src="https://cdn.jsdelivr.net/npm/simple-icons@v9/icons/github.svg" alt="GitHub" width="24" height="24" style="display: block; filter: invert(50%);">
+                          </a>
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" class="footer-text" style="font-size: 13px; line-height: 1.5; color: #6b7280;">
+                    <p style="margin: 0 0 8px 0;">
+                      &copy; <%= copyright_year %> <%= company_name %>. All rights reserved.
+                    </p>
+                    <p style="margin: 0 0 8px 0;">
+                      Questions? Contact us at <a href="mailto:<%= support_email %>" style="color: #4F46E5;"><%= support_email %></a>
+                    </p>
+                    <% if defined?(@unsubscribe_url) && @unsubscribe_url.present? %>
+                      <p style="margin: 0;">
+                        <a href="<%= @unsubscribe_url %>" style="color: #9ca3af; font-size: 12px;">Unsubscribe from these emails</a>
+                      </p>
+                    <% end %>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
 </html>
