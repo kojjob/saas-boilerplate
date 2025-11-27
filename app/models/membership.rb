@@ -4,14 +4,14 @@ class Membership < ApplicationRecord
   # Associations
   belongs_to :user, optional: true # Optional for pending invitations
   belongs_to :account
-  belongs_to :invited_by, class_name: 'User', optional: true
+  belongs_to :invited_by, class_name: "User", optional: true
 
   # Enums
-  enum :role, { owner: 'owner', admin: 'admin', member: 'member', guest: 'guest' }, default: :member
+  enum :role, { owner: "owner", admin: "admin", member: "member", guest: "guest" }, default: :member
 
   # Validations
   validates :role, presence: true
-  validates :user_id, uniqueness: { scope: :account_id, message: 'is already a member of this account' }, allow_nil: true
+  validates :user_id, uniqueness: { scope: :account_id, message: "is already a member of this account" }, allow_nil: true
   validates :invitation_email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, if: :pending_invitation?
   validate :owner_role_immutable, on: :update
   validate :single_owner_per_account, on: :create
@@ -22,7 +22,7 @@ class Membership < ApplicationRecord
   # Scopes
   scope :active, -> { where.not(accepted_at: nil) }
   scope :pending, -> { where(accepted_at: nil).where.not(invitation_token: nil) }
-  scope :owners, -> { where(role: 'owner') }
+  scope :owners, -> { where(role: "owner") }
   scope :admins, -> { where(role: %w[owner admin]) }
 
   # Class methods
@@ -78,7 +78,7 @@ class Membership < ApplicationRecord
   private
 
   def owner_role_immutable
-    return unless role_changed? && role_was == 'owner'
+    return unless role_changed? && role_was == "owner"
 
     errors.add(:role, "cannot be changed for the account owner")
   end

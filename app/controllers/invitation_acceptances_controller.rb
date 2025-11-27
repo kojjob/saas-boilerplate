@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class InvitationAcceptancesController < ApplicationController
-  skip_before_action :authenticate_user!, only: [:show, :create], raise: false
+  skip_before_action :authenticate_user!, only: [ :show, :create ], raise: false
   before_action :set_membership
   before_action :validate_invitation
   before_action :check_email_match, if: :signed_in?
@@ -52,12 +52,12 @@ class InvitationAcceptancesController < ApplicationController
 
   def validate_invitation
     if @membership.nil?
-      redirect_to sign_in_path, alert: 'This invitation is invalid or has already been used.'
+      redirect_to sign_in_path, alert: "This invitation is invalid or has already been used."
       return
     end
 
     if @membership.invitation_expired?
-      redirect_to sign_in_path, alert: 'This invitation has expired. Please request a new one.'
+      redirect_to sign_in_path, alert: "This invitation has expired. Please request a new one."
     end
   end
 
@@ -65,7 +65,7 @@ class InvitationAcceptancesController < ApplicationController
     return unless @membership
 
     if current_user.email != @membership.invitation_email
-      redirect_to dashboard_path, alert: 'This invitation was sent to a different email address. Please sign in with the correct account.'
+      redirect_to dashboard_path, alert: "This invitation was sent to a different email address. Please sign in with the correct account."
     end
   end
 

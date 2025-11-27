@@ -14,7 +14,7 @@ class CreateMemberships < ActiveRecord::Migration[8.1]
     end
 
     add_index :memberships, :invitation_token, unique: true, where: 'invitation_token IS NOT NULL'
-    add_index :memberships, [:user_id, :account_id], unique: true, where: 'user_id IS NOT NULL'
+    add_index :memberships, [ :user_id, :account_id ], unique: true, where: 'user_id IS NOT NULL'
     add_index :memberships, :role
   end
 end
