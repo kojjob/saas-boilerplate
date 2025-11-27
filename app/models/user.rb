@@ -2,6 +2,7 @@
 
 class User < ApplicationRecord
   include Discard::Model
+  include Cacheable
 
   has_secure_password
 

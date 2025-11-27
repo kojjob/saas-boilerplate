@@ -2,6 +2,7 @@
 
 class Account < ApplicationRecord
   include Discard::Model
+  include Cacheable
 
   # Associations
   has_many :memberships, dependent: :destroy
