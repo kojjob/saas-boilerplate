@@ -4,32 +4,21 @@ class MembersController < ApplicationController
   before_action :authenticate_user!
   before_action :set_account
   before_action :set_membership, only: [:update, :destroy]
-  before_action :authorize_member_management, only: [:update, :destroy]
 
   def index
-    @memberships = @account.memberships.includes(:user, :invited_by).order(created_at: :asc)
+    authorize Membership
+    @memberships = policy_scope(Membership).includes(:user, :invited_by).order(created_at: :asc)
     @current_membership = @account.memberships.find_by(user: current_user)
   end
 
   def update
+    authorize @membership
+
     new_role = membership_params[:role]
 
-    # Prevent changing to owner role
+    # Prevent changing to owner role via update
     if new_role == 'owner'
       render json: { error: 'Cannot assign owner role' }, status: :unprocessable_entity
-      return
-    end
-
-    # Prevent owner from changing their own role
-    if @membership.owner?
-      render json: { error: 'Cannot change owner role' }, status: :unprocessable_entity
-      return
-    end
-
-    # Admins cannot change other admin roles (only owners can)
-    user_membership = @account.memberships.find_by(user: current_user)
-    if user_membership.admin? && @membership.admin?
-      render json: { error: 'Admins cannot change other admin roles' }, status: :unprocessable_entity
       return
     end
 
@@ -41,18 +30,7 @@ class MembersController < ApplicationController
   end
 
   def destroy
-    # Prevent owner from removing themselves
-    if @membership.owner?
-      render json: { error: 'Cannot remove the account owner' }, status: :unprocessable_entity
-      return
-    end
-
-    # Prevent admins from removing other admins
-    user_membership = @account.memberships.find_by(user: current_user)
-    if user_membership.admin? && @membership.admin?
-      render json: { error: 'Admins cannot remove other admins' }, status: :unprocessable_entity
-      return
-    end
+    authorize @membership
 
     member_name = @membership.user&.full_name || @membership.invitation_email
     @membership.destroy
@@ -72,6 +50,9 @@ class MembersController < ApplicationController
       redirect_to account_members_path, alert: 'Account owners cannot leave. Transfer ownership first.'
       return
     end
+
+    # Use policy to check if user can leave (destroy their own membership)
+    authorize membership, :destroy?
 
     membership.destroy
 
@@ -96,12 +77,5 @@ class MembersController < ApplicationController
 
   def membership_params
     params.require(:membership).permit(:role)
-  end
-
-  def authorize_member_management
-    user_membership = @account.memberships.find_by(user: current_user)
-    unless user_membership&.can_manage_members?
-      redirect_to dashboard_path, alert: 'You do not have permission to manage team members.'
-    end
   end
 end
