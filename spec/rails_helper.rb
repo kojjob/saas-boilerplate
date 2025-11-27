@@ -11,6 +11,7 @@ require 'capybara/rspec'
 require 'webmock/rspec'
 require 'vcr'
 require 'database_cleaner/active_record'
+require 'with_model'
 
 # Start SimpleCov for code coverage
 require 'simplecov'
@@ -66,6 +67,9 @@ RSpec.configure do |config|
 
   # Include Pundit test helpers
   config.include Pundit::Matchers
+
+  # Include WithModel for dynamic model testing
+  config.extend WithModel
 
   # Configure request specs to include helpers
   config.include ActionDispatch::TestProcess::FixtureFile
