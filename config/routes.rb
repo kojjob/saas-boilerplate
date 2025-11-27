@@ -65,6 +65,30 @@ Rails.application.routes.draw do
   post "pay/webhooks/stripe", to: "pay/webhooks/stripe#create"
 
   # ==================================
+  # API V1 Routes
+  # ==================================
+  namespace :api do
+    namespace :v1 do
+      # Authentication
+      scope :auth do
+        post :token, to: "authentication#create", as: :auth_token
+        delete :token, to: "authentication#destroy"
+      end
+
+      # User profile
+      scope :users do
+        get :me, to: "users#me", as: :users_me
+        patch :me, to: "users#update"
+      end
+
+      # Accounts
+      resources :accounts, only: [:index, :show, :update] do
+        resources :memberships, only: [:index, :create, :update, :destroy]
+      end
+    end
+  end
+
+  # ==================================
   # Admin Dashboard
   # ==================================
   namespace :admin do
