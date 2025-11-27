@@ -85,6 +85,17 @@ Rails.application.routes.draw do
       resources :accounts, only: [:index, :show, :update] do
         resources :memberships, only: [:index, :create, :update, :destroy]
       end
+
+      # Notifications
+      resources :notifications, only: [:index, :show, :destroy] do
+        member do
+          post :mark_as_read
+        end
+        collection do
+          post :mark_all_as_read
+          get :unread_count
+        end
+      end
     end
   end
 
@@ -108,6 +119,15 @@ Rails.application.routes.draw do
         post :upgrade
         post :extend_trial
       end
+    end
+  end
+
+  # ==================================
+  # Notifications
+  # ==================================
+  resources :notifications, only: [:index, :show, :destroy] do
+    collection do
+      post :mark_all_as_read
     end
   end
 

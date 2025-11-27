@@ -10,6 +10,7 @@ class User < ApplicationRecord
   has_many :accounts, through: :memberships
   has_many :sessions, dependent: :destroy
   has_many :api_tokens, dependent: :destroy
+  has_many :notifications, dependent: :destroy
 
   # Validations
   validates :first_name, presence: true
