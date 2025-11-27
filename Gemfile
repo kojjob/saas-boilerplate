@@ -55,8 +55,8 @@ gem "acts_as_tenant", "~> 1.0"
 gem "pundit", "~> 2.4"
 
 # Billing - Stripe subscription management
-gem "pay", "~> 8.0"
-gem "stripe", "~> 18.0"
+gem "pay", "~> 11.4"
+gem "stripe", "~> 13.0"
 
 # Audit logging - Version tracking for models
 # Note: paper_trail ~> 16.0 is not compatible with Rails 8.1
