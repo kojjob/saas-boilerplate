@@ -7,7 +7,7 @@ class ConfirmationMailer < ApplicationMailer
 
     mail(
       to: user.email,
-      subject: 'Confirm your email address'
+      subject: "Confirm your email address"
     )
   end
 end

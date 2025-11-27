@@ -2,7 +2,7 @@
 
 class RegistrationsController < ApplicationController
   skip_before_action :set_current_tenant_from_subdomain
-  before_action :redirect_if_signed_in, only: [:new, :create]
+  before_action :redirect_if_signed_in, only: [ :new, :create ]
 
   def new
     @user = User.new
@@ -16,11 +16,11 @@ class RegistrationsController < ApplicationController
     ActiveRecord::Base.transaction do
       @account.save!
       @user.save!
-      Membership.create!(user: @user, account: @account, role: 'owner')
+      Membership.create!(user: @user, account: @account, role: "owner")
       sign_in(@user)
     end
 
-    redirect_to dashboard_path, notice: 'Welcome! Your account has been created.'
+    redirect_to dashboard_path, notice: "Welcome! Your account has been created."
   rescue ActiveRecord::RecordInvalid
     render :new, status: :unprocessable_entity
   end
@@ -36,6 +36,6 @@ class RegistrationsController < ApplicationController
   end
 
   def redirect_if_signed_in
-    redirect_to dashboard_path, notice: 'You are already signed in.' if signed_in?
+    redirect_to dashboard_path, notice: "You are already signed in." if signed_in?
   end
 end

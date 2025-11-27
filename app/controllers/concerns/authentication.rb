@@ -53,7 +53,7 @@ module Authentication
     return if signed_in?
 
     store_location_for_redirect
-    redirect_to sign_in_path, alert: 'Please sign in to continue.'
+    redirect_to sign_in_path, alert: "Please sign in to continue."
   end
 
   # Stores the current URL for redirect after sign in

@@ -18,7 +18,7 @@ module TenantScoping
   end
 
   def subdomain_request?
-    request.subdomain.present? && request.subdomain != 'www'
+    request.subdomain.present? && request.subdomain != "www"
   end
 
   def set_current_tenant_from_subdomain
@@ -41,6 +41,6 @@ module TenantScoping
     return unless current_user && current_account
     return if current_user.accounts.include?(current_account)
 
-    raise ActsAsTenant::Errors::NoTenantSet, 'User does not have access to this account'
+    raise ActsAsTenant::Errors::NoTenantSet, "User does not have access to this account"
   end
 end

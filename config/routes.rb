@@ -4,38 +4,38 @@ Rails.application.routes.draw do
   # ==================================
   # Authentication Routes
   # ==================================
-  get 'sign_in', to: 'sessions#new', as: :sign_in
-  post 'sign_in', to: 'sessions#create'
-  delete 'sign_out', to: 'sessions#destroy', as: :sign_out
+  get "sign_in", to: "sessions#new", as: :sign_in
+  post "sign_in", to: "sessions#create"
+  delete "sign_out", to: "sessions#destroy", as: :sign_out
 
-  get 'sign_up', to: 'registrations#new', as: :sign_up
-  post 'sign_up', to: 'registrations#create'
+  get "sign_up", to: "registrations#new", as: :sign_up
+  post "sign_up", to: "registrations#create"
 
   # Password reset
-  resources :password_resets, only: [:new, :create, :edit, :update], param: :token
+  resources :password_resets, only: [ :new, :create, :edit, :update ], param: :token
 
   # Email confirmation
-  get 'confirm_email/:token', to: 'confirmations#show', as: :confirm_email
-  resources :confirmations, only: [:new, :create]
+  get "confirm_email/:token", to: "confirmations#show", as: :confirm_email
+  resources :confirmations, only: [ :new, :create ]
 
   # OAuth callbacks
-  get 'auth/:provider/callback', to: 'oauth_callbacks#create'
-  get 'auth/failure', to: 'oauth_callbacks#failure'
+  get "auth/:provider/callback", to: "oauth_callbacks#create"
+  get "auth/failure", to: "oauth_callbacks#failure"
 
   # ==================================
   # Account Management Routes
   # ==================================
-  resource :account, only: [:show, :edit, :update] do
+  resource :account, only: [ :show, :edit, :update ] do
     member do
       get :billing
-      post :switch, to: 'accounts#switch'
+      post :switch, to: "accounts#switch"
     end
   end
 
   # ==================================
   # Dashboard
   # ==================================
-  get 'dashboard', to: 'dashboard#show', as: :dashboard
+  get "dashboard", to: "dashboard#show", as: :dashboard
 
   # ==================================
   # Health Check
