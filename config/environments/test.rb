@@ -6,6 +6,10 @@
 Rails.application.configure do
   # Settings specified here will take precedence over those in config/application.rb.
 
+  # Completely disable host authorization for tests
+  # RSpec uses www.example.com by default and we want all hosts allowed in tests
+  config.host_authorization = { exclude: ->(request) { true } }
+
   # While tests run files are not watched, reloading is not necessary.
   config.enable_reloading = false
 

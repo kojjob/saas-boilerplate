@@ -61,6 +61,9 @@ RSpec.configure do |config|
   # Include FactoryBot methods
   config.include FactoryBot::Syntax::Methods
 
+  # Include ActiveSupport TimeHelpers for travel_to, freeze_time, etc.
+  config.include ActiveSupport::Testing::TimeHelpers
+
   # Include Devise test helpers (when we add authentication)
   # config.include Devise::Test::IntegrationHelpers, type: :request
   # config.include Devise::Test::ControllerHelpers, type: :controller
@@ -73,6 +76,7 @@ RSpec.configure do |config|
 
   # Configure request specs to include helpers
   config.include ActionDispatch::TestProcess::FixtureFile
+
 
   # Add Capybara DSL to system specs
   config.include Capybara::DSL, type: :system
