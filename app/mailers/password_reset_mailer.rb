@@ -7,7 +7,7 @@ class PasswordResetMailer < ApplicationMailer
 
     mail(
       to: user.email,
-      subject: 'Reset your password'
+      subject: "Reset your password"
     )
   end
 end
