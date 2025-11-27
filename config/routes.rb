@@ -53,6 +53,85 @@ Rails.application.routes.draw do
   post "invitations/:token/accept", to: "invitation_acceptances#create"
 
   # ==================================
+  # Billing Routes
+  # ==================================
+  get "billing", to: "billing#index", as: :billing
+  get "billing/portal", to: "billing#portal", as: :billing_portal
+  post "billing/checkout", to: "billing#checkout", as: :billing_checkout
+  get "billing/success", to: "billing#success", as: :billing_success
+  get "billing/cancel", to: "billing#cancel", as: :billing_cancel
+
+  # Pay webhook for Stripe events
+  post "pay/webhooks/stripe", to: "pay/webhooks/stripe#create"
+
+  # ==================================
+  # API V1 Routes
+  # ==================================
+  namespace :api do
+    namespace :v1 do
+      # Authentication
+      scope :auth do
+        post :token, to: "authentication#create", as: :auth_token
+        delete :token, to: "authentication#destroy"
+      end
+
+      # User profile
+      scope :users do
+        get :me, to: "users#me", as: :users_me
+        patch :me, to: "users#update"
+      end
+
+      # Accounts
+      resources :accounts, only: [:index, :show, :update] do
+        resources :memberships, only: [:index, :create, :update, :destroy]
+      end
+
+      # Notifications
+      resources :notifications, only: [:index, :show, :destroy] do
+        member do
+          post :mark_as_read
+        end
+        collection do
+          post :mark_all_as_read
+          get :unread_count
+        end
+      end
+    end
+  end
+
+  # ==================================
+  # Admin Dashboard
+  # ==================================
+  namespace :admin do
+    root "dashboard#index"
+
+    resources :users, only: [:index, :show, :edit, :update, :destroy] do
+      member do
+        post :impersonate
+      end
+      collection do
+        delete :stop_impersonating
+      end
+    end
+
+    resources :accounts, only: [:index, :show, :edit, :update, :destroy] do
+      member do
+        post :upgrade
+        post :extend_trial
+      end
+    end
+  end
+
+  # ==================================
+  # Notifications
+  # ==================================
+  resources :notifications, only: [:index, :show, :destroy] do
+    collection do
+      post :mark_all_as_read
+    end
+  end
+
+  # ==================================
   # Dashboard
   # ==================================
   get "dashboard", to: "dashboard#show", as: :dashboard

@@ -1,51 +1,28 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-      line-height: 1.6;
-      color: #333;
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 20px;
-    }
-    .button {
-      display: inline-block;
-      background-color: #4f46e5;
-      color: white !important;
-      padding: 12px 24px;
-      text-decoration: none;
-      border-radius: 6px;
-      margin: 20px 0;
-    }
-    .footer {
-      margin-top: 40px;
-      padding-top: 20px;
-      border-top: 1px solid #eee;
-      font-size: 14px;
-      color: #666;
-    }
-  </style>
-</head>
-<body>
-  <h2>Reset your password</h2>
+<%= email_heading "Reset your password" %>
 
-  <p>Hi <%= @user.first_name %>,</p>
+<%= email_paragraph "Hi #{@user.first_name}," %>
 
-  <p>We received a request to reset your password. Click the button below to create a new password:</p>
+<%= email_paragraph "We received a request to reset your password. Click the button below to create a new password:" %>
 
-  <a href="<%= @reset_url %>" class="button">Reset Password</a>
+<%= email_spacer %>
 
-  <p>This link will expire in 2 hours.</p>
+<table role="presentation" cellspacing="0" cellpadding="0" border="0" align="center">
+  <tr>
+    <td>
+      <%= email_button "Reset Password", @reset_url %>
+    </td>
+  </tr>
+</table>
 
-  <p>If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged.</p>
+<%= email_spacer %>
 
-  <div class="footer">
-    <p>If the button doesn't work, copy and paste this link into your browser:</p>
-    <p><%= @reset_url %></p>
-  </div>
-</body>
-</html>
+<%= email_info_box "This link will expire in 2 hours.", type: :warning %>
+
+<%= email_paragraph "If you didn't request this password reset, you can safely ignore this email. Your password will remain unchanged." %>
+
+<%= email_divider %>
+
+<p style="margin: 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 13px; line-height: 1.5; color: #6b7280;">
+  If the button doesn't work, copy and paste this link into your browser:<br>
+  <%= email_text_link @reset_url, @reset_url %>
+</p>
