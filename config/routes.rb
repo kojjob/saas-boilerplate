@@ -65,6 +65,29 @@ Rails.application.routes.draw do
   post "pay/webhooks/stripe", to: "pay/webhooks/stripe#create"
 
   # ==================================
+  # Admin Dashboard
+  # ==================================
+  namespace :admin do
+    root "dashboard#index"
+
+    resources :users, only: [:index, :show, :edit, :update, :destroy] do
+      member do
+        post :impersonate
+      end
+      collection do
+        delete :stop_impersonating
+      end
+    end
+
+    resources :accounts, only: [:index, :show, :edit, :update, :destroy] do
+      member do
+        post :upgrade
+        post :extend_trial
+      end
+    end
+  end
+
+  # ==================================
   # Dashboard
   # ==================================
   get "dashboard", to: "dashboard#show", as: :dashboard

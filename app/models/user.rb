@@ -83,6 +83,11 @@ class User < ApplicationRecord
     membership_for(account).present?
   end
 
+  # Site-wide admin check (separate from account membership roles)
+  def site_admin?
+    site_admin == true
+  end
+
   private
 
   def generate_confirmation_token

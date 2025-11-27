@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Admin - Deployable" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-full flex flex-col bg-slate-100 text-slate-900 antialiased">
+    <%# Impersonation banner %>
+    <% if impersonating? %>
+      <div class="bg-amber-500 text-amber-900 px-4 py-2 text-center text-sm font-medium">
+        You are impersonating <%= current_user.full_name %>.
+        <%= button_to "Stop Impersonating", stop_impersonating_admin_users_path, method: :delete, class: "ml-2 underline hover:no-underline" %>
+      </div>
+    <% end %>
+
+    <%# Admin Navigation %>
+    <nav class="bg-slate-800 text-white">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <%= link_to "Admin Dashboard", admin_root_path, class: "text-xl font-bold" %>
+            <div class="hidden md:block ml-10">
+              <div class="flex items-baseline space-x-4">
+                <%= link_to "Dashboard", admin_root_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 #{request.path == admin_root_path ? 'bg-slate-900' : ''}" %>
+                <%= link_to "Users", admin_users_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 #{request.path.start_with?('/admin/users') ? 'bg-slate-900' : ''}" %>
+                <%= link_to "Accounts", admin_accounts_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700 #{request.path.start_with?('/admin/accounts') ? 'bg-slate-900' : ''}" %>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <%= link_to "Back to App", root_path, class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700" %>
+            <%= link_to "Sign Out", sign_out_path, data: { turbo_method: :delete }, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <%# Flash messages %>
+    <%= render "shared/flash" %>
+
+    <%# Main content area %>
+    <main id="main-content" class="flex-1 py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <%= yield %>
+      </div>
+    </main>
+
+    <%# Footer %>
+    <footer class="bg-slate-800 text-slate-400 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+        Admin Panel &copy; <%= Date.current.year %>
+      </div>
+    </footer>
+  </body>
+</html>
