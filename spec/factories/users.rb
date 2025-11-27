@@ -53,5 +53,17 @@ FactoryBot.define do
         create(:membership, :admin, user: user, account: account)
       end
     end
+
+    trait :oauth_google do
+      provider { 'google_oauth2' }
+      uid { SecureRandom.uuid }
+      avatar_url { 'https://lh3.googleusercontent.com/photo.jpg' }
+    end
+
+    trait :oauth_github do
+      provider { 'github' }
+      uid { SecureRandom.uuid }
+      avatar_url { 'https://avatars.githubusercontent.com/u/123456' }
+    end
   end
 end

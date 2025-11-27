@@ -19,7 +19,8 @@ Rails.application.routes.draw do
   resources :confirmations, only: [:new, :create]
 
   # OAuth callbacks
-  get 'auth/:provider/callback', to: 'oauth_callbacks#create'
+  get 'auth/google_oauth2/callback', to: 'oauth_callbacks#google_oauth2'
+  get 'auth/github/callback', to: 'oauth_callbacks#github'
   get 'auth/failure', to: 'oauth_callbacks#failure'
 
   # ==================================
