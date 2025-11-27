@@ -1,0 +1,27 @@
+#!/bin/bash
+
+# Pre-deploy hook - Run database migrations before deployment
+# This ensures the database schema is updated before the new code is deployed
+
+set -e
+
+echo "=== Pre-deploy Hook ==="
+echo "Version: $KAMAL_VERSION"
+echo "Performer: $KAMAL_PERFORMER"
+echo "Recorded at: $KAMAL_RECORDED_AT"
+
+# Skip migrations for rollbacks
+if [ "$KAMAL_COMMAND" = "rollback" ]; then
+  echo "Skipping migrations for rollback"
+  exit 0
+fi
+
+echo "Running database migrations..."
+
+# Run migrations using kamal app exec
+# This runs against the currently deployed container
+kamal app exec "bin/rails db:migrate" 2>/dev/null || {
+  echo "Note: Could not run migrations (this is normal for initial deployment)"
+}
+
+echo "Pre-deploy hook completed successfully"

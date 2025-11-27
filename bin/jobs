@@ -1,0 +1,18 @@
+#!/usr/bin/env bash
+
+# Script to start Solid Queue background job worker
+# Used by Kamal for the job server role
+
+set -e
+
+# Wait for the database to be ready
+echo "Waiting for database connection..."
+until bundle exec rails db:version 2>/dev/null; do
+  echo "Database not ready, waiting..."
+  sleep 2
+done
+
+echo "Database ready, starting Solid Queue worker..."
+
+# Start Solid Queue in work mode
+exec bundle exec rake solid_queue:start
