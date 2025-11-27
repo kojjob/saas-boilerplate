@@ -19,8 +19,7 @@ Rails.application.routes.draw do
   resources :confirmations, only: [ :new, :create ]
 
   # OAuth callbacks
-  get "auth/google_oauth2/callback", to: "oauth_callbacks#google_oauth2"
-  get "auth/github/callback", to: "oauth_callbacks#github"
+  get "auth/:provider/callback", to: "oauth_callbacks#create"
   get "auth/failure", to: "oauth_callbacks#failure"
 
   # ==================================
@@ -30,20 +29,6 @@ Rails.application.routes.draw do
     member do
       get :billing
       post :switch, to: "accounts#switch"
-    end
-
-    # Team members management
-    resources :members, only: [ :index, :update, :destroy ], controller: "members" do
-      member do
-        delete :leave, to: "members#leave"
-      end
-    end
-
-    # Invitations (sent by admins/owners)
-    resources :invitations, only: [ :new, :create, :destroy ], controller: "invitations" do
-      member do
-        post :resend
-      end
     end
   end
 
