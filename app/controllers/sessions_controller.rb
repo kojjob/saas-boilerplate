@@ -13,6 +13,8 @@ class SessionsController < ApplicationController
 
     if user&.authenticate(params[:password])
       sign_in(user)
+      set_tenant_for_user(user)
+      session[:current_account_id] = current_account&.id
       redirect_to stored_location_or(dashboard_path), notice: 'Signed in successfully.'
     else
       flash.now[:alert] = 'Invalid email or password.'

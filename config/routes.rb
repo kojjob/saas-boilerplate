@@ -31,7 +31,27 @@ Rails.application.routes.draw do
       get :billing
       post :switch, to: 'accounts#switch'
     end
+
+    # Team members management
+    resources :members, only: [:index, :update, :destroy], controller: 'members' do
+      member do
+        delete :leave, to: 'members#leave'
+      end
+    end
+
+    # Invitations (sent by admins/owners)
+    resources :invitations, only: [:new, :create, :destroy], controller: 'invitations' do
+      member do
+        post :resend
+      end
+    end
   end
+
+  # ==================================
+  # Public Invitation Acceptance
+  # ==================================
+  get 'invitations/:token/accept', to: 'invitation_acceptances#show', as: :accept_invitation
+  post 'invitations/:token/accept', to: 'invitation_acceptances#create'
 
   # ==================================
   # Dashboard
