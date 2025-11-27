@@ -33,7 +33,7 @@ RSpec.describe InvitationMailer, type: :mailer do
     end
 
     it "sets the from address correctly" do
-      expect(mail.from).to eq([ "from@example.com" ])
+      expect(mail.from).to eq([ "noreply@example.com" ])
     end
 
     context "when membership has different roles" do
