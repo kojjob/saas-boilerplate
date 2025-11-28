@@ -4,7 +4,7 @@ module Admin
   class AccountsController < BaseController
     include Pagy::Backend
 
-    before_action :set_account, only: [:show, :edit, :update, :destroy, :upgrade, :extend_trial]
+    before_action :set_account, only: [ :show, :edit, :update, :destroy, :upgrade, :extend_trial ]
 
     def index
       accounts = Account.kept.order(created_at: :desc)

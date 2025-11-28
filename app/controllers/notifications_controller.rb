@@ -2,7 +2,7 @@
 
 class NotificationsController < ApplicationController
   before_action :authenticate_user!
-  before_action :set_notification, only: [:show, :destroy]
+  before_action :set_notification, only: [ :show, :destroy ]
 
   def index
     @notifications = current_user.notifications.recent.limit(50)

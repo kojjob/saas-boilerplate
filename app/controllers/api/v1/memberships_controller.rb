@@ -5,8 +5,8 @@ module Api
     class MembershipsController < BaseController
       before_action :set_account
       before_action :authorize_account_access!
-      before_action :authorize_account_owner!, only: [:create, :update, :destroy]
-      before_action :set_membership, only: [:update, :destroy]
+      before_action :authorize_account_owner!, only: [ :create, :update, :destroy ]
+      before_action :set_membership, only: [ :update, :destroy ]
 
       def index
         memberships = @account.memberships.includes(:user)

@@ -3,9 +3,9 @@
 module Api
   module V1
     class AccountsController < BaseController
-      before_action :set_account, only: [:show, :update]
-      before_action :authorize_account_access!, only: [:show, :update]
-      before_action :authorize_account_admin!, only: [:update]
+      before_action :set_account, only: [ :show, :update ]
+      before_action :authorize_account_access!, only: [ :show, :update ]
+      before_action :authorize_account_admin!, only: [ :update ]
 
       def index
         accounts = current_api_user.accounts.kept
