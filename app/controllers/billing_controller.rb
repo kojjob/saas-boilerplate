@@ -38,7 +38,7 @@ class BillingController < ApplicationController
     # Create Stripe checkout session
     checkout_session = current_account.payment_processor.checkout(
       mode: "subscription",
-      line_items: [{ price: plan.stripe_price_id, quantity: 1 }],
+      line_items: [ { price: plan.stripe_price_id, quantity: 1 } ],
       success_url: billing_success_url + "?session_id={CHECKOUT_SESSION_ID}",
       cancel_url: billing_cancel_url,
       subscription_data: {

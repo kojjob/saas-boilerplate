@@ -93,7 +93,7 @@ RSpec.describe Account, "billing", type: :model do
   end
 
   describe '#can_access_feature?' do
-    let(:pro_plan) { create(:plan, :pro, features: ['advanced_reports', 'api_access']) }
+    let(:pro_plan) { create(:plan, :pro, features: [ 'advanced_reports', 'api_access' ]) }
 
     before do
       account.update!(plan: pro_plan, subscription_status: 'active')

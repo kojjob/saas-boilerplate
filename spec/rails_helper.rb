@@ -13,22 +13,7 @@ require 'vcr'
 require 'database_cleaner/active_record'
 require 'with_model'
 
-# Start SimpleCov for code coverage
-require 'simplecov'
-SimpleCov.start 'rails' do
-  add_filter '/spec/'
-  add_filter '/config/'
-  add_filter '/vendor/'
-
-  add_group 'Controllers', 'app/controllers'
-  add_group 'Models', 'app/models'
-  add_group 'Services', 'app/services'
-  add_group 'Policies', 'app/policies'
-  add_group 'Jobs', 'app/jobs'
-  add_group 'Mailers', 'app/mailers'
-
-  minimum_coverage 70
-end
+# SimpleCov is started in spec_helper.rb BEFORE Rails loads for accurate coverage
 
 # Requires supporting ruby files with custom matchers and macros, etc, in
 # spec/support/ and its subdirectories.

@@ -12,7 +12,7 @@ Pay.setup do |config|
   config.default_plan_name = "default"
 
   # Enable or disable specific payment processors
-  config.enabled_processors = [:stripe]
+  config.enabled_processors = [ :stripe ]
 
   # Send emails for receipts/invoices
   config.send_emails = false # Disable emails in development/test

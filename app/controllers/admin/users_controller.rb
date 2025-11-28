@@ -4,7 +4,7 @@ module Admin
   class UsersController < BaseController
     include Pagy::Backend
 
-    before_action :set_user, only: [:show, :edit, :update, :destroy, :impersonate]
+    before_action :set_user, only: [ :show, :edit, :update, :destroy, :impersonate ]
 
     def index
       users = User.kept.order(created_at: :desc)
