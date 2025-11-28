@@ -7,7 +7,7 @@ module Admin
     before_action :set_user, only: [ :show, :edit, :update, :destroy, :impersonate ]
 
     def index
-      users = User.kept.order(created_at: :desc)
+      users = User.kept.includes(:memberships, :accounts).order(created_at: :desc)
       users = users.where("email ILIKE ?", "%#{params[:q]}%") if params[:q].present?
       @pagy, @users = pagy(users, limit: 25)
     end
