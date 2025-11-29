@@ -7,7 +7,7 @@ module Admin
     before_action :set_account, only: [ :show, :edit, :update, :destroy, :upgrade, :extend_trial ]
 
     def index
-      accounts = Account.kept.order(created_at: :desc)
+      accounts = Account.kept.includes(:plan, :memberships).order(created_at: :desc)
       accounts = accounts.where(subscription_status: params[:status]) if params[:status].present?
       @pagy, @accounts = pagy(accounts, limit: 25)
     end

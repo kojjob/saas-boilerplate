@@ -39,7 +39,7 @@ RSpec.describe "API V1 Memberships", type: :request do
       it "creates a new membership" do
         expect {
           post api_v1_account_memberships_path(account),
-            params: { membership: { user_id: new_user.id, role: "member" } },
+            params: { membership: { email: new_user.email, role: "member" } },
             headers: auth_headers,
             as: :json
         }.to change(Membership, :count).by(1)
@@ -48,6 +48,35 @@ RSpec.describe "API V1 Memberships", type: :request do
         json = JSON.parse(response.body)
         expect(json["data"]["user"]["id"]).to eq(new_user.id)
         expect(json["data"]["role"]).to eq("member")
+      end
+
+      it "returns not found for non-existent email" do
+        post api_v1_account_memberships_path(account),
+          params: { membership: { email: "nonexistent@example.com", role: "member" } },
+          headers: auth_headers,
+          as: :json
+
+        expect(response).to have_http_status(:not_found)
+      end
+
+      it "rejects invalid roles" do
+        post api_v1_account_memberships_path(account),
+          params: { membership: { email: new_user.email, role: "invalid_role" } },
+          headers: auth_headers,
+          as: :json
+
+        expect(response).to have_http_status(:bad_request)
+      end
+
+      it "prevents duplicate memberships" do
+        create(:membership, user: new_user, account: account)
+
+        post api_v1_account_memberships_path(account),
+          params: { membership: { email: new_user.email, role: "member" } },
+          headers: auth_headers,
+          as: :json
+
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
@@ -60,7 +89,7 @@ RSpec.describe "API V1 Memberships", type: :request do
       it "returns forbidden" do
         member_membership # ensure membership exists
         post api_v1_account_memberships_path(account),
-          params: { membership: { user_id: new_user.id, role: "member" } },
+          params: { membership: { email: new_user.email, role: "member" } },
           headers: member_auth_headers,
           as: :json
 
