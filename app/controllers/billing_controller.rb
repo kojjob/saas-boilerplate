@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class BillingController < ApplicationController
+  layout "dashboard"
+
   before_action :authenticate_user!
   before_action :require_account!
 

@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class AccountsController < ApplicationController
+  layout "dashboard"
+
   before_action :authenticate_user!
   before_action :set_account, only: [:show, :edit, :update, :billing]
   before_action :authorize_account, only: [:edit, :update]

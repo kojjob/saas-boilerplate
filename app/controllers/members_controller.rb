@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class MembersController < ApplicationController
+  layout "dashboard"
+
   before_action :authenticate_user!
   before_action :set_account
   before_action :set_membership, only: [ :update, :destroy ]
