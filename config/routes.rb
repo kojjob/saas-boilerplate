@@ -68,12 +68,12 @@ Rails.application.routes.draw do
       end
 
       # Accounts
-      resources :accounts, only: [:index, :show, :update] do
-        resources :memberships, only: [:index, :create, :update, :destroy]
+      resources :accounts, only: [ :index, :show, :update ] do
+        resources :memberships, only: [ :index, :create, :update, :destroy ]
       end
 
       # Notifications
-      resources :notifications, only: [:index, :show, :destroy] do
+      resources :notifications, only: [ :index, :show, :destroy ] do
         member do
           post :mark_as_read
         end
@@ -91,7 +91,7 @@ Rails.application.routes.draw do
   namespace :admin do
     root "dashboard#index"
 
-    resources :users, only: [:index, :show, :edit, :update, :destroy] do
+    resources :users, only: [ :index, :show, :edit, :update, :destroy ] do
       member do
         post :impersonate
       end
@@ -100,7 +100,7 @@ Rails.application.routes.draw do
       end
     end
 
-    resources :accounts, only: [:index, :show, :edit, :update, :destroy] do
+    resources :accounts, only: [ :index, :show, :edit, :update, :destroy ] do
       member do
         post :upgrade
         post :extend_trial
@@ -111,7 +111,7 @@ Rails.application.routes.draw do
   # ==================================
   # Notifications
   # ==================================
-  resources :notifications, only: [:index, :show, :destroy] do
+  resources :notifications, only: [ :index, :show, :destroy ] do
     collection do
       post :mark_all_as_read
     end

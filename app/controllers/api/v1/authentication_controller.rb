@@ -3,7 +3,7 @@
 module Api
   module V1
     class AuthenticationController < BaseController
-      skip_before_action :authenticate_api_user!, only: [:create]
+      skip_before_action :authenticate_api_user!, only: [ :create ]
 
       def create
         if params[:email].blank? || params[:password].blank?

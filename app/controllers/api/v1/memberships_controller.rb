@@ -5,8 +5,8 @@ module Api
     class MembershipsController < BaseController
       before_action :set_account
       before_action :authorize_account_access!
-      before_action :authorize_account_owner!, only: [:create, :update, :destroy]
-      before_action :set_membership, only: [:update, :destroy]
+      before_action :authorize_account_owner!, only: [ :create, :update, :destroy ]
+      before_action :set_membership, only: [ :update, :destroy ]
 
       def index
         memberships = @account.memberships.includes(:user)
@@ -15,7 +15,24 @@ module Api
       end
 
       def create
-        membership = @account.memberships.build(membership_params)
+        # Look up user by email instead of accepting user_id directly
+        user = User.kept.find_by(email: membership_params[:email]&.downcase)
+
+        unless user
+          render json: { error: "User not found with that email" }, status: :not_found
+          return
+        end
+
+        # Check if user is already a member
+        if @account.memberships.exists?(user: user)
+          render json: { error: "User is already a member of this account" }, status: :unprocessable_entity
+          return
+        end
+
+        membership = @account.memberships.build(
+          user: user,
+          role: membership_params[:role] || "member"
+        )
 
         if membership.save
           render_created(membership_data(membership))
@@ -66,11 +83,28 @@ module Api
       end
 
       def membership_params
-        params.require(:membership).permit(:user_id, :role)
+        # Only allow role - user_id must be set explicitly from a validated user lookup
+        permitted = params.require(:membership).permit(:email, :role)
+
+        # Validate role is in allowed list
+        if permitted[:role].present? && !Membership.roles.keys.include?(permitted[:role])
+          raise ActionController::BadRequest, "Invalid role"
+        end
+
+        permitted
       end
 
       def membership_update_params
-        params.require(:membership).permit(:role)
+        permitted = params.require(:membership).permit(:role)
+
+        # Validate role is in allowed list and not owner (can't change to owner via API)
+        if permitted[:role].present?
+          unless Membership.roles.keys.include?(permitted[:role]) && permitted[:role] != "owner"
+            raise ActionController::BadRequest, "Invalid role"
+          end
+        end
+
+        permitted
       end
 
       def membership_data(membership)

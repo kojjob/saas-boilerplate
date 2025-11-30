@@ -25,11 +25,13 @@ test: {}
 
 production:
   # Clean up expired user sessions daily at 3am
+  # Removes sessions older than 30 days and inactive sessions (no activity for 7 days)
   cleanup_expired_sessions:
     class: CleanupExpiredSessionsJob
     queue: maintenance
     args:
       expiry_days: 30
+      inactive_days: 7
     schedule: every day at 3am
 
   # Clear finished Solid Queue jobs hourly

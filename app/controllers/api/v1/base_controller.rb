@@ -69,10 +69,10 @@ module Api
 
       def render_bad_request(exception_or_message = nil)
         message = case exception_or_message
-                  when String then exception_or_message
-                  when nil then "Bad request"
-                  else exception_or_message.message
-                  end
+        when String then exception_or_message
+        when nil then "Bad request"
+        else exception_or_message.message
+        end
         render json: { error: message }, status: :bad_request
       end
     end

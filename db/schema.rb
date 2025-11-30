@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_27_103528) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_30_154159) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -25,6 +25,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_103528) do
     t.string "subscription_status", default: "trialing"
     t.datetime "trial_ends_at"
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_accounts_on_created_at"
     t.index ["discarded_at"], name: "index_accounts_on_discarded_at"
     t.index ["plan_id"], name: "index_accounts_on_plan_id"
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
@@ -78,6 +79,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_103528) do
     t.string "role", default: "member", null: false
     t.datetime "updated_at", null: false
     t.bigint "user_id"
+    t.index ["account_id", "role"], name: "index_memberships_on_account_id_and_role"
     t.index ["account_id"], name: "index_memberships_on_account_id"
     t.index ["invitation_token"], name: "index_memberships_on_invitation_token", unique: true, where: "(invitation_token IS NOT NULL)"
     t.index ["invited_by_id"], name: "index_memberships_on_invited_by_id"
@@ -99,6 +101,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_103528) do
     t.bigint "user_id", null: false
     t.index ["account_id"], name: "index_notifications_on_account_id"
     t.index ["notifiable_type", "notifiable_id"], name: "index_notifications_on_notifiable"
+    t.index ["read_at"], name: "index_notifications_on_read_at"
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
@@ -227,6 +230,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_103528) do
     t.string "user_agent"
     t.bigint "user_id", null: false
     t.index ["created_at"], name: "index_sessions_on_created_at"
+    t.index ["last_active_at"], name: "index_sessions_on_last_active_at"
     t.index ["user_id"], name: "index_sessions_on_user_id"
   end
 
@@ -368,6 +372,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_27_103528) do
     t.string "uid"
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, where: "(confirmation_token IS NOT NULL)"
+    t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"

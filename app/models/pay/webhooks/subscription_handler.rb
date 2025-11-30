@@ -55,8 +55,8 @@ module Pay
 
         account = pay_customer.owner
 
-        # Downgrade to free plan on cancellation
-        free_plan = Plan.free.first
+        # Downgrade to free plan on cancellation (uses cached lookup)
+        free_plan = Plan.free_plan
 
         account.update!(
           plan: free_plan,
