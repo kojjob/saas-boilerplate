@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Plan < ApplicationRecord
+  # Callbacks
+  after_commit :bust_cache
+
   # Validations
   validates :name, presence: true
   validates :stripe_price_id, presence: true, uniqueness: true
@@ -15,6 +18,24 @@ class Plan < ApplicationRecord
   scope :monthly, -> { where(interval: "month") }
   scope :yearly, -> { where(interval: "year") }
   scope :sorted, -> { order(sort_order: :asc, price_cents: :asc) }
+
+  # Cached class methods to avoid N+1 queries
+  def self.free_plan
+    Rails.cache.fetch("plans/free_plan", expires_in: 1.day) do
+      free.first
+    end
+  end
+
+  def self.monthly_reference_plan
+    Rails.cache.fetch("plans/monthly_reference", expires_in: 1.hour) do
+      active.monthly.paid.first
+    end
+  end
+
+  def self.bust_plan_cache
+    Rails.cache.delete("plans/free_plan")
+    Rails.cache.delete("plans/monthly_reference")
+  end
 
   # Instance methods
   def price
@@ -42,8 +63,8 @@ class Plan < ApplicationRecord
   def yearly_savings
     return 0 unless interval == "year"
 
-    # Calculate savings compared to monthly
-    monthly_plan = Plan.active.monthly.where("price_cents > 0").first
+    # Calculate savings compared to monthly (uses cached lookup)
+    monthly_plan = self.class.monthly_reference_plan
     return 0 unless monthly_plan
 
     monthly_yearly_cost = monthly_plan.price_cents * 12
@@ -61,5 +82,11 @@ class Plan < ApplicationRecord
 
   def unlimited?(resource)
     limit_for(resource) == -1
+  end
+
+  private
+
+  def bust_cache
+    self.class.bust_plan_cache
   end
 end
