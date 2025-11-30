@@ -39,11 +39,30 @@ end
 
 # Register webhook handlers for subscription events
 # These handlers update our Account model when Stripe subscription status changes
+#
+# Webhook URL: https://your-domain.com/pay/webhooks/stripe
+# Required Stripe webhook events to configure:
+# - customer.subscription.created
+# - customer.subscription.updated
+# - customer.subscription.deleted
+# - customer.subscription.trial_will_end
+# - customer.subscription.paused
+# - customer.subscription.resumed
+# - invoice.payment_failed
+# - invoice.payment_succeeded
+#
 Rails.application.config.to_prepare do
   subscription_handler = Pay::Webhooks::SubscriptionHandler.new
 
+  # Subscription lifecycle events
   Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.created", subscription_handler)
   Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.updated", subscription_handler)
   Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.deleted", subscription_handler)
   Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.trial_will_end", subscription_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.paused", subscription_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.resumed", subscription_handler)
+
+  # Invoice/payment events
+  Pay::Webhooks.delegator.subscribe("stripe.invoice.payment_failed", subscription_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.invoice.payment_succeeded", subscription_handler)
 end
