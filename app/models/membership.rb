@@ -49,6 +49,10 @@ class Membership < ApplicationRecord
     admin_or_owner?
   end
 
+  def can_manage_account?
+    admin_or_owner?
+  end
+
   def can_manage_billing?
     owner?
   end
