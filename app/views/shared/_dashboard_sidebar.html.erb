@@ -1,0 +1,131 @@
+<%# Dark Sidebar Navigation %>
+<aside id="sidebar" class="hidden lg:flex lg:flex-shrink-0">
+  <div class="flex flex-col w-64 bg-slate-900">
+    <%# Logo Section %>
+    <div class="flex items-center h-16 px-6 border-b border-slate-800">
+      <%= link_to root_path, class: "flex items-center space-x-3" do %>
+        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="text-lg font-semibold text-white">Deployable</span>
+      <% end %>
+    </div>
+
+    <%# Navigation Menu %>
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <%# Main Navigation %>
+      <div class="space-y-1">
+        <%= sidebar_link_to "Dashboard", dashboard_path, icon: "home" %>
+        <%= sidebar_link_to "Projects", "#", icon: "folder" %>
+        <%= sidebar_link_to "Invoices", "#", icon: "document-text" %>
+        <%= sidebar_link_to "Clients", "#", icon: "users" %>
+        <%= sidebar_link_to "Documents", "#", icon: "document-duplicate" %>
+        <%= sidebar_link_to "Time & Materials", "#", icon: "clock" %>
+        <%= sidebar_link_to "Messages", "#", icon: "chat-alt-2" %>
+      </div>
+
+      <%# Divider %>
+      <div class="pt-4 mt-4 border-t border-slate-800">
+        <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Account</p>
+        <div class="mt-2 space-y-1">
+          <%= sidebar_link_to "Settings", account_path, icon: "cog" %>
+          <%= sidebar_link_to "Team Members", account_members_path, icon: "user-group" %>
+          <%= sidebar_link_to "Billing", billing_path, icon: "credit-card" %>
+        </div>
+      </div>
+    </nav>
+
+    <%# User Profile Section %>
+    <div class="flex-shrink-0 p-4 border-t border-slate-800">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <span class="text-sm font-medium text-white">
+              <%= current_user&.first_name&.first&.upcase || current_user&.email&.first&.upcase || "U" %><%= current_user&.last_name&.first&.upcase || "" %>
+            </span>
+          </div>
+        </div>
+        <div class="ml-3 flex-1 min-w-0">
+          <p class="text-sm font-medium text-white truncate">
+            <%= current_user&.full_name.presence || current_user&.email&.split("@")&.first || "User" %>
+          </p>
+          <p class="text-xs text-slate-400 truncate">
+            <%= current_account&.name || "No Account" %>
+          </p>
+        </div>
+        <%= link_to sign_out_path, method: :delete, class: "p-2 text-slate-400 hover:text-white rounded-lg hover:bg-slate-800 transition-colors", data: { turbo_method: :delete } do %>
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<%# Mobile Sidebar (hidden by default) %>
+<aside id="mobile-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 transform -translate-x-full lg:hidden transition-transform duration-300 ease-in-out" data-controller="sidebar">
+  <div class="flex flex-col h-full">
+    <%# Logo Section with Close Button %>
+    <div class="flex items-center justify-between h-16 px-6 border-b border-slate-800">
+      <%= link_to root_path, class: "flex items-center space-x-3" do %>
+        <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+          <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+          </svg>
+        </div>
+        <span class="text-lg font-semibold text-white">Deployable</span>
+      <% end %>
+      <button type="button" class="p-2 text-slate-400 hover:text-white rounded-lg" data-action="click->sidebar#close">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+        </svg>
+      </button>
+    </div>
+
+    <%# Navigation Menu (same as desktop) %>
+    <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
+      <div class="space-y-1">
+        <%= sidebar_link_to "Dashboard", dashboard_path, icon: "home" %>
+        <%= sidebar_link_to "Projects", "#", icon: "folder" %>
+        <%= sidebar_link_to "Invoices", "#", icon: "document-text" %>
+        <%= sidebar_link_to "Clients", "#", icon: "users" %>
+        <%= sidebar_link_to "Documents", "#", icon: "document-duplicate" %>
+        <%= sidebar_link_to "Time & Materials", "#", icon: "clock" %>
+        <%= sidebar_link_to "Messages", "#", icon: "chat-alt-2" %>
+      </div>
+
+      <div class="pt-4 mt-4 border-t border-slate-800">
+        <p class="px-3 text-xs font-semibold text-slate-500 uppercase tracking-wider">Account</p>
+        <div class="mt-2 space-y-1">
+          <%= sidebar_link_to "Settings", account_path, icon: "cog" %>
+          <%= sidebar_link_to "Team Members", account_members_path, icon: "user-group" %>
+          <%= sidebar_link_to "Billing", billing_path, icon: "credit-card" %>
+        </div>
+      </div>
+    </nav>
+
+    <%# User Profile Section %>
+    <div class="flex-shrink-0 p-4 border-t border-slate-800">
+      <div class="flex items-center">
+        <div class="flex-shrink-0">
+          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+            <span class="text-sm font-medium text-white">
+              <%= current_user&.first_name&.first&.upcase || current_user&.email&.first&.upcase || "U" %><%= current_user&.last_name&.first&.upcase || "" %>
+            </span>
+          </div>
+        </div>
+        <div class="ml-3 flex-1 min-w-0">
+          <p class="text-sm font-medium text-white truncate">
+            <%= current_user&.full_name.presence || current_user&.email&.split("@")&.first || "User" %>
+          </p>
+          <p class="text-xs text-slate-400 truncate">
+            <%= current_account&.name || "No Account" %>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
