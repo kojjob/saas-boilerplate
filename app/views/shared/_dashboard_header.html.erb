@@ -36,14 +36,104 @@
       </svg>
     </button>
 
-    <%# Notifications %>
-    <button type="button" class="relative p-2 text-slate-500 hover:text-slate-700 rounded-lg hover:bg-slate-100">
-      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
-      </svg>
-      <%# Notification Badge %>
-      <span class="absolute top-1.5 right-1.5 block h-2 w-2 rounded-full bg-red-500 ring-2 ring-white"></span>
-    </button>
+    <%# Notifications Dropdown %>
+    <div class="relative" data-controller="dropdown">
+      <button type="button" class="relative p-2 text-slate-500 hover:text-slate-700 rounded-lg hover:bg-slate-100" data-action="click->dropdown#toggle">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+        <%# Notification Badge - shows count of unread notifications %>
+        <% unread_count = current_user&.notifications&.unread&.count || 0 %>
+        <% if unread_count > 0 %>
+          <span class="absolute -top-0.5 -right-0.5 flex items-center justify-center min-w-[1.25rem] h-5 px-1 text-xs font-bold text-white bg-red-500 rounded-full ring-2 ring-white">
+            <%= unread_count > 99 ? "99+" : unread_count %>
+          </span>
+        <% end %>
+      </button>
+
+      <%# Notifications Dropdown Menu %>
+      <div data-dropdown-target="menu" class="hidden absolute right-0 mt-2 w-80 bg-white rounded-lg shadow-lg border border-slate-200 z-50 overflow-hidden">
+        <div class="px-4 py-3 border-b border-slate-100 flex items-center justify-between bg-slate-50">
+          <h3 class="text-sm font-semibold text-slate-900">Notifications</h3>
+          <% if unread_count > 0 %>
+            <%= button_to mark_all_as_read_notifications_path, method: :post, class: "text-xs text-indigo-600 hover:text-indigo-800 font-medium", data: { turbo_method: :post } do %>
+              Mark all as read
+            <% end %>
+          <% end %>
+        </div>
+
+        <div class="max-h-96 overflow-y-auto">
+          <% notifications = current_user&.notifications&.order(created_at: :desc)&.limit(10) || [] %>
+          <% if notifications.any? %>
+            <% notifications.each do |notification| %>
+              <%= link_to notification_path(notification), class: "block px-4 py-3 hover:bg-slate-50 border-b border-slate-100 last:border-0 #{notification.unread? ? 'bg-indigo-50/50' : ''}" do %>
+                <div class="flex items-start space-x-3">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <% case notification.notification_type&.to_sym %>
+                    <% when :info %>
+                      <div class="w-8 h-8 rounded-full bg-blue-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    <% when :success %>
+                      <div class="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    <% when :warning %>
+                      <div class="w-8 h-8 rounded-full bg-yellow-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+                        </svg>
+                      </div>
+                    <% when :error, :alert %>
+                      <div class="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                        </svg>
+                      </div>
+                    <% else %>
+                      <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+                        <svg class="w-4 h-4 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                        </svg>
+                      </div>
+                    <% end %>
+                  </div>
+                  <div class="flex-1 min-w-0">
+                    <p class="text-sm font-medium text-slate-900 truncate"><%= notification.title %></p>
+                    <p class="text-xs text-slate-500 line-clamp-2"><%= notification.body %></p>
+                    <p class="text-xs text-slate-400 mt-1"><%= time_ago_in_words(notification.created_at) %> ago</p>
+                  </div>
+                  <% if notification.unread? %>
+                    <div class="flex-shrink-0">
+                      <span class="block w-2 h-2 rounded-full bg-indigo-500"></span>
+                    </div>
+                  <% end %>
+                </div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <div class="px-4 py-8 text-center">
+              <svg class="mx-auto h-12 w-12 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+              </svg>
+              <p class="mt-2 text-sm text-slate-500">No notifications yet</p>
+            </div>
+          <% end %>
+        </div>
+
+        <% if notifications.any? %>
+          <div class="px-4 py-3 border-t border-slate-100 bg-slate-50">
+            <%= link_to notifications_path, class: "block text-center text-sm text-indigo-600 hover:text-indigo-800 font-medium" do %>
+              View all notifications
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+    </div>
 
     <%# Divider %>
     <div class="hidden sm:block h-6 w-px bg-slate-200"></div>

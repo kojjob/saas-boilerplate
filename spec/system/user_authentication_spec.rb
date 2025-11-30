@@ -87,11 +87,11 @@ RSpec.describe "User Authentication", type: :system do
     end
 
     it "allows a user to sign out" do
-      # Open the user dropdown menu first (click on user avatar/profile area)
-      find('[data-controller="dropdown"] button', match: :first).click
+      # Open the user profile dropdown menu (the last dropdown in the header)
+      all('[data-controller="dropdown"] button').last.click
 
       # Wait for dropdown to be visible and click sign out
-      within('[data-dropdown-target="menu"]', visible: true, match: :first) do
+      within(all('[data-dropdown-target="menu"]').last, visible: true) do
         # Click on the element containing "Sign out" text
         click_on "Sign out"
       end
