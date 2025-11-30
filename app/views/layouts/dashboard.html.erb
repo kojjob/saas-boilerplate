@@ -48,5 +48,8 @@
 
     <%# Mobile sidebar overlay %>
     <div id="mobile-sidebar-overlay" class="fixed inset-0 bg-slate-900/50 z-40 hidden lg:hidden" data-action="click->sidebar#close"></div>
+
+    <%# Modal container for Turbo Frame modals %>
+    <%= turbo_frame_tag "modal" %>
   </body>
 </html>

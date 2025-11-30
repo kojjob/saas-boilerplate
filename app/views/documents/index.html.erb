@@ -1,0 +1,166 @@
+<div class="space-y-6">
+  <%# Header %>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Documents</h1>
+      <p class="mt-1 text-sm text-slate-500">Manage contracts, photos, receipts and other files</p>
+    </div>
+    <%= link_to new_document_path, class: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-gradient-to-r from-indigo-500 to-purple-600 rounded-lg hover:from-indigo-600 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all", data: { turbo_frame: "modal" } do %>
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+      </svg>
+      Upload Document
+    <% end %>
+  </div>
+
+  <%# Search and Filter %>
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+    <%= form_with url: documents_path, method: :get, class: "flex flex-col sm:flex-row gap-4", data: { turbo_frame: "_self" } do |f| %>
+      <div class="flex-1">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+            </svg>
+          </div>
+          <%= f.search_field :search, value: params[:search], placeholder: "Search documents...", class: "block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+      </div>
+      <div>
+        <%= f.select :category, [["All Categories", "all"]] + Document.categories.keys.map { |c| [c.humanize, c] }, { selected: params[:category] || "all" }, class: "block w-full px-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+      </div>
+      <div class="flex gap-2">
+        <%= f.submit "Search", class: "px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer transition-colors" %>
+        <% if params[:search].present? || params[:category].present? %>
+          <%= link_to "Clear", documents_path, class: "px-4 py-2 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50 transition-colors" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Documents Grid %>
+  <% if @documents.any? %>
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+      <% @documents.each do |document| %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden hover:shadow-md transition-shadow group">
+          <%# Preview area %>
+          <div class="aspect-square bg-slate-100 flex items-center justify-center relative">
+            <% if document.file.attached? && document.image? %>
+              <%= image_tag document.file.variant(resize_to_fill: [400, 400]), class: "w-full h-full object-cover" %>
+            <% else %>
+              <% icon_colors = {
+                general: "bg-slate-100 text-slate-600",
+                contract: "bg-blue-100 text-blue-600",
+                proposal: "bg-purple-100 text-purple-600",
+                receipt: "bg-green-100 text-green-600",
+                photo: "bg-amber-100 text-amber-600",
+                permit: "bg-red-100 text-red-600",
+                insurance: "bg-indigo-100 text-indigo-600",
+                other: "bg-slate-100 text-slate-600"
+              } %>
+              <div class="w-20 h-20 rounded-xl <%= icon_colors[document.category.to_sym] || 'bg-slate-100 text-slate-600' %> flex items-center justify-center">
+                <% if document.pdf? %>
+                  <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                  </svg>
+                <% else %>
+                  <svg class="w-10 h-10" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
+
+            <%# Hover overlay with actions %>
+            <div class="absolute inset-0 bg-slate-900/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-3">
+              <%= link_to document_path(document), class: "p-2 bg-white rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" do %>
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                </svg>
+              <% end %>
+              <% if document.file.attached? %>
+                <%= link_to download_document_path(document), class: "p-2 bg-white rounded-lg text-slate-700 hover:bg-slate-100 transition-colors" do %>
+                  <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+                  </svg>
+                <% end %>
+              <% end %>
+              <%= link_to edit_document_path(document), class: "p-2 bg-white rounded-lg text-slate-700 hover:bg-slate-100 transition-colors", data: { turbo_frame: "modal" } do %>
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L10.582 16.07a4.5 4.5 0 01-1.897 1.13L6 18l.8-2.685a4.5 4.5 0 011.13-1.897l8.932-8.931zm0 0L19.5 7.125M18 14v4.75A2.25 2.25 0 0115.75 21H5.25A2.25 2.25 0 013 18.75V8.25A2.25 2.25 0 015.25 6H10" />
+                </svg>
+              <% end %>
+            </div>
+          </div>
+
+          <%# Info %>
+          <div class="p-4">
+            <h3 class="text-sm font-medium text-slate-900 truncate"><%= document.name %></h3>
+            <div class="mt-1 flex items-center gap-2 text-xs text-slate-500">
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">
+                <%= document.category.humanize %>
+              </span>
+              <% if document.file.attached? %>
+                <span><%= number_to_human_size(document.file.byte_size) %></span>
+              <% end %>
+            </div>
+            <% if document.project.present? %>
+              <p class="mt-2 text-xs text-slate-500 truncate">
+                <span class="text-slate-400">Project:</span> <%= document.project.name %>
+              </p>
+            <% end %>
+            <p class="mt-1 text-xs text-slate-400">
+              Uploaded <%= time_ago_in_words(document.created_at) %> ago
+            </p>
+          </div>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Pagination %>
+    <% if @documents.respond_to?(:total_pages) && @documents.total_pages > 1 %>
+      <div class="bg-white rounded-xl shadow-sm border border-slate-200 px-6 py-3">
+        <div class="flex items-center justify-between">
+          <div class="text-sm text-slate-500">
+            Showing <%= @documents.offset_value + 1 %> to <%= [@documents.offset_value + @documents.length, @documents.total_count].min %> of <%= @documents.total_count %> documents
+          </div>
+          <div class="flex gap-2">
+            <% if @documents.prev_page %>
+              <%= link_to "Previous", documents_path(page: @documents.prev_page, search: params[:search], category: params[:category]), class: "px-3 py-1 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50" %>
+            <% end %>
+            <% if @documents.next_page %>
+              <%= link_to "Next", documents_path(page: @documents.next_page, search: params[:search], category: params[:category]), class: "px-3 py-1 text-sm font-medium text-slate-700 bg-white border border-slate-300 rounded-lg hover:bg-slate-50" %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    <% end %>
+  <% else %>
+    <%# Empty State %>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 text-center py-12">
+      <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+      </svg>
+      <h3 class="mt-2 text-sm font-semibold text-slate-900">No documents found</h3>
+      <p class="mt-1 text-sm text-slate-500">
+        <% if params[:search].present? || params[:category].present? %>
+          Try adjusting your search or filter criteria.
+        <% else %>
+          Get started by uploading your first document.
+        <% end %>
+      </p>
+      <div class="mt-6">
+        <%= link_to new_document_path, class: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors", data: { turbo_frame: "modal" } do %>
+          <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+          </svg>
+          Upload Document
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>
+
+<%# Modal container %>
+<%= turbo_frame_tag "modal" %>

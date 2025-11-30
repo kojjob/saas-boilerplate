@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -31,6 +31,34 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
     t.index ["subdomain"], name: "index_accounts_on_subdomain", unique: true, where: "(subdomain IS NOT NULL)"
     t.index ["subscription_status"], name: "index_accounts_on_subscription_status"
+  end
+
+  create_table "active_storage_attachments", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.datetime "created_at", null: false
+    t.string "name", null: false
+    t.bigint "record_id", null: false
+    t.string "record_type", null: false
+    t.index ["blob_id"], name: "index_active_storage_attachments_on_blob_id"
+    t.index ["record_type", "record_id", "name", "blob_id"], name: "index_active_storage_attachments_uniqueness", unique: true
+  end
+
+  create_table "active_storage_blobs", force: :cascade do |t|
+    t.bigint "byte_size", null: false
+    t.string "checksum"
+    t.string "content_type"
+    t.datetime "created_at", null: false
+    t.string "filename", null: false
+    t.string "key", null: false
+    t.text "metadata"
+    t.string "service_name", null: false
+    t.index ["key"], name: "index_active_storage_blobs_on_key", unique: true
+  end
+
+  create_table "active_storage_variant_records", force: :cascade do |t|
+    t.bigint "blob_id", null: false
+    t.string "variation_digest", null: false
+    t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
   end
 
   create_table "api_tokens", force: :cascade do |t|
@@ -68,6 +96,28 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "clients", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "address_line1"
+    t.string "address_line2"
+    t.string "city"
+    t.string "company"
+    t.string "country"
+    t.datetime "created_at", null: false
+    t.string "email", null: false
+    t.string "name", null: false
+    t.text "notes"
+    t.string "phone"
+    t.string "postal_code"
+    t.string "state"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "email"], name: "index_clients_on_account_id_and_email", unique: true
+    t.index ["account_id", "name"], name: "index_clients_on_account_id_and_name"
+    t.index ["account_id"], name: "index_clients_on_account_id"
+    t.index ["status"], name: "index_clients_on_status"
+  end
+
   create_table "conversations", force: :cascade do |t|
     t.bigint "account_id"
     t.datetime "created_at", null: false
@@ -78,6 +128,90 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
     t.index ["participant_1_id", "participant_2_id"], name: "index_conversations_on_participants", unique: true
     t.index ["participant_1_id"], name: "index_conversations_on_participant_1_id"
     t.index ["participant_2_id"], name: "index_conversations_on_participant_2_id"
+  end
+
+  create_table "documents", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.integer "category", default: 0, null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.bigint "project_id"
+    t.datetime "updated_at", null: false
+    t.bigint "uploaded_by_id", null: false
+    t.index ["account_id", "project_id"], name: "index_documents_on_account_id_and_project_id"
+    t.index ["account_id"], name: "index_documents_on_account_id"
+    t.index ["category"], name: "index_documents_on_category"
+    t.index ["project_id"], name: "index_documents_on_project_id"
+    t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
+  end
+
+  create_table "invoice_line_items", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "description", null: false
+    t.bigint "invoice_id", null: false
+    t.integer "position", default: 0
+    t.decimal "quantity", precision: 10, scale: 2, default: "1.0"
+    t.decimal "unit_price", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["invoice_id", "position"], name: "index_invoice_line_items_on_invoice_id_and_position"
+    t.index ["invoice_id"], name: "index_invoice_line_items_on_invoice_id"
+  end
+
+  create_table "invoices", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.datetime "created_at", null: false
+    t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0"
+    t.date "due_date", null: false
+    t.string "invoice_number", null: false
+    t.date "issue_date", null: false
+    t.text "notes"
+    t.datetime "paid_at"
+    t.string "payment_method"
+    t.text "payment_notes"
+    t.string "payment_reference"
+    t.bigint "project_id"
+    t.datetime "sent_at"
+    t.integer "status", default: 0, null: false
+    t.decimal "subtotal", precision: 10, scale: 2, default: "0.0"
+    t.decimal "tax_amount", precision: 10, scale: 2, default: "0.0"
+    t.decimal "tax_rate", precision: 5, scale: 2, default: "0.0"
+    t.text "terms"
+    t.decimal "total_amount", precision: 10, scale: 2, default: "0.0"
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "invoice_number"], name: "index_invoices_on_account_id_and_invoice_number", unique: true
+    t.index ["account_id"], name: "index_invoices_on_account_id"
+    t.index ["client_id"], name: "index_invoices_on_client_id"
+    t.index ["due_date"], name: "index_invoices_on_due_date"
+    t.index ["issue_date"], name: "index_invoices_on_issue_date"
+    t.index ["project_id"], name: "index_invoices_on_project_id"
+    t.index ["status"], name: "index_invoices_on_status"
+  end
+
+  create_table "material_entries", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "billable", default: true, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.text "description"
+    t.boolean "invoiced", default: false, null: false
+    t.decimal "markup_percentage", precision: 5, scale: 2, default: "0.0"
+    t.string "name", null: false
+    t.bigint "project_id", null: false
+    t.decimal "quantity", precision: 10, scale: 2, default: "1.0", null: false
+    t.decimal "total_amount", precision: 10, scale: 2
+    t.string "unit"
+    t.decimal "unit_cost", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["account_id"], name: "index_material_entries_on_account_id"
+    t.index ["billable"], name: "index_material_entries_on_billable"
+    t.index ["invoiced"], name: "index_material_entries_on_invoiced"
+    t.index ["project_id", "date"], name: "index_material_entries_on_project_id_and_date"
+    t.index ["project_id"], name: "index_material_entries_on_project_id"
+    t.index ["user_id"], name: "index_material_entries_on_user_id"
   end
 
   create_table "memberships", force: :cascade do |t|
@@ -251,6 +385,34 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
     t.index ["stripe_price_id"], name: "index_plans_on_stripe_price_id", unique: true
   end
 
+  create_table "projects", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.string "address_line1"
+    t.string "address_line2"
+    t.decimal "budget", precision: 10, scale: 2
+    t.string "city"
+    t.bigint "client_id", null: false
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.date "due_date"
+    t.date "end_date"
+    t.decimal "hourly_rate", precision: 10, scale: 2
+    t.string "name", null: false
+    t.text "notes"
+    t.string "postal_code"
+    t.string "project_number"
+    t.date "start_date"
+    t.string "state"
+    t.integer "status", default: 0, null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "client_id"], name: "index_projects_on_account_id_and_client_id"
+    t.index ["account_id", "project_number"], name: "index_projects_on_account_id_and_project_number", unique: true, where: "(project_number IS NOT NULL)"
+    t.index ["account_id"], name: "index_projects_on_account_id"
+    t.index ["client_id"], name: "index_projects_on_client_id"
+    t.index ["due_date"], name: "index_projects_on_due_date"
+    t.index ["status"], name: "index_projects_on_status"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -384,6 +546,28 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
     t.index ["key"], name: "index_solid_queue_semaphores_on_key", unique: true
   end
 
+  create_table "time_entries", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "billable", default: true, null: false
+    t.datetime "created_at", null: false
+    t.date "date", null: false
+    t.text "description"
+    t.decimal "hourly_rate", precision: 10, scale: 2
+    t.decimal "hours", precision: 5, scale: 2, null: false
+    t.boolean "invoiced", default: false, null: false
+    t.bigint "project_id", null: false
+    t.decimal "total_amount", precision: 10, scale: 2
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["account_id"], name: "index_time_entries_on_account_id"
+    t.index ["billable"], name: "index_time_entries_on_billable"
+    t.index ["invoiced"], name: "index_time_entries_on_invoiced"
+    t.index ["project_id", "date"], name: "index_time_entries_on_project_id_and_date"
+    t.index ["project_id"], name: "index_time_entries_on_project_id"
+    t.index ["user_id", "date"], name: "index_time_entries_on_user_id_and_date"
+    t.index ["user_id"], name: "index_time_entries_on_user_id"
+  end
+
   create_table "users", force: :cascade do |t|
     t.string "avatar_url"
     t.string "confirmation_token"
@@ -409,10 +593,23 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
   end
 
   add_foreign_key "accounts", "plans"
+  add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "clients", "accounts"
   add_foreign_key "conversations", "accounts"
   add_foreign_key "conversations", "users", column: "participant_1_id"
   add_foreign_key "conversations", "users", column: "participant_2_id"
+  add_foreign_key "documents", "accounts"
+  add_foreign_key "documents", "projects"
+  add_foreign_key "documents", "users", column: "uploaded_by_id"
+  add_foreign_key "invoice_line_items", "invoices"
+  add_foreign_key "invoices", "accounts"
+  add_foreign_key "invoices", "clients"
+  add_foreign_key "invoices", "projects"
+  add_foreign_key "material_entries", "accounts"
+  add_foreign_key "material_entries", "projects"
+  add_foreign_key "material_entries", "users"
   add_foreign_key "memberships", "accounts"
   add_foreign_key "memberships", "users"
   add_foreign_key "memberships", "users", column: "invited_by_id"
@@ -426,6 +623,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
   add_foreign_key "pay_charges", "pay_subscriptions", column: "subscription_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
+  add_foreign_key "projects", "accounts"
+  add_foreign_key "projects", "clients"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
@@ -433,4 +632,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
   add_foreign_key "solid_queue_ready_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_recurring_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_scheduled_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
+  add_foreign_key "time_entries", "accounts"
+  add_foreign_key "time_entries", "projects"
+  add_foreign_key "time_entries", "users"
 end

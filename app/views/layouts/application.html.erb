@@ -46,5 +46,7 @@
     <% unless content_for?(:hide_footer) %>
       <%= render "shared/footer" %>
     <% end %>
+
+    <%= turbo_frame_tag "modal" %>
   </body>
 </html>

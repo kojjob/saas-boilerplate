@@ -144,6 +144,68 @@ Rails.application.routes.draw do
   get "dashboard", to: "dashboard#show", as: :dashboard
 
   # ==================================
+  # Core Business Features
+  # ==================================
+
+  # Clients
+  resources :clients do
+    member do
+      get :projects
+      get :invoices
+    end
+  end
+
+  # Projects with nested time/material entries
+  resources :projects do
+    resources :time_entries, only: [ :new, :create ]
+    resources :material_entries, only: [ :new, :create ]
+    resources :documents, only: [ :index, :new, :create ]
+    member do
+      patch :archive
+      patch :complete
+    end
+  end
+
+  # Invoices with nested line items
+  resources :invoices do
+    resources :line_items, controller: "invoice_line_items", only: [ :create, :update, :destroy ]
+    member do
+      patch :send_invoice
+      patch :mark_paid
+      patch :mark_cancelled
+      get :preview
+      get :download
+    end
+  end
+
+  # Documents (can be standalone or associated with project)
+  resources :documents, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
+    member do
+      get :download
+    end
+  end
+
+  # Time Entries
+  resources :time_entries do
+    collection do
+      get :report
+    end
+    member do
+      patch :mark_invoiced
+    end
+  end
+
+  # Material Entries
+  resources :material_entries do
+    collection do
+      get :report
+    end
+    member do
+      patch :mark_invoiced
+    end
+  end
+
+  # ==================================
   # Health Check
   # ==================================
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.

@@ -15,6 +15,14 @@ class Account < ApplicationRecord
   has_many :users, through: :memberships
   belongs_to :plan, optional: true
 
+  # Business domain associations
+  has_many :clients, dependent: :destroy
+  has_many :projects, dependent: :destroy
+  has_many :invoices, dependent: :destroy
+  has_many :documents, dependent: :destroy
+  has_many :time_entries, dependent: :destroy
+  has_many :material_entries, dependent: :destroy
+
   # Validations
   validates :name, presence: true, length: { maximum: 100 }
   validates :slug, presence: true, uniqueness: { case_sensitive: false }, length: { minimum: 3, maximum: 50 }

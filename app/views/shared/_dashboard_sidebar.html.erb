@@ -18,11 +18,12 @@
       <%# Main Navigation %>
       <div class="space-y-1">
         <%= sidebar_link_to "Dashboard", dashboard_path, icon: "home" %>
-        <%= sidebar_link_to "Projects", "#", icon: "folder" %>
-        <%= sidebar_link_to "Invoices", "#", icon: "document-text" %>
-        <%= sidebar_link_to "Clients", "#", icon: "users" %>
-        <%= sidebar_link_to "Documents", "#", icon: "document-duplicate" %>
-        <%= sidebar_link_to "Time & Materials", "#", icon: "clock" %>
+        <%= sidebar_link_to "Clients", clients_path, icon: "users" %>
+        <%= sidebar_link_to "Projects", projects_path, icon: "folder" %>
+        <%= sidebar_link_to "Invoices", invoices_path, icon: "document-text" %>
+        <%= sidebar_link_to "Documents", documents_path, icon: "document-duplicate" %>
+        <%= sidebar_link_to "Time Entries", time_entries_path, icon: "clock" %>
+        <%= sidebar_link_to "Materials", material_entries_path, icon: "cube" %>
         <%= sidebar_link_to "Messages", conversations_path, icon: "chat-alt-2" %>
       </div>
 
@@ -89,11 +90,12 @@
     <nav class="flex-1 px-3 py-4 space-y-1 overflow-y-auto">
       <div class="space-y-1">
         <%= sidebar_link_to "Dashboard", dashboard_path, icon: "home" %>
-        <%= sidebar_link_to "Projects", "#", icon: "folder" %>
-        <%= sidebar_link_to "Invoices", "#", icon: "document-text" %>
-        <%= sidebar_link_to "Clients", "#", icon: "users" %>
-        <%= sidebar_link_to "Documents", "#", icon: "document-duplicate" %>
-        <%= sidebar_link_to "Time & Materials", "#", icon: "clock" %>
+        <%= sidebar_link_to "Clients", clients_path, icon: "users" %>
+        <%= sidebar_link_to "Projects", projects_path, icon: "folder" %>
+        <%= sidebar_link_to "Invoices", invoices_path, icon: "document-text" %>
+        <%= sidebar_link_to "Documents", documents_path, icon: "document-duplicate" %>
+        <%= sidebar_link_to "Time Entries", time_entries_path, icon: "clock" %>
+        <%= sidebar_link_to "Materials", material_entries_path, icon: "cube" %>
         <%= sidebar_link_to "Messages", conversations_path, icon: "chat-alt-2" %>
       </div>
 

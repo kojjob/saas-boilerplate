@@ -1,0 +1,148 @@
+<% content_for :page_title, "Projects" %>
+
+<div class="space-y-6">
+  <%# Header with actions %>
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
+      <p class="mt-1 text-sm text-slate-500">Manage your projects and track progress</p>
+    </div>
+    <div class="flex items-center gap-3">
+      <%= link_to new_project_path, data: { turbo_frame: "modal" }, class: "inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-sm" do %>
+        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+        </svg>
+        New Project
+      <% end %>
+    </div>
+  </div>
+
+  <%# Search and filters %>
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-4">
+    <%= form_with url: projects_path, method: :get, class: "flex flex-col sm:flex-row gap-4" do |f| %>
+      <div class="flex-1">
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </div>
+          <%= f.search_field :search, value: params[:search], placeholder: "Search projects...", class: "block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg text-sm placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" %>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <%= f.submit "Search", class: "px-4 py-2 bg-slate-100 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-200 transition-colors" %>
+        <% if params[:search].present? %>
+          <%= link_to "Clear", projects_path, class: "px-4 py-2 text-slate-600 text-sm font-medium hover:text-slate-900" %>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Projects list %>
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <% if @projects.any? %>
+      <%# Table header - visible on larger screens %>
+      <div class="hidden md:grid md:grid-cols-12 gap-4 px-6 py-3 border-b border-slate-200 bg-slate-50 text-xs font-medium text-slate-500 uppercase tracking-wider">
+        <div class="col-span-4">Project</div>
+        <div class="col-span-2">Client</div>
+        <div class="col-span-2">Status</div>
+        <div class="col-span-2">Due Date</div>
+        <div class="col-span-2 text-right">Actions</div>
+      </div>
+
+      <div class="divide-y divide-slate-200">
+        <% @projects.each do |project| %>
+          <div class="px-6 py-4 hover:bg-slate-50 transition-colors">
+            <div class="md:grid md:grid-cols-12 md:gap-4 md:items-center">
+              <%# Project info %>
+              <div class="col-span-4 mb-3 md:mb-0">
+                <div class="flex items-center gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <%= link_to project.name, project, class: "font-medium text-slate-900 hover:text-indigo-600" %>
+                    <% if project.project_number.present? %>
+                      <p class="text-xs text-slate-500"><%= project.project_number %></p>
+                    <% end %>
+                  </div>
+                </div>
+              </div>
+
+              <%# Client %>
+              <div class="col-span-2 mb-2 md:mb-0">
+                <span class="md:hidden text-xs text-slate-500 mr-2">Client:</span>
+                <%= link_to project.client.name, project.client, class: "text-sm text-slate-600 hover:text-indigo-600" %>
+              </div>
+
+              <%# Status %>
+              <div class="col-span-2 mb-2 md:mb-0">
+                <span class="md:hidden text-xs text-slate-500 mr-2">Status:</span>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= project_status_class(project.status) %>">
+                  <%= project.status.humanize %>
+                </span>
+              </div>
+
+              <%# Due Date %>
+              <div class="col-span-2 mb-3 md:mb-0">
+                <span class="md:hidden text-xs text-slate-500 mr-2">Due:</span>
+                <% if project.due_date.present? %>
+                  <span class="text-sm <%= project.overdue? ? 'text-red-600 font-medium' : 'text-slate-600' %>">
+                    <%= project.due_date.strftime("%b %d, %Y") %>
+                    <% if project.overdue? %>
+                      <span class="block text-xs text-red-500">Overdue</span>
+                    <% end %>
+                  </span>
+                <% else %>
+                  <span class="text-sm text-slate-400">Not set</span>
+                <% end %>
+              </div>
+
+              <%# Actions %>
+              <div class="col-span-2 flex items-center justify-end gap-2">
+                <%= link_to project, class: "p-2 text-slate-400 hover:text-indigo-600 transition-colors", title: "View" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                <% end %>
+                <%= link_to edit_project_path(project), data: { turbo_frame: "modal" }, class: "p-2 text-slate-400 hover:text-indigo-600 transition-colors", title: "Edit" do %>
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                  </svg>
+                <% end %>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Pagination %>
+      <% if @projects.respond_to?(:total_pages) && @projects.total_pages > 1 %>
+        <div class="px-6 py-4 border-t border-slate-200 bg-slate-50">
+          <%== pagy_nav(@pagy) if defined?(@pagy) %>
+        </div>
+      <% end %>
+    <% else %>
+      <%# Empty state %>
+      <div class="px-6 py-12 text-center">
+        <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z" />
+        </svg>
+        <h3 class="mt-4 text-lg font-medium text-slate-900">No projects yet</h3>
+        <p class="mt-2 text-sm text-slate-500">Get started by creating your first project.</p>
+        <div class="mt-6">
+          <%= link_to new_project_path, data: { turbo_frame: "modal" }, class: "inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-500 to-purple-600 text-white text-sm font-medium rounded-lg hover:from-indigo-600 hover:to-purple-700 transition-all shadow-sm" do %>
+            <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+            </svg>
+            Create Project
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

@@ -22,6 +22,11 @@ class User < ApplicationRecord
   has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
   has_many :received_messages, class_name: "Message", foreign_key: :recipient_id, dependent: :destroy
 
+  # Business domain associations
+  has_many :time_entries, dependent: :destroy
+  has_many :material_entries, dependent: :destroy
+  has_many :uploaded_documents, class_name: "Document", foreign_key: :uploaded_by_id, dependent: :destroy
+
   # Validations
   validates :first_name, presence: true
   validates :last_name, presence: true
