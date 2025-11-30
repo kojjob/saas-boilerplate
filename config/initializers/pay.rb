@@ -7,6 +7,11 @@ Rails.configuration.stripe = {
   webhook_secret: Rails.application.credentials.dig(:stripe, :webhook_secret)
 }
 
+# Set Stripe API key immediately (before Pay.setup)
+if Rails.configuration.stripe[:secret_key].present?
+  Stripe.api_key = Rails.configuration.stripe[:secret_key]
+end
+
 Pay.setup do |config|
   # For use in the receipt/refund/renewal mailers
   config.business_name = "SaaS Boilerplate"
@@ -25,9 +30,9 @@ Pay.setup do |config|
   config.send_emails = false # Disable emails in development/test
 end
 
-# Set Stripe API key after Pay is configured
+# Also ensure Stripe API key is set after all initializers
 Rails.application.config.after_initialize do
-  if Rails.configuration.stripe[:secret_key].present?
+  if Rails.configuration.stripe[:secret_key].present? && Stripe.api_key.blank?
     Stripe.api_key = Rails.configuration.stripe[:secret_key]
   end
 end
