@@ -61,8 +61,7 @@ Rails.application.routes.draw do
   get "billing/success", to: "billing#success", as: :billing_success
   get "billing/cancel", to: "billing#cancel", as: :billing_cancel
 
-  # Pay webhook for Stripe events
-  post "pay/webhooks/stripe", to: "pay/webhooks/stripe#create"
+  # Pay gem auto-mounts at /pay/webhooks/stripe via Pay.automount_routes
 
   # ==================================
   # API V1 Routes

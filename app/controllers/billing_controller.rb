@@ -68,6 +68,33 @@ class BillingController < ApplicationController
 
   def success
     @session_id = params[:session_id]
+
+    # Verify the checkout session with Stripe and update the account plan
+    if @session_id.present? && stripe_configured?
+      begin
+        session = Stripe::Checkout::Session.retrieve(@session_id)
+
+        if session.payment_status == "paid" || session.status == "complete"
+          # Get the subscription to find the price ID
+          subscription = Stripe::Subscription.retrieve(session.subscription)
+          price_id = subscription.items.data.first&.price&.id
+
+          if price_id
+            plan = Plan.find_by(stripe_price_id: price_id)
+            if plan && current_account
+              current_account.update!(
+                plan: plan,
+                subscription_status: map_stripe_status(subscription.status),
+                trial_ends_at: subscription.trial_end ? Time.at(subscription.trial_end) : nil
+              )
+            end
+          end
+        end
+      rescue Stripe::StripeError => e
+        Rails.logger.error "Stripe error in billing success: #{e.message}"
+      end
+    end
+
     flash.now[:notice] = "Your subscription was successful! Thank you for subscribing."
   end
 
@@ -85,5 +112,16 @@ class BillingController < ApplicationController
 
   def stripe_configured?
     ENV["STRIPE_SECRET_KEY"].present? || Rails.application.credentials.dig(:stripe, :secret_key).present?
+  end
+
+  def map_stripe_status(status)
+    case status
+    when "trialing" then "trialing"
+    when "active" then "active"
+    when "past_due" then "past_due"
+    when "canceled", "unpaid" then "canceled"
+    when "paused" then "paused"
+    else "active"
+    end
   end
 end
