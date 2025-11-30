@@ -132,6 +132,13 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Messages / Conversations
+  # ==================================
+  resources :conversations, only: [ :index, :show, :new, :create, :destroy ] do
+    resources :messages, only: [ :create, :destroy ]
+  end
+
+  # ==================================
   # Dashboard
   # ==================================
   get "dashboard", to: "dashboard#show", as: :dashboard

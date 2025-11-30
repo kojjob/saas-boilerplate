@@ -16,6 +16,12 @@ class User < ApplicationRecord
   has_many :api_tokens, dependent: :destroy
   has_many :notifications, dependent: :destroy
 
+  # Conversations (user can be either participant)
+  has_many :conversations_as_participant_1, class_name: "Conversation", foreign_key: :participant_1_id, dependent: :destroy
+  has_many :conversations_as_participant_2, class_name: "Conversation", foreign_key: :participant_2_id, dependent: :destroy
+  has_many :sent_messages, class_name: "Message", foreign_key: :sender_id, dependent: :destroy
+  has_many :received_messages, class_name: "Message", foreign_key: :recipient_id, dependent: :destroy
+
   # Validations
   validates :first_name, presence: true
   validates :last_name, presence: true
@@ -87,6 +93,14 @@ class User < ApplicationRecord
 
   def member_of?(account)
     membership_for(account).present?
+  end
+
+  def conversations
+    Conversation.for_user(self)
+  end
+
+  def unread_messages_count
+    received_messages.unread.count
   end
 
   # Site-wide admin check (separate from account membership roles)

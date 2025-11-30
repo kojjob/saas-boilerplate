@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_30_154159) do
+ActiveRecord::Schema[8.1].define(version: 2025_11_30_165925) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -68,6 +68,18 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_154159) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "conversations", force: :cascade do |t|
+    t.bigint "account_id"
+    t.datetime "created_at", null: false
+    t.bigint "participant_1_id", null: false
+    t.bigint "participant_2_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_conversations_on_account_id"
+    t.index ["participant_1_id", "participant_2_id"], name: "index_conversations_on_participants", unique: true
+    t.index ["participant_1_id"], name: "index_conversations_on_participant_1_id"
+    t.index ["participant_2_id"], name: "index_conversations_on_participant_2_id"
+  end
+
   create_table "memberships", force: :cascade do |t|
     t.datetime "accepted_at"
     t.bigint "account_id", null: false
@@ -86,6 +98,23 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_154159) do
     t.index ["role"], name: "index_memberships_on_role"
     t.index ["user_id", "account_id"], name: "index_memberships_on_user_id_and_account_id", unique: true, where: "(user_id IS NOT NULL)"
     t.index ["user_id"], name: "index_memberships_on_user_id"
+  end
+
+  create_table "messages", force: :cascade do |t|
+    t.bigint "account_id"
+    t.text "body", null: false
+    t.bigint "conversation_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "read_at"
+    t.bigint "recipient_id", null: false
+    t.bigint "sender_id", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id"], name: "index_messages_on_account_id"
+    t.index ["conversation_id", "created_at"], name: "index_messages_on_conversation_id_and_created_at"
+    t.index ["conversation_id"], name: "index_messages_on_conversation_id"
+    t.index ["recipient_id", "read_at"], name: "index_messages_on_recipient_id_and_read_at"
+    t.index ["recipient_id"], name: "index_messages_on_recipient_id"
+    t.index ["sender_id"], name: "index_messages_on_sender_id"
   end
 
   create_table "notifications", force: :cascade do |t|
@@ -381,9 +410,16 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_154159) do
 
   add_foreign_key "accounts", "plans"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "conversations", "accounts"
+  add_foreign_key "conversations", "users", column: "participant_1_id"
+  add_foreign_key "conversations", "users", column: "participant_2_id"
   add_foreign_key "memberships", "accounts"
   add_foreign_key "memberships", "users"
   add_foreign_key "memberships", "users", column: "invited_by_id"
+  add_foreign_key "messages", "accounts"
+  add_foreign_key "messages", "conversations"
+  add_foreign_key "messages", "users", column: "recipient_id"
+  add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "notifications", "accounts"
   add_foreign_key "notifications", "users"
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
