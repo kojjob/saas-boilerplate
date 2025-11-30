@@ -1,5 +1,12 @@
 # frozen_string_literal: true
 
+# Configure Stripe API key from Rails credentials
+Rails.configuration.stripe = {
+  secret_key: Rails.application.credentials.dig(:stripe, :secret_key),
+  publishable_key: Rails.application.credentials.dig(:stripe, :publishable_key),
+  webhook_secret: Rails.application.credentials.dig(:stripe, :webhook_secret)
+}
+
 Pay.setup do |config|
   # For use in the receipt/refund/renewal mailers
   config.business_name = "SaaS Boilerplate"
@@ -16,6 +23,13 @@ Pay.setup do |config|
 
   # Send emails for receipts/invoices
   config.send_emails = false # Disable emails in development/test
+end
+
+# Set Stripe API key after Pay is configured
+Rails.application.config.after_initialize do
+  if Rails.configuration.stripe[:secret_key].present?
+    Stripe.api_key = Rails.configuration.stripe[:secret_key]
+  end
 end
 
 # Register webhook handlers for subscription events
