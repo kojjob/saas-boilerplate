@@ -9,9 +9,15 @@ class BillingController < ApplicationController
   def index
     @plans = Plan.active.sorted
     @current_plan = current_account.current_plan
+    @stripe_configured = stripe_configured?
   end
 
   def portal
+    unless stripe_configured?
+      redirect_to billing_path, alert: "Stripe is not configured. Please set up your Stripe API keys."
+      return
+    end
+
     if current_account.payment_processor.present?
       portal_session = current_account.payment_processor.billing_portal(
         return_url: billing_url
@@ -34,6 +40,11 @@ class BillingController < ApplicationController
       # For free plan, just update the account directly
       current_account.update!(plan: plan, subscription_status: "active")
       redirect_to billing_path, notice: "Successfully switched to #{plan.name}."
+      return
+    end
+
+    unless stripe_configured?
+      redirect_to billing_path, alert: "Stripe is not configured. Please set up your Stripe API keys to subscribe to paid plans."
       return
     end
 
@@ -70,5 +81,9 @@ class BillingController < ApplicationController
     unless current_account
       redirect_to root_path, alert: "Please select an account first."
     end
+  end
+
+  def stripe_configured?
+    ENV["STRIPE_SECRET_KEY"].present? || Rails.application.credentials.dig(:stripe, :secret_key).present?
   end
 end
