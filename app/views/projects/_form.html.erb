@@ -1,0 +1,174 @@
+<%= form_with model: project, class: "space-y-5" do |f| %>
+  <% if project.errors.any? %>
+    <div class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+      <ul class="list-disc pl-5 space-y-1">
+        <% project.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# Basic Information Section %>
+  <div class="space-y-4">
+    <h3 class="text-sm font-medium text-gray-900">Basic information</h3>
+
+    <%# Project Name %>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Project name</label>
+      <%= f.text_field :name,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+          placeholder: "Kitchen Renovation" %>
+    </div>
+
+    <%# Client & Status - Two columns %>
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Client</label>
+        <%= f.collection_select :client_id, @clients, :id, :name,
+            { prompt: "Select a client" },
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white" %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+        <%= f.select :status, Project.statuses.keys.map { |s| [s.humanize, s] },
+            {},
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white" %>
+      </div>
+    </div>
+
+    <%# Description %>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Description <span class="text-gray-400 font-normal">(optional)</span></label>
+      <%= f.text_area :description,
+          rows: 2,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none",
+          placeholder: "Project description..." %>
+    </div>
+  </div>
+
+  <%# Timeline Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Timeline</h3>
+
+    <%# Three date columns %>
+    <div class="grid grid-cols-3 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Start date</label>
+        <%= f.date_field :start_date,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Due date</label>
+        <%= f.date_field :due_date,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">End date</label>
+        <%= f.date_field :end_date,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Budget Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Budget & rates</h3>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Budget</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-400 text-sm">$</span>
+          </div>
+          <%= f.number_field :budget,
+              step: 0.01,
+              min: 0,
+              class: "w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+              placeholder: "0.00" %>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Hourly rate</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-400 text-sm">$</span>
+          </div>
+          <%= f.number_field :hourly_rate,
+              step: 0.01,
+              min: 0,
+              class: "w-full pl-7 pr-12 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+              placeholder: "0.00" %>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-400 text-sm">/hr</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Location Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Job site location <span class="text-gray-400 font-normal">(optional)</span></h3>
+
+    <%# Street Address %>
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Street address</label>
+      <%= f.text_field :address_line1,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+          placeholder: "123 Main Street" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Address line 2</label>
+      <%= f.text_field :address_line2,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+          placeholder: "Apt, suite, unit, etc." %>
+    </div>
+
+    <%# City, State, ZIP - Three columns %>
+    <div class="grid grid-cols-6 gap-4">
+      <div class="col-span-3">
+        <label class="block text-sm font-medium text-gray-700 mb-2">City</label>
+        <%= f.text_field :city,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+            placeholder: "San Francisco" %>
+      </div>
+      <div class="col-span-1">
+        <label class="block text-sm font-medium text-gray-700 mb-2">State</label>
+        <%= f.text_field :state,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+            placeholder: "CA" %>
+      </div>
+      <div class="col-span-2">
+        <label class="block text-sm font-medium text-gray-700 mb-2">ZIP</label>
+        <%= f.text_field :postal_code,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+            placeholder: "94102" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Notes Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Notes <span class="text-gray-400 font-normal">(optional)</span></label>
+      <%= f.text_area :notes,
+          rows: 2,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none",
+          placeholder: "Internal notes about this project..." %>
+    </div>
+  </div>
+
+  <%# Footer with actions %>
+  <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+    <button type="button"
+            data-action="modal#close"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+      Cancel
+    </button>
+    <%= f.submit project.persisted? ? "Save changes" : "Create project",
+        class: "px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer" %>
+  </div>
+<% end %>

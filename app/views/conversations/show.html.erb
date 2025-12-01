@@ -1,0 +1,86 @@
+<div class="max-w-4xl mx-auto flex flex-col h-[calc(100vh-12rem)]">
+  <!-- Header -->
+  <div class="flex items-center justify-between pb-4 border-b border-gray-200">
+    <div class="flex items-center">
+      <%= link_to conversations_path, class: "mr-4 text-gray-400 hover:text-gray-600 transition-colors" do %>
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+        </svg>
+      <% end %>
+      <% other_user = @conversation.other_participant(current_user) %>
+      <div class="flex items-center">
+        <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+          <%= other_user.initials %>
+        </div>
+        <div class="ml-3">
+          <h1 class="text-lg font-semibold text-gray-900"><%= other_user.full_name %></h1>
+          <p class="text-sm text-gray-500"><%= other_user.email %></p>
+        </div>
+      </div>
+    </div>
+    <div class="flex items-center space-x-2">
+      <%= button_to conversation_path(@conversation), method: :delete, class: "p-2 text-gray-400 hover:text-red-600 transition-colors", data: { turbo_confirm: "Are you sure you want to delete this conversation? This action cannot be undone." } do %>
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+        </svg>
+      <% end %>
+    </div>
+  </div>
+
+  <!-- Messages Area -->
+  <div id="messages" class="flex-1 overflow-y-auto py-4 space-y-4" data-controller="scroll-to-bottom">
+    <% if @messages.any? %>
+      <% @messages.each do |message| %>
+        <div class="flex <%= message.sender == current_user ? 'justify-end' : 'justify-start' %>">
+          <div class="max-w-[70%] <%= message.sender == current_user ? 'order-2' : '' %>">
+            <% if message.sender != current_user %>
+              <div class="flex items-center mb-1">
+                <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
+                  <%= message.sender.initials %>
+                </div>
+                <span class="ml-2 text-xs text-gray-500"><%= message.sender.first_name %></span>
+              </div>
+            <% end %>
+            <div class="<%= message.sender == current_user ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 'bg-gray-100 text-gray-900' %> rounded-2xl px-4 py-3 shadow-sm">
+              <p class="text-sm whitespace-pre-wrap"><%= message.body %></p>
+            </div>
+            <p class="mt-1 text-xs text-gray-400 <%= message.sender == current_user ? 'text-right' : '' %>">
+              <%= message.created_at.strftime("%I:%M %p") %>
+              <% if message.sender == current_user && message.read_at.present? %>
+                <span class="ml-1">&#x2713;&#x2713;</span>
+              <% end %>
+            </p>
+          </div>
+        </div>
+      <% end %>
+    <% else %>
+      <div class="flex items-center justify-center h-full text-center">
+        <div>
+          <svg class="mx-auto h-12 w-12 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+          <p class="mt-2 text-sm text-gray-500">No messages yet. Start the conversation!</p>
+        </div>
+      </div>
+    <% end %>
+  </div>
+
+  <!-- Message Input -->
+  <div class="pt-4 border-t border-gray-200">
+    <%= form_with model: [@conversation, @message], class: "flex items-end space-x-3", data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |form| %>
+      <div class="flex-1">
+        <%= form.text_area :body,
+            rows: 1,
+            placeholder: "Type your message...",
+            class: "block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none",
+            data: { action: "input->reset-form#autoResize keydown.enter->reset-form#submitOnEnter" },
+            required: true %>
+      </div>
+      <button type="submit" class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+        </svg>
+      </button>
+    <% end %>
+  </div>
+</div>

@@ -37,16 +37,45 @@ module Admin
     end
 
     def impersonate
+      # Audit trail for impersonation start
+      Rails.logger.info("[ADMIN IMPERSONATION] #{current_user.email} (ID: #{current_user.id}) started impersonating #{@user.email} (ID: #{@user.id})")
+
+      Audited::Audit.create!(
+        auditable: @user,
+        action: "impersonate_started",
+        user: current_user,
+        comment: "Admin #{current_user.email} started impersonating user",
+        remote_address: request.remote_ip,
+        request_uuid: request.uuid
+      )
+
       session[:admin_user_id] = current_user.id
+      session[:impersonation_started_at] = Time.current.to_i
       sign_in(@user)
       redirect_to root_path, notice: "You are now impersonating #{@user.full_name}."
     end
 
     def stop_impersonating
       admin = User.find_by(id: session[:admin_user_id])
+      impersonated_user = current_user
+      impersonation_duration = session[:impersonation_started_at] ? Time.current.to_i - session[:impersonation_started_at].to_i : 0
+
       session.delete(:admin_user_id)
+      session.delete(:impersonation_started_at)
 
       if admin
+        # Audit trail for impersonation end
+        Rails.logger.info("[ADMIN IMPERSONATION] #{admin.email} (ID: #{admin.id}) stopped impersonating #{impersonated_user.email} (ID: #{impersonated_user.id}) after #{impersonation_duration} seconds")
+
+        Audited::Audit.create!(
+          auditable: impersonated_user,
+          action: "impersonate_ended",
+          user: admin,
+          comment: "Admin #{admin.email} stopped impersonating user after #{impersonation_duration} seconds",
+          remote_address: request.remote_ip,
+          request_uuid: request.uuid
+        )
+
         sign_in(admin)
         redirect_to admin_root_path, notice: "You have stopped impersonating."
       else
