@@ -16,6 +16,9 @@ application.register("counter", CounterController)
 import DropdownController from "./dropdown_controller"
 application.register("dropdown", DropdownController)
 
+import EstimateFormController from "./estimate_form_controller"
+application.register("estimate-form", EstimateFormController)
+
 import FlashController from "./flash_controller"
 application.register("flash", FlashController)
 
@@ -34,6 +37,12 @@ application.register("navbar", NavbarController)
 import NotificationsController from "./notifications_controller"
 application.register("notifications", NotificationsController)
 
+import ParallaxController from "./parallax_controller"
+application.register("parallax", ParallaxController)
+
+import PricingToggleController from "./pricing_toggle_controller"
+application.register("pricing-toggle", PricingToggleController)
+
 import ResetFormController from "./reset_form_controller"
 application.register("reset-form", ResetFormController)
 
@@ -45,6 +54,9 @@ application.register("scroll-to-bottom", ScrollToBottomController)
 
 import SidebarController from "./sidebar_controller"
 application.register("sidebar", SidebarController)
+
+import TestimonialSliderController from "./testimonial_slider_controller"
+application.register("testimonial-slider", TestimonialSliderController)
 
 import TypewriterController from "./typewriter_controller"
 application.register("typewriter", TypewriterController)
