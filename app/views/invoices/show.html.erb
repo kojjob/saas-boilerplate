@@ -490,6 +490,59 @@
           <% end %>
         </div>
       </div>
+
+      <%# Payment Link Card - Only show for unpaid invoices %>
+      <% if @invoice.payable? %>
+        <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+          <div class="px-6 py-4 bg-gradient-to-r from-emerald-50 to-teal-50 border-b border-slate-200">
+            <div class="flex items-center gap-2">
+              <svg class="w-5 h-5 text-emerald-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              <h2 class="text-base font-semibold text-slate-900">Payment Link</h2>
+            </div>
+          </div>
+          <div class="p-4 space-y-4">
+            <p class="text-sm text-slate-600">Share this link with your client so they can pay online via credit card.</p>
+
+            <div class="flex items-center gap-2" data-controller="clipboard">
+              <input type="text"
+                     value="<%= pay_invoice_url(payment_token: @invoice.payment_token) %>"
+                     readonly
+                     data-clipboard-target="source"
+                     class="flex-1 px-3 py-2 text-sm bg-slate-50 border border-slate-200 rounded-lg text-slate-600 truncate">
+              <button type="button"
+                      data-action="clipboard#copy"
+                      data-clipboard-target="button"
+                      class="inline-flex items-center px-3 py-2 border border-slate-300 text-sm font-medium rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-colors">
+                <svg class="w-4 h-4 mr-1.5" data-clipboard-target="copyIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3" />
+                </svg>
+                <svg class="w-4 h-4 mr-1.5 hidden" data-clipboard-target="checkIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+                <span data-clipboard-target="label">Copy</span>
+              </button>
+            </div>
+
+            <div class="flex items-center gap-2">
+              <%= link_to pay_invoice_path(payment_token: @invoice.payment_token), target: "_blank", class: "flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-600 text-white text-sm font-medium rounded-lg hover:from-emerald-600 hover:to-teal-700 transition-all shadow-sm" do %>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+                </svg>
+                Open Payment Page
+              <% end %>
+            </div>
+
+            <p class="text-xs text-slate-500 flex items-center gap-1">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+              </svg>
+              Secure payment powered by Stripe
+            </p>
+          </div>
+        </div>
+      <% end %>
     </div>
 
     <%# Right Column: Invoice Document %>
