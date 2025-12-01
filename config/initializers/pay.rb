@@ -37,11 +37,14 @@ Rails.application.config.after_initialize do
   end
 end
 
-# Register webhook handlers for subscription events
+# Register webhook handlers for Stripe events
 # These handlers update our Account model when Stripe subscription status changes
+# and mark invoices as paid when payments are completed via Checkout
 #
 # Webhook URL: https://your-domain.com/pay/webhooks/stripe
 # Required Stripe webhook events to configure:
+#
+# Subscription events:
 # - customer.subscription.created
 # - customer.subscription.updated
 # - customer.subscription.deleted
@@ -50,6 +53,10 @@ end
 # - customer.subscription.resumed
 # - invoice.payment_failed
 # - invoice.payment_succeeded
+#
+# Invoice payment events (for one-time invoice payments):
+# - checkout.session.completed
+# - payment_intent.succeeded
 #
 Rails.application.config.to_prepare do
   subscription_handler = Pay::Webhooks::SubscriptionHandler.new
@@ -62,7 +69,13 @@ Rails.application.config.to_prepare do
   Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.paused", subscription_handler)
   Pay::Webhooks.delegator.subscribe("stripe.customer.subscription.resumed", subscription_handler)
 
-  # Invoice/payment events
+  # Invoice/payment events (subscription-related)
   Pay::Webhooks.delegator.subscribe("stripe.invoice.payment_failed", subscription_handler)
   Pay::Webhooks.delegator.subscribe("stripe.invoice.payment_succeeded", subscription_handler)
+
+  # Invoice payment handler for one-time invoice payments via Checkout
+  # This handles payments made through the public invoice payment page
+  invoice_payment_handler = Pay::Webhooks::InvoicePaymentHandler.new
+  Pay::Webhooks.delegator.subscribe("stripe.checkout.session.completed", invoice_payment_handler)
+  Pay::Webhooks.delegator.subscribe("stripe.payment_intent.succeeded", invoice_payment_handler)
 end
