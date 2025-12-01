@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class DocumentsController < ApplicationController
+  include Pagy::Backend
+
   layout "dashboard"
 
   before_action :authenticate_user!
@@ -8,19 +10,20 @@ class DocumentsController < ApplicationController
   before_action :set_projects, only: [ :new, :create, :edit, :update ]
 
   def index
-    @documents = current_account.documents.includes(:project, :uploaded_by, file_attachment: :blob)
-                                .search(params[:search])
-                                .order(created_at: :desc)
+    documents = current_account.documents.includes(:project, :uploaded_by)
+                               .with_attached_file
+                               .search(params[:search])
+                               .order(created_at: :desc)
 
     if params[:category].present? && params[:category] != "all"
-      @documents = @documents.where(category: params[:category])
+      documents = documents.where(category: params[:category])
     end
 
     if params[:project_id].present?
-      @documents = @documents.where(project_id: params[:project_id])
+      documents = documents.where(project_id: params[:project_id])
     end
 
-    @documents = @documents.page(params[:page]).per(20) if @documents.respond_to?(:page)
+    @pagy, @documents = pagy(documents, limit: 20)
   end
 
   def show

@@ -1,121 +1,272 @@
 <% content_for :page_title, "Edit Account" %>
 
 <div class="space-y-6">
-  <%# Page Header %>
-  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-slate-900">Edit Account</h1>
-      <p class="mt-1 text-sm text-slate-500">Update your account information</p>
+  <%# Hero Header with Dark Background %>
+  <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl">
+    <%# Decorative grid pattern %>
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="edit-account-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#edit-account-grid)"/>
+      </svg>
     </div>
-    <div class="mt-4 sm:mt-0">
-      <%= link_to account_path, class: "inline-flex items-center px-4 py-2 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors" do %>
-        <svg class="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-        </svg>
-        Back to Account
-      <% end %>
+
+    <%# Gradient orbs %>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/20 rounded-full blur-3xl"></div>
+
+    <div class="relative px-6 py-8 sm:px-8 sm:py-10">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <%# Title and info %>
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">Edit Account</h1>
+            <p class="mt-1 text-slate-400">Update your organization's information and settings</p>
+            <div class="mt-3 flex items-center gap-3">
+              <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-amber-500/20 text-amber-300">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+                <%= @account.name %>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <%# Back button %>
+        <div class="flex-shrink-0">
+          <%= link_to account_path, class: "inline-flex items-center gap-2 px-5 py-3 bg-slate-700/50 hover:bg-slate-700 text-white font-semibold rounded-xl border border-slate-600 hover:border-slate-500 transition-all duration-300" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+            Back to Account
+          <% end %>
+        </div>
+      </div>
     </div>
   </div>
 
-  <%# Main Form Card %>
-  <div class="bg-white rounded-xl shadow-sm border border-slate-200">
-    <div class="px-6 py-4 border-b border-slate-200">
-      <h3 class="text-lg font-semibold text-slate-900">Account Details</h3>
-      <p class="text-sm text-slate-500">Update your organization's information</p>
-    </div>
+  <%# Main Content Grid %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <%# Main Form Card %>
+    <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900">Account Details</h3>
+            <p class="text-sm text-slate-500">Update your organization's basic information</p>
+          </div>
+        </div>
+      </div>
 
-    <div class="p-6">
-      <%= form_with model: @account, url: account_path, method: :patch, local: true, class: "space-y-6" do |form| %>
-        <% if @account.errors.any? %>
-          <div class="rounded-lg bg-red-50 border border-red-200 p-4">
-            <div class="flex">
-              <div class="flex-shrink-0">
-                <svg class="h-5 w-5 text-red-400" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
-                </svg>
-              </div>
-              <div class="ml-3">
-                <h3 class="text-sm font-medium text-red-800">
-                  There <%= @account.errors.count == 1 ? 'was an error' : "were #{@account.errors.count} errors" %> with your submission
-                </h3>
-                <div class="mt-2 text-sm text-red-700">
-                  <ul class="list-disc pl-5 space-y-1">
-                    <% @account.errors.full_messages.each do |message| %>
-                      <li><%= message %></li>
-                    <% end %>
-                  </ul>
+      <div class="p-6">
+        <%= form_with model: @account, url: account_path, method: :patch, local: true, class: "space-y-6" do |form| %>
+          <% if @account.errors.any? %>
+            <div class="rounded-xl bg-red-50 border border-red-200 p-4">
+              <div class="flex">
+                <div class="flex-shrink-0">
+                  <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+                    <svg class="h-5 w-5 text-red-500" viewBox="0 0 20 20" fill="currentColor">
+                      <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clip-rule="evenodd" />
+                    </svg>
+                  </div>
+                </div>
+                <div class="ml-4">
+                  <h3 class="text-sm font-semibold text-red-800">
+                    There <%= @account.errors.count == 1 ? 'was an error' : "were #{@account.errors.count} errors" %> with your submission
+                  </h3>
+                  <div class="mt-2 text-sm text-red-700">
+                    <ul class="list-disc pl-5 space-y-1">
+                      <% @account.errors.full_messages.each do |message| %>
+                        <li><%= message %></li>
+                      <% end %>
+                    </ul>
+                  </div>
                 </div>
               </div>
             </div>
+          <% end %>
+
+          <%# Account Name %>
+          <div>
+            <%= form.label :name, class: "block text-sm font-semibold text-slate-700 mb-2" %>
+            <div class="relative">
+              <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <%= form.text_field :name,
+                  class: "block w-full pl-12 pr-4 py-3 border border-slate-300 rounded-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
+                  placeholder: "Your organization name" %>
+            </div>
+            <p class="mt-2 text-sm text-slate-500">This is the name of your organization or team that will be displayed throughout the app.</p>
+          </div>
+
+          <%# Subdomain %>
+          <div>
+            <%= form.label :subdomain, class: "block text-sm font-semibold text-slate-700 mb-2" %>
+            <div class="flex rounded-xl shadow-sm">
+              <div class="relative flex-grow">
+                <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                  <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
+                  </svg>
+                </div>
+                <%= form.text_field :subdomain,
+                    class: "block w-full pl-12 pr-4 py-3 border border-slate-300 rounded-l-xl text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all",
+                    placeholder: "yourcompany" %>
+              </div>
+              <span class="inline-flex items-center px-4 py-3 border border-l-0 border-slate-300 bg-slate-50 text-slate-500 rounded-r-xl text-sm font-medium">
+                .<%= request.domain %>
+              </span>
+            </div>
+            <p class="mt-2 text-sm text-slate-500">
+              Optional: A custom subdomain for your account. Only lowercase letters, numbers, and hyphens allowed.
+            </p>
+          </div>
+
+          <%# Actions %>
+          <div class="flex items-center justify-end pt-6 border-t border-slate-200 space-x-3">
+            <%= link_to "Cancel", account_path, class: "px-5 py-2.5 border border-slate-300 text-slate-700 text-sm font-semibold rounded-xl hover:bg-slate-50 transition-colors" %>
+            <%= form.submit "Save Changes",
+                class: "px-6 py-2.5 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all duration-200 cursor-pointer" %>
           </div>
         <% end %>
+      </div>
+    </div>
 
-        <%# Account Name %>
-        <div>
-          <%= form.label :name, class: "block text-sm font-medium text-slate-700 mb-2" %>
-          <div class="relative">
-            <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-              <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-              </svg>
-            </div>
-            <%= form.text_field :name,
-                class: "block w-full pl-10 pr-4 py-3 border border-slate-300 rounded-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors",
-                placeholder: "Your organization name" %>
-          </div>
-          <p class="mt-2 text-sm text-slate-500">This is the name of your organization or team.</p>
+    <%# Sidebar %>
+    <div class="space-y-6">
+      <%# Current Settings Card %>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-white">
+          <h3 class="text-lg font-semibold text-slate-900">Current Settings</h3>
+          <p class="text-sm text-slate-500 mt-1">Your current account configuration</p>
         </div>
-
-        <%# Subdomain %>
-        <div>
-          <%= form.label :subdomain, class: "block text-sm font-medium text-slate-700 mb-2" %>
-          <div class="flex rounded-lg shadow-sm">
-            <div class="relative flex-grow">
-              <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <svg class="h-5 w-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <div class="divide-y divide-slate-100">
+          <div class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-amber-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Account Name</p>
+                <p class="text-sm font-semibold text-slate-900 truncate"><%= @account.name %></p>
+              </div>
+            </div>
+          </div>
+          <div class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-blue-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 01-9 9m9-9a9 9 0 00-9-9m9 9H3m9 9a9 9 0 01-9-9m9 9c1.657 0 3-4.03 3-9s-1.343-9-3-9m0 18c-1.657 0-3-4.03-3-9s1.343-9 3-9m-9 9a9 9 0 019-9" />
                 </svg>
               </div>
-              <%= form.text_field :subdomain,
-                  class: "block w-full pl-10 pr-4 py-3 border border-slate-300 rounded-l-lg text-slate-900 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-colors",
-                  placeholder: "yourcompany" %>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Subdomain</p>
+                <p class="text-sm font-semibold text-slate-900 truncate">
+                  <%= @account.subdomain.present? ? "#{@account.subdomain}.#{request.domain}" : 'Not configured' %>
+                </p>
+              </div>
             </div>
-            <span class="inline-flex items-center px-4 py-3 border border-l-0 border-slate-300 bg-slate-50 text-slate-500 rounded-r-lg text-sm font-medium">
-              .<%= request.domain %>
-            </span>
           </div>
-          <p class="mt-2 text-sm text-slate-500">
-            Optional: A custom subdomain for your account. Only lowercase letters, numbers, and hyphens allowed.
-          </p>
+          <div class="px-6 py-4">
+            <div class="flex items-center gap-3">
+              <div class="flex-shrink-0 w-9 h-9 rounded-lg bg-green-100 flex items-center justify-center">
+                <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div class="flex-1 min-w-0">
+                <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Created</p>
+                <p class="text-sm font-semibold text-slate-900"><%= @account.created_at.strftime('%B %d, %Y') %></p>
+              </div>
+            </div>
+          </div>
         </div>
+      </div>
 
-        <%# Actions %>
-        <div class="flex items-center justify-end pt-4 border-t border-slate-200 space-x-3">
-          <%= link_to "Cancel", account_path, class: "px-4 py-2.5 border border-slate-300 text-slate-700 text-sm font-medium rounded-lg hover:bg-slate-50 transition-colors" %>
-          <%= form.submit "Save Changes",
-              class: "px-6 py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg shadow-lg shadow-indigo-500/25 hover:shadow-indigo-500/40 transition-all duration-200 cursor-pointer" %>
+      <%# Tips Card %>
+      <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl border border-amber-200 p-5">
+        <div class="flex items-start gap-3">
+          <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-semibold text-amber-900">Tips</h4>
+            <ul class="mt-2 text-sm text-amber-800 space-y-2">
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Your account name appears in invoices and communications with clients.</span>
+              </li>
+              <li class="flex items-start gap-2">
+                <svg class="w-4 h-4 text-amber-500 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+                </svg>
+                <span>Subdomains let team members access your account with a custom URL.</span>
+              </li>
+            </ul>
+          </div>
         </div>
-      <% end %>
+      </div>
     </div>
   </div>
 
   <%# Danger Zone %>
-  <div class="bg-white rounded-xl shadow-sm border border-red-200">
-    <div class="px-6 py-4 border-b border-red-100 bg-red-50 rounded-t-xl">
-      <h3 class="text-lg font-semibold text-red-900">Danger Zone</h3>
-      <p class="text-sm text-red-600">Irreversible and destructive actions</p>
+  <div class="bg-white rounded-2xl shadow-sm border border-red-200 overflow-hidden">
+    <div class="px-6 py-5 border-b border-red-100 bg-gradient-to-r from-red-50 to-white">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-red-100 flex items-center justify-center">
+          <svg class="w-5 h-5 text-red-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-lg font-semibold text-red-900">Danger Zone</h3>
+          <p class="text-sm text-red-600">Irreversible and destructive actions</p>
+        </div>
+      </div>
     </div>
     <div class="p-6">
-      <div class="flex items-center justify-between">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div>
-          <h4 class="text-sm font-medium text-slate-900">Delete this account</h4>
+          <h4 class="text-sm font-semibold text-slate-900">Delete this account</h4>
           <p class="text-sm text-slate-500 mt-1">
-            Once you delete an account, there is no going back. This will permanently delete all data associated with this account.
+            Once you delete an account, there is no going back. This will permanently delete all data associated with this account including projects, invoices, documents, and team members.
           </p>
         </div>
-        <button type="button" class="flex-shrink-0 px-4 py-2 border border-red-300 text-red-700 text-sm font-medium rounded-lg hover:bg-red-50 transition-colors" disabled>
+        <button type="button" class="flex-shrink-0 inline-flex items-center gap-2 px-4 py-2.5 border border-red-300 text-red-700 text-sm font-semibold rounded-xl hover:bg-red-50 transition-colors cursor-not-allowed opacity-60" disabled>
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+          </svg>
           Delete Account
         </button>
+      </div>
+      <div class="mt-4 p-3 bg-slate-50 rounded-xl">
+        <p class="text-xs text-slate-500">
+          <span class="font-semibold">Note:</span> Account deletion is currently disabled. Please contact support if you need to delete your account.
+        </p>
       </div>
     </div>
   </div>

@@ -30,6 +30,16 @@ Rails.application.routes.draw do
       get :billing
       post :switch, to: "accounts#switch"
     end
+    resources :members, only: [ :index, :create, :update, :destroy ] do
+      member do
+        delete :leave
+      end
+    end
+    resources :invitations, only: [ :new, :create, :destroy ] do
+      member do
+        post :resend
+      end
+    end
   end
 
   # ==================================

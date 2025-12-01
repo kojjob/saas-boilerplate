@@ -1,156 +1,282 @@
-<div class="max-w-4xl mx-auto">
-  <div class="bg-white rounded-lg shadow-xl overflow-hidden">
-    <%# Invoice Header %>
-    <div class="bg-gradient-to-r from-slate-800 to-slate-900 text-white px-8 py-8">
-      <div class="flex justify-between items-start">
-        <div>
-          <h1 class="text-3xl font-bold">INVOICE</h1>
-          <p class="text-slate-300 mt-1">#<%= @invoice.invoice_number %></p>
+<div class="max-w-4xl mx-auto invoice-container">
+  <div class="bg-white rounded-2xl shadow-2xl shadow-slate-200/50 overflow-hidden">
+    <%# Invoice Header with Gradient %>
+    <div class="relative overflow-hidden">
+      <%# Background gradient based on status - darker, more vibrant colors %>
+      <% header_gradient = case @invoice.status
+        when "paid" then "from-emerald-800 via-emerald-700 to-teal-700"
+        when "overdue" then "from-red-800 via-red-700 to-rose-700"
+        when "sent", "viewed" then "from-indigo-900 via-purple-800 to-violet-800"
+        else "from-slate-900 via-slate-800 to-slate-700"
+      end %>
+
+      <div class="bg-gradient-to-r <%= header_gradient %> text-white px-10 py-10">
+        <%# Decorative pattern %>
+        <div class="absolute inset-0 opacity-10">
+          <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+            <defs>
+              <pattern id="invoice-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+                <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#invoice-grid)"/>
+          </svg>
         </div>
-        <div class="text-right">
-          <h2 class="text-xl font-semibold"><%= current_account.name %></h2>
-          <% if current_account.respond_to?(:email) && current_account.email.present? %>
-            <p class="text-slate-300 text-sm"><%= current_account.email %></p>
+
+        <div class="relative flex justify-between items-start">
+          <%# Left: Invoice Title %>
+          <div>
+            <div class="flex items-center gap-3 mb-2">
+              <div class="w-12 h-12 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+                <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+              </div>
+              <div>
+                <h1 class="text-3xl font-bold tracking-tight">INVOICE</h1>
+                <p class="text-white/80 font-mono text-lg">#<%= @invoice.invoice_number %></p>
+              </div>
+            </div>
+          </div>
+
+          <%# Right: Company Info %>
+          <div class="text-right">
+            <h2 class="text-2xl font-bold mb-1"><%= current_account.name %></h2>
+            <% if current_account.respond_to?(:email) && current_account.email.present? %>
+              <p class="text-white/80 text-sm"><%= current_account.email %></p>
+            <% end %>
+            <% if current_account.respond_to?(:phone) && current_account.phone.present? %>
+              <p class="text-white/80 text-sm"><%= current_account.phone %></p>
+            <% end %>
+          </div>
+        </div>
+
+        <%# Status Badge %>
+        <div class="mt-6 flex items-center gap-4">
+          <% status_badge_class = case @invoice.status
+            when "paid" then "bg-white/20 text-white"
+            when "overdue" then "bg-white/20 text-white"
+            when "sent", "viewed" then "bg-white/20 text-white"
+            else "bg-white/20 text-white"
+          end %>
+          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-semibold <%= status_badge_class %> backdrop-blur">
+            <% if @invoice.paid? %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            <% elsif @invoice.overdue? %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+            <% else %>
+              <span class="w-2 h-2 rounded-full bg-white"></span>
+            <% end %>
+            <%= @invoice.status.humanize.upcase %>
+          </span>
+
+          <% if @invoice.paid? && @invoice.paid_at.present? %>
+            <span class="text-white/70 text-sm">
+              Paid on <%= @invoice.paid_at.strftime("%B %d, %Y") %>
+            </span>
           <% end %>
         </div>
       </div>
     </div>
 
-    <%# Invoice Details %>
-    <div class="px-8 py-6 border-b border-slate-200">
-      <div class="grid grid-cols-2 gap-8">
+    <%# Invoice Details Section %>
+    <div class="px-10 py-8 bg-slate-50/50 border-b border-slate-200">
+      <div class="grid grid-cols-2 gap-12">
         <%# Bill To %>
         <div>
-          <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-3">Bill To</h3>
-          <p class="text-lg font-semibold text-slate-900"><%= @invoice.client.name %></p>
-          <% if @invoice.client.company.present? %>
-            <p class="text-slate-600"><%= @invoice.client.company %></p>
-          <% end %>
-          <% if @invoice.client.email.present? %>
-            <p class="text-slate-500 text-sm"><%= @invoice.client.email %></p>
-          <% end %>
-          <% if @invoice.client.phone.present? %>
-            <p class="text-slate-500 text-sm"><%= @invoice.client.phone %></p>
-          <% end %>
-          <% if @invoice.client.address_line1.present? %>
-            <div class="text-slate-500 text-sm mt-2">
-              <p><%= @invoice.client.address_line1 %></p>
-              <% if @invoice.client.address_line2.present? %>
-                <p><%= @invoice.client.address_line2 %></p>
-              <% end %>
-              <% if @invoice.client.city.present? || @invoice.client.state.present? %>
-                <p>
-                  <%= [@invoice.client.city, @invoice.client.state].compact.join(", ") %>
-                  <%= @invoice.client.postal_code %>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+            </svg>
+            Bill To
+          </h3>
+          <div class="bg-white rounded-xl p-5 border border-slate-200 shadow-sm">
+            <p class="text-lg font-bold text-slate-900"><%= @invoice.client.name %></p>
+            <% if @invoice.client.company.present? %>
+              <p class="text-slate-600 font-medium"><%= @invoice.client.company %></p>
+            <% end %>
+            <div class="mt-3 space-y-1">
+              <% if @invoice.client.email.present? %>
+                <p class="text-sm text-slate-500 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+                  </svg>
+                  <%= @invoice.client.email %>
                 </p>
               <% end %>
-              <% if @invoice.client.country.present? %>
-                <p><%= @invoice.client.country %></p>
+              <% if @invoice.client.phone.present? %>
+                <p class="text-sm text-slate-500 flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 6.75c0 8.284 6.716 15 15 15h2.25a2.25 2.25 0 002.25-2.25v-1.372c0-.516-.351-.966-.852-1.091l-4.423-1.106c-.44-.11-.902.055-1.173.417l-.97 1.293c-.282.376-.769.542-1.21.38a12.035 12.035 0 01-7.143-7.143c-.162-.441.004-.928.38-1.21l1.293-.97c.363-.271.527-.734.417-1.173L6.963 3.102a1.125 1.125 0 00-1.091-.852H4.5A2.25 2.25 0 002.25 4.5v2.25z" />
+                  </svg>
+                  <%= @invoice.client.phone %>
+                </p>
               <% end %>
             </div>
-          <% end %>
+            <% if @invoice.client.address_line1.present? %>
+              <div class="mt-3 pt-3 border-t border-slate-100 text-sm text-slate-500">
+                <p><%= @invoice.client.address_line1 %></p>
+                <% if @invoice.client.address_line2.present? %>
+                  <p><%= @invoice.client.address_line2 %></p>
+                <% end %>
+                <% if @invoice.client.city.present? || @invoice.client.state.present? %>
+                  <p><%= [@invoice.client.city, @invoice.client.state].compact.join(", ") %> <%= @invoice.client.postal_code %></p>
+                <% end %>
+                <% if @invoice.client.country.present? %>
+                  <p><%= @invoice.client.country %></p>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
         </div>
 
         <%# Invoice Info %>
-        <div class="text-right">
-          <div class="inline-block text-left">
-            <div class="grid grid-cols-2 gap-x-6 gap-y-2">
-              <span class="text-slate-500 text-sm">Issue Date:</span>
-              <span class="text-slate-900 font-medium text-sm"><%= @invoice.issue_date&.strftime("%b %d, %Y") %></span>
-
-              <span class="text-slate-500 text-sm">Due Date:</span>
-              <span class="text-slate-900 font-medium text-sm <%= @invoice.past_due? ? 'text-red-600' : '' %>">
-                <%= @invoice.due_date&.strftime("%b %d, %Y") %>
-              </span>
-
-              <span class="text-slate-500 text-sm">Status:</span>
-              <span class="text-sm font-medium">
-                <% status_colors = {
-                  "draft" => "text-slate-600",
-                  "sent" => "text-blue-600",
-                  "viewed" => "text-purple-600",
-                  "paid" => "text-emerald-600",
-                  "overdue" => "text-red-600",
-                  "cancelled" => "text-slate-400"
-                } %>
-                <span class="<%= status_colors[@invoice.status] %>"><%= @invoice.status.humanize %></span>
-              </span>
+        <div>
+          <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4 flex items-center gap-2">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+            </svg>
+            Invoice Details
+          </h3>
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="divide-y divide-slate-100">
+              <div class="flex justify-between items-center px-5 py-4">
+                <span class="text-sm text-slate-500">Invoice Number</span>
+                <span class="text-sm font-bold text-slate-900 font-mono">#<%= @invoice.invoice_number %></span>
+              </div>
+              <div class="flex justify-between items-center px-5 py-4">
+                <span class="text-sm text-slate-500">Issue Date</span>
+                <span class="text-sm font-semibold text-slate-900"><%= @invoice.issue_date&.strftime("%B %d, %Y") %></span>
+              </div>
+              <div class="flex justify-between items-center px-5 py-4 <%= @invoice.past_due? ? 'bg-red-50' : '' %>">
+                <span class="text-sm text-slate-500">Due Date</span>
+                <span class="text-sm font-semibold <%= @invoice.past_due? ? 'text-red-600' : 'text-slate-900' %>">
+                  <%= @invoice.due_date&.strftime("%B %d, %Y") %>
+                  <% if @invoice.past_due? %>
+                    <span class="text-xs ml-1">(Overdue)</span>
+                  <% end %>
+                </span>
+              </div>
+              <% if @invoice.project.present? %>
+                <div class="flex justify-between items-center px-5 py-4">
+                  <span class="text-sm text-slate-500">Project</span>
+                  <span class="text-sm font-semibold text-slate-900"><%= @invoice.project.name %></span>
+                </div>
+              <% end %>
             </div>
           </div>
         </div>
       </div>
     </div>
 
-    <% if @invoice.project.present? %>
-      <div class="px-8 py-4 border-b border-slate-200 bg-slate-50">
-        <div class="flex items-center gap-2">
-          <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider">Project:</span>
-          <span class="text-sm font-medium text-slate-700"><%= @invoice.project.name %></span>
-        </div>
-      </div>
-    <% end %>
+    <%# Line Items Table %>
+    <div class="px-10 py-8">
+      <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-5 flex items-center gap-2">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 6.75h12M8.25 12h12m-12 5.25h12M3.75 6.75h.007v.008H3.75V6.75zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zM3.75 12h.007v.008H3.75V12zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm-.375 5.25h.007v.008H3.75v-.008zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+        </svg>
+        Line Items
+      </h3>
 
-    <%# Line Items %>
-    <div class="px-8 py-6">
-      <table class="w-full">
-        <thead>
-          <tr class="border-b-2 border-slate-200">
-            <th class="py-3 text-left text-xs font-semibold text-slate-500 uppercase tracking-wider">Description</th>
-            <th class="py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider w-24">Qty</th>
-            <th class="py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider w-32">Rate</th>
-            <th class="py-3 text-right text-xs font-semibold text-slate-500 uppercase tracking-wider w-32">Amount</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-slate-100">
-          <% @invoice.line_items.each do |item| %>
-            <tr>
-              <td class="py-4 text-sm text-slate-900"><%= item.description %></td>
-              <td class="py-4 text-sm text-slate-600 text-right"><%= number_with_precision(item.quantity, precision: 2) %></td>
-              <td class="py-4 text-sm text-slate-600 text-right"><%= number_to_currency(item.unit_price) %></td>
-              <td class="py-4 text-sm text-slate-900 font-medium text-right"><%= number_to_currency(item.quantity * item.unit_price) %></td>
+      <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+        <table class="w-full">
+          <thead>
+            <tr class="bg-slate-50 border-b border-slate-200">
+              <th class="py-4 px-6 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Description</th>
+              <th class="py-4 px-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider w-24">Qty</th>
+              <th class="py-4 px-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider w-32">Rate</th>
+              <th class="py-4 px-6 text-right text-xs font-bold text-slate-500 uppercase tracking-wider w-36">Amount</th>
             </tr>
-          <% end %>
-          <% if @invoice.line_items.empty? %>
-            <tr>
-              <td colspan="4" class="py-8 text-center text-slate-400">No line items</td>
-            </tr>
-          <% end %>
-        </tbody>
-      </table>
+          </thead>
+          <tbody class="divide-y divide-slate-100">
+            <% @invoice.line_items.each_with_index do |item, index| %>
+              <tr class="<%= index.even? ? 'bg-white' : 'bg-slate-50/30' %> hover:bg-slate-50 transition-colors">
+                <td class="py-5 px-6">
+                  <p class="text-sm font-medium text-slate-900"><%= item.description %></p>
+                </td>
+                <td class="py-5 px-4 text-right">
+                  <span class="text-sm text-slate-600"><%= number_with_precision(item.quantity, precision: 2) %></span>
+                </td>
+                <td class="py-5 px-4 text-right">
+                  <span class="text-sm text-slate-600"><%= number_to_currency(item.unit_price) %></span>
+                </td>
+                <td class="py-5 px-6 text-right">
+                  <span class="text-sm font-semibold text-slate-900"><%= number_to_currency(item.quantity * item.unit_price) %></span>
+                </td>
+              </tr>
+            <% end %>
+            <% if @invoice.line_items.empty? %>
+              <tr>
+                <td colspan="4" class="py-12 text-center">
+                  <svg class="w-12 h-12 text-slate-300 mx-auto mb-3" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25z" />
+                  </svg>
+                  <p class="text-slate-400">No line items</p>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
     </div>
 
-    <%# Totals %>
-    <div class="px-8 py-6 bg-slate-50 border-t border-slate-200">
+    <%# Totals Section %>
+    <div class="px-10 py-8 bg-slate-50 border-t border-slate-200">
       <div class="flex justify-end">
-        <div class="w-64 space-y-2">
-          <div class="flex justify-between text-sm">
-            <span class="text-slate-500">Subtotal</span>
-            <span class="text-slate-900 font-medium"><%= number_to_currency(@invoice.subtotal) %></span>
-          </div>
-          <% if @invoice.tax_rate.present? && @invoice.tax_rate > 0 %>
-            <div class="flex justify-between text-sm">
-              <span class="text-slate-500">Tax (<%= number_with_precision(@invoice.tax_rate, precision: 2) %>%)</span>
-              <span class="text-slate-900 font-medium"><%= number_to_currency(@invoice.tax_amount) %></span>
+        <div class="w-80">
+          <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+            <div class="divide-y divide-slate-100">
+              <div class="flex justify-between items-center px-6 py-4">
+                <span class="text-sm text-slate-500">Subtotal</span>
+                <span class="text-sm font-semibold text-slate-900"><%= number_to_currency(@invoice.subtotal) %></span>
+              </div>
+              <% if @invoice.tax_rate.present? && @invoice.tax_rate > 0 %>
+                <div class="flex justify-between items-center px-6 py-4">
+                  <span class="text-sm text-slate-500">Tax (<%= number_with_precision(@invoice.tax_rate, precision: 2) %>%)</span>
+                  <span class="text-sm font-semibold text-slate-900"><%= number_to_currency(@invoice.tax_amount) %></span>
+                </div>
+              <% end %>
+              <% if @invoice.discount_amount.present? && @invoice.discount_amount > 0 %>
+                <div class="flex justify-between items-center px-6 py-4">
+                  <span class="text-sm text-slate-500">Discount</span>
+                  <span class="text-sm font-semibold text-emerald-600">-<%= number_to_currency(@invoice.discount_amount) %></span>
+                </div>
+              <% end %>
             </div>
-          <% end %>
-          <% if @invoice.discount_amount.present? && @invoice.discount_amount > 0 %>
-            <div class="flex justify-between text-sm">
-              <span class="text-slate-500">Discount</span>
-              <span class="text-emerald-600 font-medium">-<%= number_to_currency(@invoice.discount_amount) %></span>
+
+            <%# Total Amount %>
+            <div class="px-6 py-5 bg-gradient-to-r <%= @invoice.paid? ? 'from-emerald-500 to-teal-500' : 'from-slate-800 to-slate-900' %>">
+              <div class="flex justify-between items-center">
+                <span class="text-white/80 font-medium">Total Amount</span>
+                <span class="text-2xl font-bold text-white"><%= number_to_currency(@invoice.total_amount) %></span>
+              </div>
             </div>
-          <% end %>
-          <div class="pt-3 border-t-2 border-slate-300 flex justify-between">
-            <span class="text-slate-900 font-semibold">Total</span>
-            <span class="text-2xl font-bold text-slate-900"><%= number_to_currency(@invoice.total_amount) %></span>
           </div>
+
           <% if @invoice.paid? %>
-            <div class="pt-2">
-              <span class="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-sm font-medium bg-emerald-100 text-emerald-700">
-                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-                PAID
-              </span>
+            <div class="mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-emerald-50 rounded-xl border border-emerald-200">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm font-semibold text-emerald-700">PAID IN FULL</span>
+            </div>
+          <% elsif @invoice.past_due? %>
+            <div class="mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-red-50 rounded-xl border border-red-200">
+              <svg class="w-5 h-5 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+              <span class="text-sm font-semibold text-red-700">PAYMENT OVERDUE</span>
+            </div>
+          <% elsif @invoice.unpaid? %>
+            <div class="mt-4 flex items-center justify-center gap-2 py-3 px-4 bg-amber-50 rounded-xl border border-amber-200">
+              <svg class="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span class="text-sm font-semibold text-amber-700">PAYMENT PENDING</span>
             </div>
           <% end %>
         </div>
@@ -159,25 +285,83 @@
 
     <%# Notes & Terms %>
     <% if @invoice.notes.present? || @invoice.terms.present? %>
-      <div class="px-8 py-6 border-t border-slate-200">
-        <% if @invoice.notes.present? %>
-          <div class="mb-4">
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Notes</h3>
-            <p class="text-sm text-slate-600"><%= simple_format(@invoice.notes) %></p>
-          </div>
-        <% end %>
-        <% if @invoice.terms.present? %>
-          <div>
-            <h3 class="text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Terms & Conditions</h3>
-            <p class="text-sm text-slate-500"><%= simple_format(@invoice.terms) %></p>
-          </div>
-        <% end %>
+      <div class="px-10 py-8 border-t border-slate-200">
+        <div class="grid grid-cols-2 gap-8">
+          <% if @invoice.notes.present? %>
+            <div>
+              <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+                </svg>
+                Notes
+              </h3>
+              <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                <p class="text-sm text-slate-600 whitespace-pre-wrap"><%= @invoice.notes %></p>
+              </div>
+            </div>
+          <% end %>
+          <% if @invoice.terms.present? %>
+            <div>
+              <h3 class="text-xs font-bold text-slate-400 uppercase tracking-widest mb-3 flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                Terms & Conditions
+              </h3>
+              <div class="bg-slate-50 rounded-xl p-5 border border-slate-100">
+                <p class="text-sm text-slate-500 whitespace-pre-wrap"><%= @invoice.terms %></p>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+
+    <%# Payment Information (if paid) %>
+    <% if @invoice.paid? && (@invoice.payment_method.present? || @invoice.payment_reference.present?) %>
+      <div class="px-10 py-8 bg-emerald-50 border-t border-emerald-100">
+        <h3 class="text-xs font-bold text-emerald-600 uppercase tracking-widest mb-4 flex items-center gap-2">
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          Payment Received
+        </h3>
+        <div class="grid grid-cols-3 gap-6">
+          <% if @invoice.paid_at.present? %>
+            <div class="bg-white rounded-xl p-4 border border-emerald-200">
+              <p class="text-xs text-emerald-600 font-medium uppercase mb-1">Payment Date</p>
+              <p class="text-sm font-semibold text-slate-900"><%= @invoice.paid_at.strftime("%B %d, %Y") %></p>
+            </div>
+          <% end %>
+          <% if @invoice.payment_method.present? %>
+            <div class="bg-white rounded-xl p-4 border border-emerald-200">
+              <p class="text-xs text-emerald-600 font-medium uppercase mb-1">Payment Method</p>
+              <p class="text-sm font-semibold text-slate-900"><%= @invoice.payment_method.humanize %></p>
+            </div>
+          <% end %>
+          <% if @invoice.payment_reference.present? %>
+            <div class="bg-white rounded-xl p-4 border border-emerald-200">
+              <p class="text-xs text-emerald-600 font-medium uppercase mb-1">Reference</p>
+              <p class="text-sm font-semibold text-slate-900 font-mono"><%= @invoice.payment_reference %></p>
+            </div>
+          <% end %>
+        </div>
       </div>
     <% end %>
 
     <%# Footer %>
-    <div class="px-8 py-4 bg-slate-100 border-t border-slate-200 text-center">
-      <p class="text-xs text-slate-400">Thank you for your business!</p>
+    <div class="px-10 py-6 bg-gradient-to-r from-slate-100 to-slate-50 border-t border-slate-200">
+      <div class="text-center">
+        <p class="text-sm text-slate-500 mb-1">Thank you for your business!</p>
+        <p class="text-xs text-slate-400">
+          Questions about this invoice? Contact us at
+          <% if current_account.respond_to?(:email) && current_account.email.present? %>
+            <span class="text-slate-600"><%= current_account.email %></span>
+          <% else %>
+            <span class="text-slate-600">support@example.com</span>
+          <% end %>
+        </p>
+      </div>
     </div>
   </div>
 </div>
