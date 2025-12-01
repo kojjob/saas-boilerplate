@@ -1,0 +1,36 @@
+<%= email_heading @alert.title %>
+
+<%= email_paragraph "A new alert has been triggered for your account." %>
+
+<%= email_spacer %>
+
+<%= email_info_box @alert.message, type: alert_severity_type(@alert) %>
+
+<%= email_spacer %>
+
+<table role="presentation" cellspacing="0" cellpadding="8" border="0" style="width: 100%; border: 1px solid #e5e7eb; border-radius: 8px;">
+  <tr>
+    <td style="border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151;">Severity</td>
+    <td style="border-bottom: 1px solid #e5e7eb; color: <%= severity_color(@alert) %>;"><%= @alert.severity.titleize %></td>
+  </tr>
+  <tr>
+    <td style="border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151;">Type</td>
+    <td style="border-bottom: 1px solid #e5e7eb;"><%= @alert.alert_type.titleize %></td>
+  </tr>
+  <tr>
+    <td style="border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151;">Account</td>
+    <td style="border-bottom: 1px solid #e5e7eb;"><%= @account&.name || 'N/A' %></td>
+  </tr>
+  <tr>
+    <td style="font-weight: 600; color: #374151;">Time</td>
+    <td><%= @alert.created_at.strftime('%B %d, %Y at %I:%M %p %Z') %></td>
+  </tr>
+</table>
+
+<%= email_spacer %>
+
+<%= email_paragraph "If this alert requires immediate attention, please take appropriate action." %>
+
+<%= email_divider %>
+
+<%= email_paragraph "This is an automated alert from #{company_name}. You can manage your alert preferences in your account settings." %>

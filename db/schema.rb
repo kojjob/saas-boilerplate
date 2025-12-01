@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_01_042504) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_01_044914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -64,6 +64,31 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_042504) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "alerts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "acknowledged_at"
+    t.string "alert_type", null: false
+    t.uuid "alertable_id"
+    t.string "alertable_type"
+    t.datetime "created_at", null: false
+    t.string "error_message"
+    t.text "message"
+    t.jsonb "metadata", default: {}
+    t.datetime "sent_at"
+    t.integer "severity", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "alert_type"], name: "index_alerts_on_account_id_and_alert_type"
+    t.index ["account_id", "status"], name: "index_alerts_on_account_id_and_status"
+    t.index ["account_id"], name: "index_alerts_on_account_id"
+    t.index ["alert_type"], name: "index_alerts_on_alert_type"
+    t.index ["alertable_type", "alertable_id"], name: "index_alerts_on_alertable"
+    t.index ["created_at"], name: "index_alerts_on_created_at"
+    t.index ["severity"], name: "index_alerts_on_severity"
+    t.index ["status"], name: "index_alerts_on_status"
   end
 
   create_table "api_tokens", force: :cascade do |t|
@@ -647,6 +672,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_042504) do
   add_foreign_key "accounts", "plans"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "alerts", "accounts"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "clients", "accounts"
   add_foreign_key "conversations", "accounts"
