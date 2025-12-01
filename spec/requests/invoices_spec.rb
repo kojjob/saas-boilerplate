@@ -621,4 +621,85 @@ RSpec.describe "Invoices", type: :request do
       end
     end
   end
+
+  describe "GET /invoices/:id/download" do
+    let!(:invoice) { create(:invoice, account: account, client: client, invoice_number: "INV-PDF-TEST") }
+
+    it "returns a PDF file" do
+      get download_invoice_path(invoice)
+
+      expect(response).to have_http_status(:success)
+      expect(response.content_type).to eq("application/pdf")
+    end
+
+    it "sets correct filename in Content-Disposition header" do
+      get download_invoice_path(invoice)
+
+      expect(response.headers["Content-Disposition"]).to include("attachment")
+      expect(response.headers["Content-Disposition"]).to include("Invoice-INV-PDF-TEST.pdf")
+    end
+
+    it "generates a valid PDF" do
+      get download_invoice_path(invoice)
+
+      expect(response.body).to start_with("%PDF")
+    end
+
+    context "when invoice belongs to another account" do
+      let(:other_account) { create(:account) }
+      let(:other_client) { create(:client, account: other_account) }
+      let(:other_invoice) { create(:invoice, account: other_account, client: other_client) }
+
+      it "returns not found" do
+        get download_invoice_path(other_invoice)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+
+    context "when user is not authenticated" do
+      before { sign_out }
+
+      it "redirects to sign in" do
+        get download_invoice_path(invoice)
+
+        expect(response).to redirect_to(sign_in_path)
+      end
+    end
+  end
+
+  describe "GET /invoices/:id/preview" do
+    let!(:invoice) { create(:invoice, account: account, client: client, invoice_number: "INV-PREVIEW") }
+
+    it "returns http success" do
+      get preview_invoice_path(invoice)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "renders the PDF template with invoice details" do
+      get preview_invoice_path(invoice)
+
+      expect(response.body).to include("INV-PREVIEW")
+      expect(response.body).to include(client.name)
+    end
+
+    it "uses the PDF layout" do
+      get preview_invoice_path(invoice)
+
+      expect(response.body).to include("INVOICE")
+    end
+
+    context "when invoice belongs to another account" do
+      let(:other_account) { create(:account) }
+      let(:other_client) { create(:client, account: other_account) }
+      let(:other_invoice) { create(:invoice, account: other_account, client: other_client) }
+
+      it "returns not found" do
+        get preview_invoice_path(other_invoice)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
 end

@@ -4,7 +4,7 @@ class InvoicesController < ApplicationController
   layout "dashboard"
 
   before_action :authenticate_user!
-  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :send_invoice, :mark_paid, :mark_cancelled ]
+  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :send_invoice, :mark_paid, :mark_cancelled, :preview, :download ]
   before_action :set_form_data, only: [ :new, :create, :edit, :update ]
 
   def index
@@ -110,6 +110,23 @@ class InvoicesController < ApplicationController
       redirect_to invoices_path, notice: "Invoice was cancelled."
     else
       redirect_to invoices_path, alert: "Paid invoices cannot be cancelled."
+    end
+  end
+
+  def preview
+    render template: "invoices/pdf", layout: "pdf"
+  end
+
+  def download
+    result = Pdf::InvoicePdfGenerator.call(invoice: @invoice)
+
+    if result.success?
+      send_data result.pdf,
+                filename: result.filename,
+                type: "application/pdf",
+                disposition: "attachment"
+    else
+      redirect_to @invoice, alert: "Failed to generate PDF: #{result.error}"
     end
   end
 
