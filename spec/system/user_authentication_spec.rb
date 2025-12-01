@@ -87,9 +87,14 @@ RSpec.describe "User Authentication", type: :system do
     end
 
     it "allows a user to sign out" do
-      # Find and click sign out (usually in a dropdown or header)
-      click_button "Sign out" if page.has_button?("Sign out")
-      click_link "Sign out" if page.has_link?("Sign out")
+      # Open the user profile dropdown menu (the last dropdown in the header)
+      all('[data-controller="dropdown"] button').last.click
+
+      # Wait for dropdown to be visible and click sign out
+      within(all('[data-dropdown-target="menu"]').last, visible: true) do
+        # Click on the element containing "Sign out" text
+        click_on "Sign out"
+      end
 
       expect(page).to have_current_path(root_path).or have_current_path(sign_in_path)
     end

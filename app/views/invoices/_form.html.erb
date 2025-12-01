@@ -1,0 +1,217 @@
+<%= form_with model: invoice, class: "space-y-5", data: { controller: "invoice-form", action: "change->invoice-form#calculateTotals" } do |f| %>
+  <% if invoice.errors.any? %>
+    <div class="rounded-lg bg-red-50 p-4 text-sm text-red-700">
+      <ul class="list-disc pl-5 space-y-1">
+        <% invoice.errors.full_messages.each do |message| %>
+          <li><%= message %></li>
+        <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <%# Invoice Details Section %>
+  <div class="space-y-4">
+    <h3 class="text-sm font-medium text-gray-900">Invoice details</h3>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Client</label>
+        <%= f.collection_select :client_id, @clients, :id, :name,
+            { prompt: "Select a client" },
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white",
+            data: { invoice_form_target: "client" } %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Project <span class="text-gray-400 font-normal">(optional)</span></label>
+        <%= f.collection_select :project_id, @projects, :id, :name,
+            { include_blank: "No project" },
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white" %>
+      </div>
+    </div>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Invoice number</label>
+        <%= f.text_field :invoice_number,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent #{invoice.persisted? ? 'bg-gray-50' : ''}",
+            placeholder: "Auto-generated if blank",
+            readonly: invoice.persisted? %>
+        <p class="mt-1 text-xs text-gray-500">Leave blank to auto-generate</p>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Status</label>
+        <%= f.select :status, Invoice.statuses.keys.map { |s| [s.humanize, s] },
+            {},
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent bg-white" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Dates Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Dates</h3>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Issue date</label>
+        <%= f.date_field :issue_date,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Due date</label>
+        <%= f.date_field :due_date,
+            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+      </div>
+    </div>
+  </div>
+
+  <%# Line Items Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Line items</h3>
+
+    <div data-invoice-form-target="lineItems" class="space-y-3">
+      <%= f.fields_for :line_items do |line_item| %>
+        <div class="flex items-start gap-3 p-3 bg-gray-50 rounded-lg" data-invoice-form-target="lineItem">
+          <div class="flex-1 grid grid-cols-12 gap-3">
+            <div class="col-span-12 md:col-span-5">
+              <%= line_item.text_field :description,
+                  placeholder: "Description",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
+            </div>
+            <div class="col-span-4 md:col-span-2">
+              <%= line_item.number_field :quantity,
+                  step: 0.01,
+                  min: 0,
+                  placeholder: "Qty",
+                  class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+                  data: { action: "change->invoice-form#calculateTotals" } %>
+            </div>
+            <div class="col-span-4 md:col-span-3">
+              <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                  <span class="text-gray-400 text-sm">$</span>
+                </div>
+                <%= line_item.number_field :unit_price,
+                    step: 0.01,
+                    min: 0,
+                    placeholder: "0.00",
+                    class: "w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+                    data: { action: "change->invoice-form#calculateTotals" } %>
+              </div>
+            </div>
+            <div class="col-span-4 md:col-span-2 flex items-center">
+              <span class="text-sm font-medium text-gray-700" data-invoice-form-target="lineAmount">
+                <%= number_to_currency((line_item.object.quantity || 0) * (line_item.object.unit_price || 0)) %>
+              </span>
+            </div>
+          </div>
+          <div class="flex-shrink-0">
+            <%= line_item.hidden_field :_destroy %>
+            <button type="button" data-action="click->invoice-form#removeLineItem" class="p-1 text-gray-400 hover:text-red-500 transition-colors">
+              <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+          <%= line_item.hidden_field :position, value: line_item.index %>
+        </div>
+      <% end %>
+    </div>
+
+    <button type="button" data-action="click->invoice-form#addLineItem" class="inline-flex items-center gap-2 px-3 py-2 text-sm font-medium text-indigo-600 hover:text-indigo-700 transition-colors">
+      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+      </svg>
+      Add line item
+    </button>
+  </div>
+
+  <%# Pricing Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Pricing</h3>
+
+    <div class="grid grid-cols-2 gap-4">
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Tax rate</label>
+        <div class="relative">
+          <%= f.number_field :tax_rate,
+              step: 0.01,
+              min: 0,
+              max: 100,
+              placeholder: "0.00",
+              class: "w-full px-3 py-2 pr-8 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+              data: { invoice_form_target: "taxRate", action: "change->invoice-form#calculateTotals" } %>
+          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
+            <span class="text-gray-400 text-sm">%</span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <label class="block text-sm font-medium text-gray-700 mb-2">Discount amount</label>
+        <div class="relative">
+          <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+            <span class="text-gray-400 text-sm">$</span>
+          </div>
+          <%= f.number_field :discount_amount,
+              step: 0.01,
+              min: 0,
+              placeholder: "0.00",
+              class: "w-full pl-7 pr-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent",
+              data: { invoice_form_target: "discountAmount", action: "change->invoice-form#calculateTotals" } %>
+        </div>
+      </div>
+    </div>
+
+    <%# Totals Display %>
+    <div class="bg-gray-50 rounded-lg p-4 space-y-2">
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">Subtotal:</span>
+        <span class="font-medium text-gray-900" data-invoice-form-target="subtotal"><%= number_to_currency(invoice.subtotal || 0) %></span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">Tax:</span>
+        <span class="font-medium text-gray-900" data-invoice-form-target="taxAmount"><%= number_to_currency(invoice.tax_amount || 0) %></span>
+      </div>
+      <div class="flex justify-between text-sm">
+        <span class="text-gray-600">Discount:</span>
+        <span class="font-medium text-gray-900">-<span data-invoice-form-target="discountDisplay"><%= number_to_currency(invoice.discount_amount || 0) %></span></span>
+      </div>
+      <div class="pt-2 border-t border-gray-200 flex justify-between">
+        <span class="font-semibold text-gray-900">Total:</span>
+        <span class="text-lg font-bold text-gray-900" data-invoice-form-target="total"><%= number_to_currency(invoice.total_amount || 0) %></span>
+      </div>
+    </div>
+  </div>
+
+  <%# Notes & Terms Section %>
+  <div class="space-y-4 pt-4 border-t border-gray-100">
+    <h3 class="text-sm font-medium text-gray-900">Notes & terms</h3>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Notes <span class="text-gray-400 font-normal">(visible to client)</span></label>
+      <%= f.text_area :notes,
+          rows: 2,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none",
+          placeholder: "Thank you for your business!" %>
+    </div>
+
+    <div>
+      <label class="block text-sm font-medium text-gray-700 mb-2">Terms & conditions</label>
+      <%= f.text_area :terms,
+          rows: 2,
+          class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent resize-none",
+          placeholder: "Payment is due within 30 days..." %>
+    </div>
+  </div>
+
+  <%# Footer with actions %>
+  <div class="flex items-center justify-end gap-3 pt-4 border-t border-gray-100">
+    <button type="button"
+            data-action="modal#close"
+            class="px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors">
+      Cancel
+    </button>
+    <%= f.submit invoice.persisted? ? "Save changes" : "Create invoice",
+        class: "px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors cursor-pointer" %>
+  </div>
+<% end %>
