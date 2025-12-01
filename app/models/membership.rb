@@ -15,7 +15,6 @@ class Membership < ApplicationRecord
   # Validations
   validates :role, presence: true
   validates :user_id, uniqueness: { scope: :account_id, message: "is already a member of this account" }, allow_nil: true
-  validates :invitation_email, presence: true, format: { with: URI::MailTo::EMAIL_REGEXP }, if: :pending_invitation?
   validate :owner_role_immutable, on: :update
   validate :single_owner_per_account, on: :create
 
@@ -46,6 +45,10 @@ class Membership < ApplicationRecord
   end
 
   def can_manage_members?
+    admin_or_owner?
+  end
+
+  def can_manage_account?
     admin_or_owner?
   end
 

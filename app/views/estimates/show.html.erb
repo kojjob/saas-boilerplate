@@ -1,0 +1,358 @@
+<% content_for :title, "Estimate ##{@estimate.estimate_number}" %>
+
+<div class="min-h-screen bg-gray-50">
+  <!-- Header -->
+  <div class="bg-gradient-to-r from-purple-600 to-indigo-700">
+    <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex items-center gap-4">
+          <%= link_to estimates_path, class: "flex items-center justify-center h-10 w-10 rounded-lg bg-white/10 hover:bg-white/20 transition-colors" do %>
+            <svg class="h-5 w-5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+            </svg>
+          <% end %>
+          <div>
+            <div class="flex items-center gap-3">
+              <h1 class="text-2xl font-bold text-white">Estimate #<%= @estimate.estimate_number %></h1>
+              <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium bg-<%= @estimate.status_color %>-100 text-<%= @estimate.status_color %>-800">
+                <%= @estimate.status.humanize %>
+              </span>
+            </div>
+            <p class="mt-1 text-purple-100">
+              Created on <%= @estimate.issue_date.strftime("%B %d, %Y") %>
+              <% if @estimate.project.present? %>
+                &middot; <%= @estimate.project.name %>
+              <% end %>
+            </p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex flex-wrap items-center gap-2">
+          <% if @estimate.draft? %>
+            <%= link_to edit_estimate_path(@estimate), class: "inline-flex items-center gap-x-1.5 rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+              </svg>
+              Edit
+            <% end %>
+            <%= button_to send_estimate_estimate_path(@estimate), method: :post, class: "inline-flex items-center gap-x-1.5 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-50 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+              </svg>
+              Send to Client
+            <% end %>
+          <% end %>
+
+          <% if @estimate.sent? || @estimate.viewed? %>
+            <%= button_to accept_estimate_path(@estimate), method: :post, class: "inline-flex items-center gap-x-1.5 rounded-lg bg-green-500 px-3 py-2 text-sm font-semibold text-white hover:bg-green-600 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              Accept
+            <% end %>
+            <%= button_to decline_estimate_path(@estimate), method: :post, class: "inline-flex items-center gap-x-1.5 rounded-lg bg-red-500 px-3 py-2 text-sm font-semibold text-white hover:bg-red-600 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Decline
+            <% end %>
+          <% end %>
+
+          <% if @estimate.can_convert? %>
+            <%= button_to convert_to_invoice_estimate_path(@estimate), method: :post, class: "inline-flex items-center gap-x-1.5 rounded-lg bg-white px-3 py-2 text-sm font-semibold text-purple-700 hover:bg-purple-50 transition-colors" do %>
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+              </svg>
+              Convert to Invoice
+            <% end %>
+          <% end %>
+
+          <%= link_to preview_estimate_path(@estimate), target: "_blank", class: "inline-flex items-center gap-x-1.5 rounded-lg bg-white/10 px-3 py-2 text-sm font-semibold text-white hover:bg-white/20 transition-colors" do %>
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+            </svg>
+            Preview
+          <% end %>
+        </div>
+      </div>
+
+      <!-- Financial Stats -->
+      <div class="mt-8 grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div class="rounded-xl bg-white/10 backdrop-blur-sm px-5 py-4">
+          <p class="text-sm text-purple-100">Subtotal</p>
+          <p class="text-2xl font-semibold text-white"><%= number_to_currency(@estimate.subtotal) %></p>
+        </div>
+        <div class="rounded-xl bg-white/10 backdrop-blur-sm px-5 py-4">
+          <p class="text-sm text-purple-100">Tax (<%= @estimate.tax_rate || 0 %>%)</p>
+          <p class="text-2xl font-semibold text-white"><%= number_to_currency(@estimate.tax_amount) %></p>
+        </div>
+        <div class="rounded-xl bg-white/10 backdrop-blur-sm px-5 py-4">
+          <p class="text-sm text-purple-100">Total</p>
+          <p class="text-2xl font-semibold text-white"><%= number_to_currency(@estimate.total_amount) %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="mx-auto max-w-7xl px-4 py-8 sm:px-6 lg:px-8">
+    <div class="grid grid-cols-1 gap-8 lg:grid-cols-3">
+      <!-- Left Column: Line Items and Details -->
+      <div class="lg:col-span-2 space-y-8">
+        <!-- Line Items -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl overflow-hidden">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-base font-semibold text-gray-900">Line Items</h3>
+          </div>
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="py-3 pl-6 pr-3 text-left text-xs font-semibold uppercase tracking-wide text-gray-500">Description</th>
+                <th scope="col" class="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Qty</th>
+                <th scope="col" class="px-3 py-3 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Unit Price</th>
+                <th scope="col" class="py-3 pl-3 pr-6 text-right text-xs font-semibold uppercase tracking-wide text-gray-500">Amount</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+              <% @estimate.line_items.each do |item| %>
+                <tr>
+                  <td class="py-4 pl-6 pr-3 text-sm text-gray-900"><%= item.description %></td>
+                  <td class="px-3 py-4 text-sm text-gray-500 text-right"><%= item.quantity %></td>
+                  <td class="px-3 py-4 text-sm text-gray-500 text-right"><%= number_to_currency(item.unit_price) %></td>
+                  <td class="py-4 pl-3 pr-6 text-sm font-medium text-gray-900 text-right"><%= number_to_currency(item.amount) %></td>
+                </tr>
+              <% end %>
+            </tbody>
+            <tfoot class="bg-gray-50">
+              <tr>
+                <td colspan="3" class="py-3 pl-6 pr-3 text-sm font-medium text-gray-900 text-right">Subtotal</td>
+                <td class="py-3 pl-3 pr-6 text-sm font-medium text-gray-900 text-right"><%= number_to_currency(@estimate.subtotal) %></td>
+              </tr>
+              <% if @estimate.tax_amount.to_f > 0 %>
+                <tr>
+                  <td colspan="3" class="py-3 pl-6 pr-3 text-sm text-gray-500 text-right">Tax (<%= @estimate.tax_rate %>%)</td>
+                  <td class="py-3 pl-3 pr-6 text-sm text-gray-500 text-right"><%= number_to_currency(@estimate.tax_amount) %></td>
+                </tr>
+              <% end %>
+              <% if @estimate.discount_amount.to_f > 0 %>
+                <tr>
+                  <td colspan="3" class="py-3 pl-6 pr-3 text-sm text-gray-500 text-right">Discount</td>
+                  <td class="py-3 pl-3 pr-6 text-sm text-red-600 text-right">-<%= number_to_currency(@estimate.discount_amount) %></td>
+                </tr>
+              <% end %>
+              <tr class="border-t border-gray-300">
+                <td colspan="3" class="py-4 pl-6 pr-3 text-base font-semibold text-gray-900 text-right">Total</td>
+                <td class="py-4 pl-3 pr-6 text-base font-semibold text-gray-900 text-right"><%= number_to_currency(@estimate.total_amount) %></td>
+              </tr>
+            </tfoot>
+          </table>
+        </div>
+
+        <!-- Notes & Terms -->
+        <% if @estimate.notes.present? || @estimate.terms.present? %>
+          <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl">
+            <div class="px-6 py-4 border-b border-gray-200">
+              <h3 class="text-base font-semibold text-gray-900">Notes & Terms</h3>
+            </div>
+            <div class="px-6 py-4 space-y-4">
+              <% if @estimate.notes.present? %>
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">Notes</h4>
+                  <p class="mt-1 text-sm text-gray-900 whitespace-pre-wrap"><%= @estimate.notes %></p>
+                </div>
+              <% end %>
+              <% if @estimate.terms.present? %>
+                <div>
+                  <h4 class="text-sm font-medium text-gray-500">Terms & Conditions</h4>
+                  <p class="mt-1 text-sm text-gray-900 whitespace-pre-wrap"><%= @estimate.terms %></p>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <!-- Right Column: Client Info and Activity -->
+      <div class="space-y-8">
+        <!-- Client Information -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-base font-semibold text-gray-900">Client Information</h3>
+          </div>
+          <div class="px-6 py-4">
+            <div class="flex items-center gap-4">
+              <div class="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-purple-700 font-semibold text-lg">
+                <%= @estimate.client.name.first(2).upcase %>
+              </div>
+              <div>
+                <h4 class="text-sm font-semibold text-gray-900"><%= @estimate.client.name %></h4>
+                <% if @estimate.client.company.present? %>
+                  <p class="text-sm text-gray-500"><%= @estimate.client.company %></p>
+                <% end %>
+              </div>
+            </div>
+            <dl class="mt-4 space-y-3 text-sm">
+              <% if @estimate.client.email.present? %>
+                <div class="flex justify-between">
+                  <dt class="text-gray-500">Email</dt>
+                  <dd class="text-gray-900"><%= mail_to @estimate.client.email, @estimate.client.email, class: "text-purple-600 hover:text-purple-700" %></dd>
+                </div>
+              <% end %>
+              <% if @estimate.client.phone.present? %>
+                <div class="flex justify-between">
+                  <dt class="text-gray-500">Phone</dt>
+                  <dd class="text-gray-900"><%= @estimate.client.phone %></dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Estimate Details -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-base font-semibold text-gray-900">Estimate Details</h3>
+          </div>
+          <div class="px-6 py-4">
+            <dl class="space-y-3 text-sm">
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Issue Date</dt>
+                <dd class="text-gray-900"><%= @estimate.issue_date.strftime("%B %d, %Y") %></dd>
+              </div>
+              <div class="flex justify-between">
+                <dt class="text-gray-500">Valid Until</dt>
+                <dd class="<%= 'text-red-600 font-medium' if @estimate.valid_until < Date.current %> text-gray-900">
+                  <%= @estimate.valid_until.strftime("%B %d, %Y") %>
+                  <% if @estimate.valid_until < Date.current %>
+                    <span class="text-xs">(Expired)</span>
+                  <% elsif @estimate.days_until_expiry <= 7 %>
+                    <span class="text-amber-600 text-xs">(<%= @estimate.days_until_expiry %> days)</span>
+                  <% end %>
+                </dd>
+              </div>
+              <% if @estimate.project.present? %>
+                <div class="flex justify-between">
+                  <dt class="text-gray-500">Project</dt>
+                  <dd class="text-gray-900"><%= link_to @estimate.project.name, @estimate.project, class: "text-purple-600 hover:text-purple-700" %></dd>
+                </div>
+              <% end %>
+            </dl>
+          </div>
+        </div>
+
+        <!-- Activity Timeline -->
+        <div class="bg-white shadow-sm ring-1 ring-gray-900/5 rounded-xl">
+          <div class="px-6 py-4 border-b border-gray-200">
+            <h3 class="text-base font-semibold text-gray-900">Activity</h3>
+          </div>
+          <div class="px-6 py-4">
+            <ul class="space-y-4">
+              <% if @estimate.converted_at.present? %>
+                <li class="flex gap-3">
+                  <div class="flex h-6 w-6 items-center justify-center rounded-full bg-purple-100">
+                    <svg class="h-3 w-3 text-purple-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                  </div>
+                  <div class="text-sm">
+                    <p class="font-medium text-gray-900">Converted to invoice</p>
+                    <p class="text-gray-500"><%= @estimate.converted_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                  </div>
+                </li>
+              <% end %>
+
+              <% if @estimate.declined_at.present? %>
+                <li class="flex gap-3">
+                  <div class="flex h-6 w-6 items-center justify-center rounded-full bg-red-100">
+                    <svg class="h-3 w-3 text-red-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </div>
+                  <div class="text-sm">
+                    <p class="font-medium text-gray-900">Declined</p>
+                    <p class="text-gray-500"><%= @estimate.declined_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                  </div>
+                </li>
+              <% end %>
+
+              <% if @estimate.accepted_at.present? %>
+                <li class="flex gap-3">
+                  <div class="flex h-6 w-6 items-center justify-center rounded-full bg-green-100">
+                    <svg class="h-3 w-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </div>
+                  <div class="text-sm">
+                    <p class="font-medium text-gray-900">Accepted</p>
+                    <p class="text-gray-500"><%= @estimate.accepted_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                  </div>
+                </li>
+              <% end %>
+
+              <% if @estimate.viewed_at.present? %>
+                <li class="flex gap-3">
+                  <div class="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-100">
+                    <svg class="h-3 w-3 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </div>
+                  <div class="text-sm">
+                    <p class="font-medium text-gray-900">Viewed by client</p>
+                    <p class="text-gray-500"><%= @estimate.viewed_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                  </div>
+                </li>
+              <% end %>
+
+              <% if @estimate.sent_at.present? %>
+                <li class="flex gap-3">
+                  <div class="flex h-6 w-6 items-center justify-center rounded-full bg-blue-100">
+                    <svg class="h-3 w-3 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                    </svg>
+                  </div>
+                  <div class="text-sm">
+                    <p class="font-medium text-gray-900">Sent to client</p>
+                    <p class="text-gray-500"><%= @estimate.sent_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                  </div>
+                </li>
+              <% end %>
+
+              <li class="flex gap-3">
+                <div class="flex h-6 w-6 items-center justify-center rounded-full bg-gray-100">
+                  <svg class="h-3 w-3 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                  </svg>
+                </div>
+                <div class="text-sm">
+                  <p class="font-medium text-gray-900">Estimate created</p>
+                  <p class="text-gray-500"><%= @estimate.created_at.strftime("%B %d, %Y at %I:%M %p") %></p>
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        <!-- Danger Zone -->
+        <% if @estimate.draft? || @estimate.declined? %>
+          <div class="bg-white shadow-sm ring-1 ring-red-200 rounded-xl">
+            <div class="px-6 py-4 border-b border-red-200">
+              <h3 class="text-base font-semibold text-red-900">Danger Zone</h3>
+            </div>
+            <div class="px-6 py-4">
+              <p class="text-sm text-gray-600 mb-4">Once deleted, this estimate cannot be recovered.</p>
+              <%= button_to estimate_path(@estimate), method: :delete, data: { confirm: "Are you sure you want to delete this estimate? This action cannot be undone." }, class: "inline-flex items-center gap-x-1.5 rounded-lg bg-red-600 px-3 py-2 text-sm font-semibold text-white hover:bg-red-500 transition-colors" do %>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                </svg>
+                Delete Estimate
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>

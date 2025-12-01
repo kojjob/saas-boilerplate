@@ -1,0 +1,44 @@
+<% content_for :title, "Payment Successful" %>
+
+<div class="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+  <div class="sm:mx-auto sm:w-full sm:max-w-lg">
+    <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100">
+      <svg class="h-10 w-10 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+      </svg>
+    </div>
+    <h2 class="mt-6 text-center text-3xl font-extrabold text-gray-900">
+      Thank you for your payment!
+    </h2>
+    <p class="mt-2 text-center text-sm text-gray-600">
+      Your payment for Invoice <%= @invoice.invoice_number %> has been received.
+    </p>
+  </div>
+
+  <div class="mt-8 sm:mx-auto sm:w-full sm:max-w-lg">
+    <div class="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+      <div class="text-center">
+        <p class="text-sm text-gray-500 mb-4">
+          A confirmation email will be sent to <%= @invoice.client.email %>.
+        </p>
+        <dl class="space-y-3 text-left border-t border-gray-200 pt-4">
+          <div class="flex justify-between">
+            <dt class="text-sm text-gray-500">Invoice Number</dt>
+            <dd class="text-sm font-medium text-gray-900"><%= @invoice.invoice_number %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-sm text-gray-500">Amount Paid</dt>
+            <dd class="text-sm font-medium text-gray-900"><%= number_to_currency(@invoice.total_amount) %></dd>
+          </div>
+          <div class="flex justify-between">
+            <dt class="text-sm text-gray-500">From</dt>
+            <dd class="text-sm font-medium text-gray-900"><%= @invoice.account.name %></dd>
+          </div>
+        </dl>
+      </div>
+    </div>
+    <p class="mt-4 text-center text-xs text-gray-500">
+      If you have any questions, please contact <%= @invoice.account.name %>.
+    </p>
+  </div>
+</div>

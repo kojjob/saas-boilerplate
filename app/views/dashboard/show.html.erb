@@ -1,48 +1,695 @@
-<div class="min-h-screen bg-gray-100">
-  <nav class="bg-white shadow-sm">
-    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-      <div class="flex justify-between h-16">
-        <div class="flex">
-          <div class="shrink-0 flex items-center">
-            <h1 class="text-xl font-bold text-gray-900">Dashboard</h1>
+<% content_for :page_title, "Dashboard" %>
+
+<div class="space-y-8">
+  <%# Welcome Hero Section %>
+  <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl">
+    <%# Decorative pattern %>
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="hero-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#hero-grid)"/>
+      </svg>
+    </div>
+
+    <%# Gradient orbs %>
+    <div class="absolute top-0 right-0 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-64 h-64 bg-purple-500/20 rounded-full blur-3xl"></div>
+
+    <div class="relative px-8 py-10">
+      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
+        <div>
+          <div class="flex items-center gap-4 mb-3">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+              <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-3xl font-bold text-white tracking-tight">
+                Welcome back, <%= current_user.first_name.presence || current_user.email.split('@').first %>!
+              </h1>
+              <p class="text-slate-400 text-lg"><%= current_account.name %></p>
+            </div>
           </div>
+          <p class="text-slate-400 mt-2 max-w-xl">
+            Here's an overview of your business performance. Track your clients, projects, and invoices all in one place.
+          </p>
         </div>
-        <div class="flex items-center">
-          <span class="text-sm text-gray-700 mr-4">Welcome, <%= current_user.full_name %></span>
-          <%= button_to 'Sign out', sign_out_path, method: :delete, class: 'inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500' %>
+
+        <div class="flex items-center gap-3">
+          <span class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur text-white/80 text-sm">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6.75 3v2.25M17.25 3v2.25M3 18.75V7.5a2.25 2.25 0 012.25-2.25h13.5A2.25 2.25 0 0121 7.5v11.25m-18 0A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75m-18 0v-7.5A2.25 2.25 0 015.25 9h13.5A2.25 2.25 0 0121 11.25v7.5" />
+            </svg>
+            <%= Time.current.strftime("%A, %B %d, %Y") %>
+          </span>
         </div>
       </div>
     </div>
-  </nav>
+  </div>
 
-  <main class="max-w-7xl mx-auto py-6 sm:px-6 lg:px-8">
-    <% if flash[:notice] %>
-      <div class="rounded-md bg-green-50 p-4 mb-6">
-        <div class="flex">
-          <div class="ml-3">
-            <p class="text-sm font-medium text-green-800"><%= flash[:notice] %></p>
-          </div>
+  <%# Business Metrics Row %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+    <%# Active Clients %>
+    <div class="group relative bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:shadow-emerald-500/10 hover:border-emerald-200 transition-all duration-300">
+      <div class="flex items-start justify-between">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/30 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+          </svg>
+        </div>
+        <%= link_to clients_path, class: "text-xs font-medium text-emerald-600 hover:text-emerald-700 opacity-0 group-hover:opacity-100 transition-opacity" do %>
+          View All
+          <svg class="w-3 h-3 inline ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        <% end %>
+      </div>
+      <div class="mt-5">
+        <p class="text-sm font-medium text-slate-500">Active Clients</p>
+        <div class="flex items-end gap-2 mt-1">
+          <p class="text-3xl font-bold text-slate-900"><%= @active_clients %></p>
+          <span class="text-sm text-slate-400 mb-1">of <%= @clients_count %> total</span>
         </div>
       </div>
-    <% end %>
+      <div class="mt-4 pt-4 border-t border-slate-100">
+        <%= link_to new_client_path, class: "inline-flex items-center text-sm font-medium text-emerald-600 hover:text-emerald-700" do %>
+          <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Add Client
+        <% end %>
+      </div>
+    </div>
 
-    <% if flash[:alert] %>
-      <div class="rounded-md bg-red-50 p-4 mb-6">
-        <div class="flex">
-          <div class="ml-3">
-            <p class="text-sm font-medium text-red-800"><%= flash[:alert] %></p>
-          </div>
+    <%# Active Projects %>
+    <div class="group relative bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:shadow-blue-500/10 hover:border-blue-200 transition-all duration-300">
+      <div class="flex items-start justify-between">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+          </svg>
+        </div>
+        <%= link_to projects_path, class: "text-xs font-medium text-blue-600 hover:text-blue-700 opacity-0 group-hover:opacity-100 transition-opacity" do %>
+          View All
+          <svg class="w-3 h-3 inline ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        <% end %>
+      </div>
+      <div class="mt-5">
+        <p class="text-sm font-medium text-slate-500">Active Projects</p>
+        <div class="flex items-end gap-2 mt-1">
+          <p class="text-3xl font-bold text-slate-900"><%= @active_projects %></p>
+          <span class="text-sm text-slate-400 mb-1">of <%= @projects_count %> total</span>
         </div>
       </div>
-    <% end %>
+      <div class="mt-4 pt-4 border-t border-slate-100">
+        <%= link_to new_project_path, class: "inline-flex items-center text-sm font-medium text-blue-600 hover:text-blue-700" do %>
+          <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          New Project
+        <% end %>
+      </div>
+    </div>
 
-    <div class="px-4 py-6 sm:px-0">
-      <div class="border-4 border-dashed border-gray-200 rounded-lg h-96 flex items-center justify-center">
-        <div class="text-center">
-          <h2 class="text-2xl font-semibold text-gray-700">Welcome to your Dashboard</h2>
-          <p class="mt-2 text-gray-500">Your account is set up and ready to go.</p>
+    <%# Total Invoiced %>
+    <div class="group relative bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:shadow-purple-500/10 hover:border-purple-200 transition-all duration-300">
+      <div class="flex items-start justify-between">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-500/30 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <%= link_to invoices_path, class: "text-xs font-medium text-purple-600 hover:text-purple-700 opacity-0 group-hover:opacity-100 transition-opacity" do %>
+          View All
+          <svg class="w-3 h-3 inline ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+          </svg>
+        <% end %>
+      </div>
+      <div class="mt-5">
+        <p class="text-sm font-medium text-slate-500">Total Invoiced</p>
+        <div class="flex items-end gap-2 mt-1">
+          <p class="text-3xl font-bold text-slate-900"><%= number_to_currency(@total_invoiced) %></p>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-slate-100">
+        <%= link_to new_invoice_path, class: "inline-flex items-center text-sm font-medium text-purple-600 hover:text-purple-700" do %>
+          <svg class="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+          </svg>
+          Create Invoice
+        <% end %>
+      </div>
+    </div>
+
+    <%# Outstanding Amount %>
+    <div class="group relative bg-white rounded-2xl shadow-sm border border-slate-200 p-6 hover:shadow-xl hover:shadow-amber-500/10 hover:border-amber-200 transition-all duration-300">
+      <div class="flex items-start justify-between">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <% if @overdue_count > 0 %>
+          <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-red-100 text-red-700">
+            <%= @overdue_count %> overdue
+          </span>
+        <% end %>
+      </div>
+      <div class="mt-5">
+        <p class="text-sm font-medium text-slate-500">Outstanding</p>
+        <div class="flex items-end gap-2 mt-1">
+          <p class="text-3xl font-bold text-slate-900"><%= number_to_currency(@total_outstanding) %></p>
+        </div>
+      </div>
+      <div class="mt-4 pt-4 border-t border-slate-100">
+        <div class="flex items-center justify-between">
+          <span class="text-sm text-slate-500">Collected</span>
+          <span class="text-sm font-semibold text-emerald-600"><%= number_to_currency(@total_paid) %></span>
         </div>
       </div>
     </div>
-  </main>
+  </div>
+
+  <%# Main Content Grid %>
+  <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+    <%# Left Column - 2/3 width %>
+    <div class="lg:col-span-2 space-y-6">
+      <%# Pending Invoices %>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200 flex items-center justify-between">
+          <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/25">
+              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-lg font-semibold text-slate-900">Pending Invoices</h3>
+              <p class="text-sm text-slate-500">Invoices awaiting payment</p>
+            </div>
+          </div>
+          <%= link_to invoices_path(status: "pending"), class: "text-sm font-medium text-indigo-600 hover:text-indigo-700" do %>
+            View All
+            <svg class="w-4 h-4 inline ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          <% end %>
+        </div>
+
+        <% if @pending_invoices.any? %>
+          <div class="divide-y divide-slate-100">
+            <% @pending_invoices.each do |invoice| %>
+              <div class="px-6 py-4 hover:bg-slate-50/50 transition-colors">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-4">
+                    <div class="w-10 h-10 rounded-xl <%= invoice_status_bg_class(invoice.status) %> flex items-center justify-center">
+                      <svg class="w-5 h-5 <%= invoice_status_icon_class(invoice.status) %>" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m2.25 0H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                      </svg>
+                    </div>
+                    <div>
+                      <div class="flex items-center gap-2">
+                        <%= link_to invoice_path(invoice), class: "font-semibold text-slate-900 hover:text-indigo-600" do %>
+                          #<%= invoice.invoice_number %>
+                        <% end %>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= invoice_status_class(invoice.status) %>">
+                          <%= invoice.status.humanize %>
+                        </span>
+                      </div>
+                      <p class="text-sm text-slate-500"><%= invoice.client.name %></p>
+                    </div>
+                  </div>
+                  <div class="text-right">
+                    <p class="font-bold text-slate-900"><%= number_to_currency(invoice.total_amount) %></p>
+                    <p class="text-sm <%= invoice.due_date < Date.current ? 'text-red-600 font-medium' : 'text-slate-500' %>">
+                      <% if invoice.due_date < Date.current %>
+                        Overdue by <%= (Date.current - invoice.due_date).to_i %> days
+                      <% else %>
+                        Due <%= invoice.due_date.strftime("%b %d, %Y") %>
+                      <% end %>
+                    </p>
+                  </div>
+                </div>
+              </div>
+            <% end %>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <div class="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-8 h-8 text-slate-400" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-slate-900 mb-1">All Caught Up!</h4>
+            <p class="text-sm text-slate-500">No pending invoices at the moment.</p>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Recent Activity - Enhanced Timeline View %>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div>
+                <h3 class="text-lg font-semibold text-slate-900">Recent Activity</h3>
+                <p class="text-sm text-slate-500">Your latest business updates</p>
+              </div>
+            </div>
+            <div class="flex items-center gap-1 text-xs text-slate-400">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+              </svg>
+              Live updates
+            </div>
+          </div>
+        </div>
+
+        <%
+          # Combine and sort all recent items by created_at
+          all_activities = []
+          @recent_clients.limit(3).each { |c| all_activities << { type: 'client', item: c, created_at: c.created_at } }
+          @recent_projects.limit(3).each { |p| all_activities << { type: 'project', item: p, created_at: p.created_at } }
+          @recent_invoices.limit(3).each { |i| all_activities << { type: 'invoice', item: i, created_at: i.created_at } }
+          all_activities.sort_by! { |a| -a[:created_at].to_i }
+          all_activities = all_activities.first(8)
+        %>
+
+        <% if all_activities.any? %>
+          <div class="divide-y divide-slate-100">
+            <% all_activities.each do |activity| %>
+              <% item = activity[:item] %>
+              <% case activity[:type] %>
+              <% when 'client' %>
+                <%= link_to client_path(item), class: "group block px-6 py-4 hover:bg-gradient-to-r hover:from-emerald-50/50 hover:to-transparent transition-all duration-200" do %>
+                  <div class="flex items-start gap-4">
+                    <%# Timeline indicator %>
+                    <div class="relative">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/25 group-hover:scale-110 group-hover:shadow-emerald-500/40 transition-all duration-200">
+                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+                        </svg>
+                      </div>
+                      <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-emerald-500 border-2 border-white flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <%# Content %>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-4">
+                        <div>
+                          <div class="flex items-center gap-2 mb-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-100 text-emerald-700">
+                              New Client
+                            </span>
+                            <% if item.respond_to?(:status) && item.status.present? %>
+                              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= item.status == 'active' ? 'bg-green-100 text-green-700' : 'bg-slate-100 text-slate-600' %>">
+                                <%= item.status.humanize %>
+                              </span>
+                            <% end %>
+                          </div>
+                          <h4 class="text-base font-semibold text-slate-900 group-hover:text-emerald-700 transition-colors">
+                            <%= item.name %>
+                          </h4>
+                          <p class="text-sm text-slate-500 mt-0.5">
+                            <% if item.email.present? %>
+                              <%= item.email %>
+                            <% elsif item.phone_number.present? %>
+                              <%= item.phone_number %>
+                            <% else %>
+                              Contact details pending
+                            <% end %>
+                          </p>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <p class="text-xs text-slate-400 mb-1"><%= time_ago_in_words(item.created_at) %> ago</p>
+                          <div class="flex items-center gap-1 text-emerald-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-xs font-medium">View</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+
+              <% when 'project' %>
+                <%= link_to project_path(item), class: "group block px-6 py-4 hover:bg-gradient-to-r hover:from-blue-50/50 hover:to-transparent transition-all duration-200" do %>
+                  <div class="flex items-start gap-4">
+                    <%# Timeline indicator %>
+                    <div class="relative">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-110 group-hover:shadow-blue-500/40 transition-all duration-200">
+                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                        </svg>
+                      </div>
+                      <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full bg-blue-500 border-2 border-white flex items-center justify-center">
+                        <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </div>
+                    </div>
+
+                    <%# Content %>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-4">
+                        <div>
+                          <div class="flex items-center gap-2 mb-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-blue-100 text-blue-700">
+                              New Project
+                            </span>
+                            <% if item.respond_to?(:status) && item.status.present? %>
+                              <%
+                                project_status_colors = {
+                                  'active' => 'bg-green-100 text-green-700',
+                                  'in_progress' => 'bg-blue-100 text-blue-700',
+                                  'completed' => 'bg-emerald-100 text-emerald-700',
+                                  'on_hold' => 'bg-amber-100 text-amber-700',
+                                  'cancelled' => 'bg-red-100 text-red-700'
+                                }
+                                status_class = project_status_colors[item.status] || 'bg-slate-100 text-slate-600'
+                              %>
+                              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= status_class %>">
+                                <%= item.status.humanize %>
+                              </span>
+                            <% end %>
+                          </div>
+                          <h4 class="text-base font-semibold text-slate-900 group-hover:text-blue-700 transition-colors">
+                            <%= item.name %>
+                          </h4>
+                          <div class="flex items-center gap-2 mt-0.5">
+                            <div class="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[10px] font-bold">
+                              <%= item.client.name.first.upcase %>
+                            </div>
+                            <p class="text-sm text-slate-500"><%= item.client.name.truncate(25) %></p>
+                          </div>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <p class="text-xs text-slate-400 mb-1"><%= time_ago_in_words(item.created_at) %> ago</p>
+                          <div class="flex items-center gap-1 text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <span class="text-xs font-medium">View</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+
+              <% when 'invoice' %>
+                <%= link_to invoice_path(item), class: "group block px-6 py-4 hover:bg-gradient-to-r hover:from-purple-50/50 hover:to-transparent transition-all duration-200" do %>
+                  <div class="flex items-start gap-4">
+                    <%# Timeline indicator %>
+                    <div class="relative">
+                      <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-110 group-hover:shadow-purple-500/40 transition-all duration-200">
+                        <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                        </svg>
+                      </div>
+                      <%# Status indicator badge %>
+                      <%
+                        invoice_badge_colors = {
+                          'paid' => 'bg-emerald-500',
+                          'sent' => 'bg-blue-500',
+                          'viewed' => 'bg-indigo-500',
+                          'overdue' => 'bg-red-500',
+                          'draft' => 'bg-slate-400'
+                        }
+                        badge_bg = invoice_badge_colors[item.status] || 'bg-slate-400'
+                      %>
+                      <div class="absolute -bottom-1 -right-1 w-5 h-5 rounded-full <%= badge_bg %> border-2 border-white flex items-center justify-center">
+                        <% if item.status == 'paid' %>
+                          <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                          </svg>
+                        <% elsif item.status == 'overdue' %>
+                          <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                          </svg>
+                        <% else %>
+                          <svg class="w-3 h-3 text-white" fill="none" viewBox="0 0 24 24" stroke-width="3" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5" />
+                          </svg>
+                        <% end %>
+                      </div>
+                    </div>
+
+                    <%# Content %>
+                    <div class="flex-1 min-w-0">
+                      <div class="flex items-start justify-between gap-4">
+                        <div>
+                          <div class="flex items-center gap-2 mb-1">
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-purple-100 text-purple-700">
+                              Invoice #<%= item.invoice_number %>
+                            </span>
+                            <%
+                              invoice_status_colors = {
+                                'paid' => 'bg-emerald-100 text-emerald-700',
+                                'sent' => 'bg-blue-100 text-blue-700',
+                                'viewed' => 'bg-indigo-100 text-indigo-700',
+                                'overdue' => 'bg-red-100 text-red-700',
+                                'draft' => 'bg-slate-100 text-slate-600'
+                              }
+                              inv_status_class = invoice_status_colors[item.status] || 'bg-slate-100 text-slate-600'
+                            %>
+                            <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium <%= inv_status_class %>">
+                              <%= item.status.humanize %>
+                            </span>
+                          </div>
+                          <h4 class="text-base font-semibold text-slate-900 group-hover:text-purple-700 transition-colors">
+                            <%= number_to_currency(item.total_amount) %>
+                          </h4>
+                          <div class="flex items-center gap-2 mt-0.5">
+                            <div class="w-5 h-5 rounded-full bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center text-white text-[10px] font-bold">
+                              <%= item.client.name.first.upcase %>
+                            </div>
+                            <p class="text-sm text-slate-500"><%= item.client.name.truncate(25) %></p>
+                          </div>
+                        </div>
+                        <div class="text-right shrink-0">
+                          <p class="text-xs text-slate-400 mb-1"><%= time_ago_in_words(item.created_at) %> ago</p>
+                          <% if item.due_date.present? %>
+                            <p class="text-xs <%= item.due_date < Date.current && item.status != 'paid' ? 'text-red-600 font-medium' : 'text-slate-500' %>">
+                              <% if item.status == 'paid' %>
+                                Paid
+                              <% elsif item.due_date < Date.current %>
+                                <%= (Date.current - item.due_date).to_i %>d overdue
+                              <% elsif item.due_date == Date.current %>
+                                Due today
+                              <% else %>
+                                Due in <%= (item.due_date - Date.current).to_i %>d
+                              <% end %>
+                            </p>
+                          <% end %>
+                          <div class="flex items-center gap-1 text-purple-600 opacity-0 group-hover:opacity-100 transition-opacity mt-1">
+                            <span class="text-xs font-medium">View</span>
+                            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+                            </svg>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+            <% end %>
+          </div>
+
+          <%# View all activity link %>
+          <div class="px-6 py-4 bg-slate-50/50 border-t border-slate-100">
+            <div class="flex items-center justify-center gap-6">
+              <%= link_to clients_path, class: "inline-flex items-center gap-2 text-sm font-medium text-emerald-600 hover:text-emerald-700" do %>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+                All Clients
+              <% end %>
+              <%= link_to projects_path, class: "inline-flex items-center gap-2 text-sm font-medium text-blue-600 hover:text-blue-700" do %>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+                </svg>
+                All Projects
+              <% end %>
+              <%= link_to invoices_path, class: "inline-flex items-center gap-2 text-sm font-medium text-purple-600 hover:text-purple-700" do %>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m0 12.75h7.5m-7.5 3H12M10.5 2.25H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+                </svg>
+                All Invoices
+              <% end %>
+            </div>
+          </div>
+        <% else %>
+          <div class="px-6 py-12 text-center">
+            <div class="w-20 h-20 rounded-2xl bg-gradient-to-br from-indigo-100 to-purple-100 flex items-center justify-center mx-auto mb-4">
+              <svg class="w-10 h-10 text-indigo-500" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <h4 class="text-lg font-semibold text-slate-900 mb-1">No Activity Yet</h4>
+            <p class="text-sm text-slate-500 mb-4">Start by adding your first client or project</p>
+            <div class="flex items-center justify-center gap-3">
+              <%= link_to new_client_path, class: "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors" do %>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                Add Client
+              <% end %>
+              <%= link_to new_project_path, class: "inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-blue-600 text-white text-sm font-medium hover:bg-blue-700 transition-colors" do %>
+                <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                </svg>
+                New Project
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Right Column - 1/3 width %>
+    <div class="space-y-6">
+      <%# Quick Actions %>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-900">Quick Actions</h3>
+          <p class="text-sm text-slate-500">Common tasks and shortcuts</p>
+        </div>
+        <div class="p-4 grid grid-cols-2 gap-3">
+          <%= link_to new_client_path, class: "flex flex-col items-center p-4 rounded-xl bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 transition-colors group" do %>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mb-2 shadow-lg shadow-emerald-500/25 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19 7.5v3m0 0v3m0-3h3m-3 0h-3m-2.25-4.125a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zM4 19.235v-.11a6.375 6.375 0 0112.75 0v.109A12.318 12.318 0 0110.374 21c-2.331 0-4.512-.645-6.374-1.766z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-emerald-800">New Client</span>
+          <% end %>
+
+          <%= link_to new_project_path, class: "flex flex-col items-center p-4 rounded-xl bg-blue-50 hover:bg-blue-100 border border-blue-200 transition-colors group" do %>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center mb-2 shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 10.5v6m3-3H9m4.06-7.19l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-blue-800">New Project</span>
+          <% end %>
+
+          <%= link_to new_invoice_path, class: "flex flex-col items-center p-4 rounded-xl bg-purple-50 hover:bg-purple-100 border border-purple-200 transition-colors group" do %>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-violet-600 flex items-center justify-center mb-2 shadow-lg shadow-purple-500/25 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 14.25v-2.625a3.375 3.375 0 00-3.375-3.375h-1.5A1.125 1.125 0 0113.5 7.125v-1.5a3.375 3.375 0 00-3.375-3.375H8.25m3.75 9v6m3-3H9m1.5-12H5.625c-.621 0-1.125.504-1.125 1.125v17.25c0 .621.504 1.125 1.125 1.125h12.75c.621 0 1.125-.504 1.125-1.125V11.25a9 9 0 00-9-9z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-purple-800">New Invoice</span>
+          <% end %>
+
+          <%= link_to billing_path, class: "flex flex-col items-center p-4 rounded-xl bg-amber-50 hover:bg-amber-100 border border-amber-200 transition-colors group" do %>
+            <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center mb-2 shadow-lg shadow-amber-500/25 group-hover:scale-110 transition-transform">
+              <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 8.25h19.5M2.25 9h19.5m-16.5 5.25h6m-6 2.25h3m-3.75 3h15a2.25 2.25 0 002.25-2.25V6.75A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25v10.5A2.25 2.25 0 004.5 19.5z" />
+              </svg>
+            </div>
+            <span class="text-sm font-semibold text-amber-800">Billing</span>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Account Overview %>
+      <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+        <div class="px-6 py-5 border-b border-slate-200">
+          <h3 class="text-lg font-semibold text-slate-900">Account Overview</h3>
+        </div>
+        <div class="p-6 space-y-4">
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-500">Status</span>
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+              <%= @account.subscription_status.humanize %>
+            </span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-500">Plan</span>
+            <span class="text-sm font-medium text-slate-900"><%= @account.plan&.name || 'Free' %></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-500">Team Members</span>
+            <span class="text-sm font-medium text-slate-900"><%= @account.memberships.count %></span>
+          </div>
+          <div class="flex items-center justify-between">
+            <span class="text-sm text-slate-500">Member Since</span>
+            <span class="text-sm font-medium text-slate-900"><%= @account.created_at.strftime("%b %Y") %></span>
+          </div>
+        </div>
+        <div class="px-6 py-4 bg-slate-50 border-t border-slate-100">
+          <%= link_to account_path, class: "text-sm font-medium text-indigo-600 hover:text-indigo-700 flex items-center" do %>
+            View Account Settings
+            <svg class="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+            </svg>
+          <% end %>
+        </div>
+      </div>
+
+      <%# Revenue Summary %>
+      <div class="bg-gradient-to-br from-indigo-900 via-purple-900 to-violet-900 rounded-2xl shadow-xl p-6 text-white overflow-hidden relative">
+        <%# Decorative elements %>
+        <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full blur-2xl"></div>
+        <div class="absolute bottom-0 left-0 w-24 h-24 bg-purple-500/20 rounded-full blur-2xl"></div>
+
+        <div class="relative">
+          <div class="flex items-center gap-3 mb-4">
+            <div class="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 18L9 11.25l4.306 4.307a11.95 11.95 0 015.814-5.519l2.74-1.22m0 0l-5.94-2.28m5.94 2.28l-2.28 5.941" />
+              </svg>
+            </div>
+            <h3 class="text-lg font-bold">Revenue Summary</h3>
+          </div>
+
+          <div class="space-y-4">
+            <div>
+              <p class="text-sm text-white/60">Total Collected</p>
+              <p class="text-3xl font-bold"><%= number_to_currency(@total_paid) %></p>
+            </div>
+
+            <div class="pt-4 border-t border-white/10 space-y-2">
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-white/60">Total Invoiced</span>
+                <span class="text-sm font-medium"><%= number_to_currency(@total_invoiced) %></span>
+              </div>
+              <div class="flex items-center justify-between">
+                <span class="text-sm text-white/60">Outstanding</span>
+                <span class="text-sm font-medium"><%= number_to_currency(@total_outstanding) %></span>
+              </div>
+              <% if @overdue_amount > 0 %>
+                <div class="flex items-center justify-between">
+                  <span class="text-sm text-red-300">Overdue</span>
+                  <span class="text-sm font-medium text-red-300"><%= number_to_currency(@overdue_amount) %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

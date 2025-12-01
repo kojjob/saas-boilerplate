@@ -1,0 +1,18 @@
+<%= @alert.title %>
+========================================
+
+A new alert has been triggered for your account.
+
+<%= @alert.message %>
+
+Details:
+- Severity: <%= @alert.severity.titleize %>
+- Type: <%= @alert.alert_type.titleize %>
+- Account: <%= @account&.name || 'N/A' %>
+- Time: <%= @alert.created_at.strftime('%B %d, %Y at %I:%M %p %Z') %>
+
+If this alert requires immediate attention, please take appropriate action.
+
+---
+
+This is an automated alert from <%= company_name %>. You can manage your alert preferences in your account settings.

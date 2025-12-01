@@ -87,11 +87,25 @@ RSpec.describe "User Authentication", type: :system do
     end
 
     it "allows a user to sign out" do
-      # Find and click sign out (usually in a dropdown or header)
-      click_button "Sign out" if page.has_button?("Sign out")
-      click_link "Sign out" if page.has_link?("Sign out")
+      # Dismiss any flash notifications using JavaScript to avoid blocking clicks
+      page.execute_script("document.querySelectorAll('[data-controller=\"flash\"]').forEach(el => el.remove())")
 
-      expect(page).to have_current_path(root_path).or have_current_path(sign_in_path)
+      # Use JavaScript to open the last dropdown menu (profile dropdown)
+      page.execute_script(<<~JS)
+        const dropdowns = document.querySelectorAll('[data-controller="dropdown"]');
+        const lastDropdown = dropdowns[dropdowns.length - 1];
+        const menu = lastDropdown.querySelector('[data-dropdown-target="menu"]');
+        menu.classList.remove('hidden');
+      JS
+
+      # Wait for dropdown menu to become visible
+      expect(page).to have_css('[data-dropdown-target="menu"]:not(.hidden)', wait: 5)
+
+      # Click the sign out button (now uses button_to which creates a form)
+      click_button "Sign out"
+
+      # Wait for the sign out to complete and redirect
+      expect(page).to have_current_path(root_path, wait: 10).or have_current_path(sign_in_path, wait: 10)
     end
   end
 

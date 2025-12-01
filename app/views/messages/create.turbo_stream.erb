@@ -1,0 +1,38 @@
+<%= turbo_stream.append "messages" do %>
+  <div class="flex <%= @message.sender == current_user ? 'justify-end' : 'justify-start' %>">
+    <div class="max-w-[70%] <%= @message.sender == current_user ? 'order-2' : '' %>">
+      <% if @message.sender != current_user %>
+        <div class="flex items-center mb-1">
+          <div class="w-6 h-6 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
+            <%= @message.sender.initials %>
+          </div>
+          <span class="ml-2 text-xs text-gray-500"><%= @message.sender.first_name %></span>
+        </div>
+      <% end %>
+      <div class="<%= @message.sender == current_user ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white' : 'bg-gray-100 text-gray-900' %> rounded-2xl px-4 py-3 shadow-sm">
+        <p class="text-sm whitespace-pre-wrap"><%= @message.body %></p>
+      </div>
+      <p class="mt-1 text-xs text-gray-400 <%= @message.sender == current_user ? 'text-right' : '' %>">
+        <%= @message.created_at.strftime("%I:%M %p") %>
+      </p>
+    </div>
+  </div>
+<% end %>
+
+<%= turbo_stream.replace "message_form" do %>
+  <%= form_with model: [@conversation, Message.new], id: "message_form", class: "flex items-end space-x-3", data: { controller: "reset-form", action: "turbo:submit-end->reset-form#reset" } do |form| %>
+    <div class="flex-1">
+      <%= form.text_area :body,
+          rows: 1,
+          placeholder: "Type your message...",
+          class: "block w-full px-4 py-3 border border-gray-300 rounded-xl shadow-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 resize-none",
+          data: { action: "input->reset-form#autoResize keydown.enter->reset-form#submitOnEnter" },
+          required: true %>
+    </div>
+    <button type="submit" class="inline-flex items-center justify-center w-12 h-12 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-xl shadow-sm hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200">
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8"/>
+      </svg>
+    </button>
+  <% end %>
+<% end %>

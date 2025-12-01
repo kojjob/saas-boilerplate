@@ -8,7 +8,7 @@ module Api
       before_action :authorize_account_admin!, only: [ :update ]
 
       def index
-        accounts = current_api_user.accounts.kept
+        accounts = current_api_user.accounts.kept.includes(:plan)
 
         render_success(accounts.map { |account| account_data(account) })
       end
