@@ -121,7 +121,8 @@ RSpec.describe "Invoices", type: :request do
     it "displays payment status section" do
       get invoice_path(invoice)
 
-      expect(response.body).to include("Payment Status")
+      # The page shows "Due In" for unpaid invoices, "Payment Received" for paid, or "Days Overdue" for overdue
+      expect(response.body).to include("Due In").or include("Payment Received").or include("Days Overdue")
     end
 
     context "when invoice belongs to another account" do

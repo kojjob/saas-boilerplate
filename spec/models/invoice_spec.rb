@@ -80,6 +80,21 @@ RSpec.describe Invoice, type: :model do
   end
 
   describe "callbacks" do
+    it "generates payment token on create" do
+      invoice = create(:invoice)
+      expect(invoice.payment_token).to be_present
+      expect(invoice.payment_token.length).to eq(32)
+    end
+
+    it "generates unique payment tokens for each invoice" do
+      account = create(:account)
+      client = create(:client, account: account)
+      invoice1 = create(:invoice, account: account, client: client)
+      invoice2 = create(:invoice, account: account, client: client)
+
+      expect(invoice1.payment_token).not_to eq(invoice2.payment_token)
+    end
+
     it "generates invoice number on create" do
       invoice = create(:invoice)
       expect(invoice.invoice_number).to match(/^INV-\d+$/)
@@ -179,6 +194,20 @@ RSpec.describe Invoice, type: :model do
 
         expect(past_due).to include(sent_past_due)
         expect(past_due).not_to include(sent_future_due, paid_past_due)
+      end
+    end
+
+    describe ".find_by_payment_token!" do
+      it "finds invoice by payment token" do
+        invoice = create(:invoice, account: account, client: client)
+        found = Invoice.find_by_payment_token!(invoice.payment_token)
+        expect(found).to eq(invoice)
+      end
+
+      it "raises RecordNotFound for invalid token" do
+        expect {
+          Invoice.find_by_payment_token!("invalid-token")
+        }.to raise_error(ActiveRecord::RecordNotFound)
       end
     end
 
@@ -317,6 +346,27 @@ RSpec.describe Invoice, type: :model do
         expect(build(:invoice, :paid).payment_status_color).to eq("green")
         expect(build(:invoice, :overdue).payment_status_color).to eq("red")
         expect(build(:invoice, :cancelled).payment_status_color).to eq("gray")
+      end
+    end
+
+    describe "#payment_url" do
+      it "returns the public payment URL" do
+        invoice = create(:invoice)
+        expect(invoice.payment_url).to include("/pay/#{invoice.payment_token}")
+      end
+    end
+
+    describe "#payable?" do
+      it "returns true for sent and overdue invoices" do
+        expect(build(:invoice, :sent).payable?).to be true
+        expect(build(:invoice, :viewed).payable?).to be true
+        expect(build(:invoice, :overdue).payable?).to be true
+      end
+
+      it "returns false for draft, paid, and cancelled invoices" do
+        expect(build(:invoice, :draft).payable?).to be false
+        expect(build(:invoice, :paid).payable?).to be false
+        expect(build(:invoice, :cancelled).payable?).to be false
       end
     end
   end
