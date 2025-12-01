@@ -4,7 +4,7 @@ class InvoicesController < ApplicationController
   layout "dashboard"
 
   before_action :authenticate_user!
-  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :send_invoice, :mark_paid, :mark_cancelled ]
+  before_action :set_invoice, only: [ :show, :edit, :update, :destroy, :send_invoice, :mark_paid, :mark_cancelled, :preview, :download ]
   before_action :set_form_data, only: [ :new, :create, :edit, :update ]
 
   def index
@@ -73,9 +73,15 @@ class InvoicesController < ApplicationController
   def destroy
     if @invoice.draft? || @invoice.cancelled?
       @invoice.destroy
-      redirect_to invoices_path, notice: "Invoice was successfully deleted."
+      respond_to do |format|
+        format.html { redirect_to invoices_path, notice: "Invoice was successfully deleted." }
+        format.turbo_stream { redirect_to invoices_path, notice: "Invoice was successfully deleted." }
+      end
     else
-      redirect_to invoices_path, alert: "Only draft or cancelled invoices can be deleted."
+      respond_to do |format|
+        format.html { redirect_to invoices_path, alert: "Only draft or cancelled invoices can be deleted." }
+        format.turbo_stream { redirect_to invoices_path, alert: "Only draft or cancelled invoices can be deleted." }
+      end
     end
   end
 
@@ -111,6 +117,15 @@ class InvoicesController < ApplicationController
     else
       redirect_to invoices_path, alert: "Paid invoices cannot be cancelled."
     end
+  end
+
+  def preview
+    render layout: "invoice_preview"
+  end
+
+  def download
+    # For now, redirect to preview - PDF generation can be added later
+    redirect_to preview_invoice_path(@invoice)
   end
 
   private

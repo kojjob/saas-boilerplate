@@ -118,10 +118,10 @@ RSpec.describe "Invoices", type: :request do
       expect(response.body).to include(client.name)
     end
 
-    it "displays payment details section" do
+    it "displays payment status section" do
       get invoice_path(invoice)
 
-      expect(response.body).to include("Payment Details")
+      expect(response.body).to include("Payment Status")
     end
 
     context "when invoice belongs to another account" do
