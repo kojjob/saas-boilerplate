@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class InvitationsController < ApplicationController
+  layout "dashboard"
+
   before_action :authenticate_user!
   before_action :set_account
   before_action :authorize_invitation_management
