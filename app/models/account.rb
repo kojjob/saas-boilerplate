@@ -19,6 +19,7 @@ class Account < ApplicationRecord
   has_many :clients, dependent: :destroy
   has_many :projects, dependent: :destroy
   has_many :invoices, dependent: :destroy
+  has_many :estimates, dependent: :destroy
   has_many :documents, dependent: :destroy
   has_many :time_entries, dependent: :destroy
   has_many :material_entries, dependent: :destroy

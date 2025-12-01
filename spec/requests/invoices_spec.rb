@@ -118,10 +118,11 @@ RSpec.describe "Invoices", type: :request do
       expect(response.body).to include(client.name)
     end
 
-    it "displays payment details section" do
+    it "displays invoice summary section" do
       get invoice_path(invoice)
 
-      expect(response.body).to include("Payment Details")
+      # The page shows "Due In" for unpaid invoices, "Payment Received" for paid, or "Days Overdue" for overdue
+      expect(response.body).to include("Due In").or include("Payment Received").or include("Days Overdue")
     end
 
     context "when invoice belongs to another account" do
@@ -449,6 +450,18 @@ RSpec.describe "Invoices", type: :request do
         patch send_invoice_invoice_path(invoice)
 
         expect(flash[:notice]).to include("sent")
+      end
+
+      it "enqueues an invoice email" do
+        expect {
+          patch send_invoice_invoice_path(invoice)
+        }.to have_enqueued_mail(InvoiceMailer, :send_invoice).with(invoice)
+      end
+
+      it "includes client's email in success message" do
+        patch send_invoice_invoice_path(invoice)
+
+        expect(flash[:notice]).to include(client.email)
       end
     end
 

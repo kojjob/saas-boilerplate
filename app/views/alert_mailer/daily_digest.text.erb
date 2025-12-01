@@ -1,0 +1,29 @@
+Daily Alert Digest
+========================================
+
+Here's a summary of alerts from the last 24 hours for <%= @account&.name || 'your account' %>.
+
+Total Alerts: <%= @alert_count %>
+
+<% if @severity_breakdown.any? %>
+Breakdown by Severity:
+<% @severity_breakdown.each do |severity, count| %>
+- <%= severity.titleize %>: <%= count %>
+<% end %>
+<% end %>
+
+Recent Alerts:
+<% @alerts.limit(10).each do |alert| %>
+---
+[<%= alert.severity.upcase %>] <%= alert.title %>
+<%= truncate(alert.message, length: 150) %>
+Time: <%= alert.created_at.strftime('%I:%M %p') %>
+<% end %>
+
+<% if @alerts.count > 10 %>
+...and <%= @alerts.count - 10 %> more alerts. Please log in to see all alerts.
+<% end %>
+
+---
+
+This is an automated daily digest from <%= company_name %>. You can manage your notification preferences in your account settings.

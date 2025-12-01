@@ -30,16 +30,12 @@ Rails.application.routes.draw do
       get :billing
       post :switch, to: "accounts#switch"
     end
-
-    # Team members management
-    resources :members, only: [ :index, :update, :destroy ], controller: "members" do
+    resources :members, only: [ :index, :create, :update, :destroy ] do
       member do
-        delete :leave, to: "members#leave"
+        delete :leave
       end
     end
-
-    # Invitations (sent by admins/owners)
-    resources :invitations, only: [ :new, :create, :destroy ], controller: "invitations" do
+    resources :invitations, only: [ :new, :create, :destroy ] do
       member do
         post :resend
       end
@@ -61,8 +57,16 @@ Rails.application.routes.draw do
   get "billing/success", to: "billing#success", as: :billing_success
   get "billing/cancel", to: "billing#cancel", as: :billing_cancel
 
-  # Pay webhook for Stripe events
-  post "pay/webhooks/stripe", to: "pay/webhooks/stripe#create"
+  # Pay gem auto-mounts at /pay/webhooks/stripe via Pay.automount_routes
+
+  # ==================================
+  # Public Invoice Payment Routes
+  # ==================================
+  # These routes are public (no authentication required) for client invoice payments
+  get "pay/:payment_token", to: "invoice_payments#show", as: :pay_invoice
+  post "pay/:payment_token/checkout", to: "invoice_payments#checkout", as: :pay_invoice_checkout
+  get "pay/:payment_token/success", to: "invoice_payments#success", as: :pay_invoice_success
+  get "pay/:payment_token/cancel", to: "invoice_payments#cancel", as: :pay_invoice_cancel
 
   # ==================================
   # API V1 Routes
@@ -95,6 +99,22 @@ Rails.application.routes.draw do
           post :mark_all_as_read
           get :unread_count
         end
+      end
+    end
+  end
+
+  # ==================================
+  # Owner Portal (Site Admins Only)
+  # ==================================
+  namespace :owner do
+    root "dashboard#index"
+    get "metrics", to: "dashboard#metrics"
+    resources :accounts, only: [ :index, :show ]
+    resources :reports, only: [ :index, :show ] do
+      collection do
+        get :mrr
+        get :customers
+        get :payments
       end
     end
   end
@@ -173,6 +193,19 @@ Rails.application.routes.draw do
       patch :send_invoice
       patch :mark_paid
       patch :mark_cancelled
+      get :preview
+      get :download
+    end
+  end
+
+  # Estimates/Quotes with nested line items
+  resources :estimates do
+    resources :line_items, controller: "estimate_line_items", only: [ :create, :update, :destroy ]
+    member do
+      post :send_estimate
+      post :accept
+      post :decline
+      post :convert_to_invoice
       get :preview
       get :download
     end

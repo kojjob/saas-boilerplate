@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Invoice < ApplicationRecord
+  # Secure token for payment links
+  has_secure_token :payment_token
+
   # Associations
   belongs_to :account
   belongs_to :client
@@ -28,6 +31,7 @@ class Invoice < ApplicationRecord
   # Callbacks
   before_validation :set_default_dates, on: :create
   before_validation :generate_invoice_number, on: :create, if: -> { invoice_number.blank? }
+  before_validation :generate_payment_token, on: :create
   before_save :calculate_totals
 
   # Scopes
@@ -44,6 +48,11 @@ class Invoice < ApplicationRecord
       query: "%#{query}%"
     )
   }
+
+  # Class Methods
+  def self.find_by_payment_token!(token)
+    find_by!(payment_token: token)
+  end
 
   # Instance Methods
   def mark_as_sent!
@@ -93,7 +102,23 @@ class Invoice < ApplicationRecord
     end
   end
 
+  def payment_url
+    Rails.application.routes.url_helpers.pay_invoice_url(payment_token: payment_token, host: default_url_host)
+  end
+
+  def payable?
+    sent? || viewed? || overdue?
+  end
+
   private
+
+  def default_url_host
+    Rails.application.config.action_mailer.default_url_options&.dig(:host) || "localhost:3000"
+  end
+
+  def generate_payment_token
+    self.payment_token ||= SecureRandom.hex(16)
+  end
 
   def set_default_dates
     self.issue_date ||= Date.current

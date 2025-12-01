@@ -5,6 +5,7 @@ class InvitationsController < ApplicationController
 
   before_action :authenticate_user!
   before_action :set_account
+  before_action :authorize_invitation_management
   before_action :set_invitation, only: [ :destroy, :resend ]
 
   def new
@@ -97,6 +98,13 @@ class InvitationsController < ApplicationController
 
   def invitation_params
     params.require(:membership).permit(:invitation_email, :role)
+  end
+
+  def authorize_invitation_management
+    membership = @account.memberships.find_by(user: current_user)
+    unless membership&.can_manage_members?
+      redirect_to dashboard_path, alert: "You do not have permission to manage invitations."
+    end
   end
 
   def available_roles

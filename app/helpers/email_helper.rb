@@ -106,4 +106,34 @@ module EmailHelper
                     style: "padding: 4px 0; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; font-size: 15px; line-height: 1.5; color: #374151;")
     end
   end
+
+  # Alert severity colors
+  def severity_color(alert)
+    colors = {
+      "info" => "#1E40AF",
+      "warning" => "#92400E",
+      "error" => "#DC2626",
+      "critical" => "#991B1B"
+    }
+    colors[alert.severity.to_s] || colors["info"]
+  end
+
+  def severity_background_color(alert)
+    colors = {
+      "info" => "#EFF6FF",
+      "warning" => "#FFFBEB",
+      "error" => "#FEF2F2",
+      "critical" => "#FEE2E2"
+    }
+    colors[alert.severity.to_s] || colors["info"]
+  end
+
+  def alert_severity_type(alert)
+    case alert.severity.to_s
+    when "info" then :info
+    when "warning" then :warning
+    when "error", "critical" then :error
+    else :info
+    end
+  end
 end

@@ -1,3 +1,17 @@
+<% content_for :head do %>
+  <meta name="turbo-visit-control" content="reload">
+  <script>
+    // Clear any stale service workers that might show offline messages
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.getRegistrations().then(function(registrations) {
+        registrations.forEach(function(registration) {
+          registration.unregister();
+        });
+      });
+    }
+  </script>
+<% end %>
+
 <div class="max-w-lg mx-auto px-4 py-16 text-center">
   <div class="rounded-full bg-yellow-100 p-3 mx-auto w-fit">
     <svg class="h-12 w-12 text-yellow-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">

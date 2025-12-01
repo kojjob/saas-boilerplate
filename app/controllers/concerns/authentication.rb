@@ -38,6 +38,11 @@ module Authentication
     session[:user_session_id] = session_record.id
     @current_session = session_record
     @current_user = user
+
+    # Set the tenant to user's first account for multi-tenancy
+    if user.accounts.any?
+      session[:current_account_id] = user.accounts.first.id
+    end
   end
 
   # Signs out the current user by destroying their session

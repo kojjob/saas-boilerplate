@@ -73,16 +73,23 @@ class InvoicesController < ApplicationController
   def destroy
     if @invoice.draft? || @invoice.cancelled?
       @invoice.destroy
-      redirect_to invoices_path, notice: "Invoice was successfully deleted."
+      respond_to do |format|
+        format.html { redirect_to invoices_path, notice: "Invoice was successfully deleted." }
+        format.turbo_stream { redirect_to invoices_path, notice: "Invoice was successfully deleted." }
+      end
     else
-      redirect_to invoices_path, alert: "Only draft or cancelled invoices can be deleted."
+      respond_to do |format|
+        format.html { redirect_to invoices_path, alert: "Only draft or cancelled invoices can be deleted." }
+        format.turbo_stream { redirect_to invoices_path, alert: "Only draft or cancelled invoices can be deleted." }
+      end
     end
   end
 
   def send_invoice
     if @invoice.draft?
+      InvoiceMailer.send_invoice(@invoice).deliver_later
       @invoice.mark_as_sent!
-      redirect_to invoices_path, notice: "Invoice was marked as sent."
+      redirect_to invoices_path, notice: "Invoice was sent to #{@invoice.client.email}."
     else
       redirect_to invoices_path, alert: "Invoice has already been sent."
     end
