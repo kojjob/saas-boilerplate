@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_01_044914) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -249,6 +249,8 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_044914) do
     t.string "payment_reference"
     t.string "payment_token", null: false
     t.bigint "project_id"
+    t.integer "reminder_count", default: 0, null: false
+    t.datetime "reminder_sent_at"
     t.datetime "sent_at"
     t.integer "status", default: 0, null: false
     t.decimal "subtotal", precision: 10, scale: 2, default: "0.0"

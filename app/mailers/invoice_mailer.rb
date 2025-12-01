@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class InvoiceMailer < ApplicationMailer
+  helper :invoices
+
   def send_invoice(invoice, recipient: nil, message: nil)
     @invoice = invoice
     @client = invoice.client
@@ -38,16 +40,22 @@ class InvoiceMailer < ApplicationMailer
     @client = invoice.client
     @account = invoice.account
     @is_overdue = invoice.past_due?
-
-    subject = if @is_overdue
-      "OVERDUE: Payment Reminder for Invoice #{@invoice.invoice_number}"
-    else
-      "Reminder: Invoice #{@invoice.invoice_number} is Due Soon"
-    end
+    @days_overdue = invoice.days_overdue
+    @days_until_due = invoice.days_until_due
 
     mail(
       to: @client.email,
-      subject: subject
+      subject: payment_reminder_subject
     )
+  end
+
+  private
+
+  def payment_reminder_subject
+    if @is_overdue
+      "Payment Reminder: Invoice #{@invoice.invoice_number} is Overdue"
+    else
+      "Payment Reminder: Invoice #{@invoice.invoice_number} Due Soon"
+    end
   end
 end
