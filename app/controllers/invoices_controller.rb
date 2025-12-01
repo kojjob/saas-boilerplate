@@ -121,11 +121,11 @@ class InvoicesController < ApplicationController
   end
 
   def preview
-    render layout: "invoice_preview"
+    render template: "invoices/pdf", layout: "pdf"
   end
 
   def download
-    result = InvoicePdfGenerator.call(@invoice)
+    result = Pdf::InvoicePdfGenerator.call(invoice: @invoice)
 
     if result.success?
       send_data result.pdf,
@@ -133,7 +133,7 @@ class InvoicesController < ApplicationController
                 type: "application/pdf",
                 disposition: "attachment"
     else
-      redirect_to invoice_path(@invoice), alert: result.error
+      redirect_to @invoice, alert: "Failed to generate PDF: #{result.error}"
     end
   end
 

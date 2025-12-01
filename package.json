@@ -1,0 +1,27 @@
+{
+  "name": "saas-boilerplate",
+  "version": "1.0.0",
+  "description": "A production-ready, full-featured SaaS boilerplate built with Ruby on Rails 8. This boilerplate provides all the essential features needed to launch a modern SaaS application, including multi-tenancy, authentication, billing, team management, and more.",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kojjob/saas-boilerplate.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/kojjob/saas-boilerplate/issues"
+  },
+  "homepage": "https://github.com/kojjob/saas-boilerplate#readme",
+  "dependencies": {
+    "puppeteer": "^24.31.0"
+  }
+}
