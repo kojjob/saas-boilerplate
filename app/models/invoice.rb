@@ -1,6 +1,9 @@
 # frozen_string_literal: true
 
 class Invoice < ApplicationRecord
+  # Secure token for payment links
+  has_secure_token :payment_token
+
   # Associations
   belongs_to :account
   belongs_to :client

@@ -5,6 +5,7 @@ class Client < ApplicationRecord
   belongs_to :account
   has_many :projects, dependent: :destroy
   has_many :invoices, dependent: :destroy
+  has_many :estimates, dependent: :destroy
 
   # Enums
   enum :status, { active: 0, archived: 1 }, default: :active

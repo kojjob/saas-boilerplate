@@ -87,8 +87,9 @@ class InvoicesController < ApplicationController
 
   def send_invoice
     if @invoice.draft?
+      InvoiceMailer.send_invoice(@invoice).deliver_later
       @invoice.mark_as_sent!
-      redirect_to invoices_path, notice: "Invoice was marked as sent."
+      redirect_to invoices_path, notice: "Invoice was sent to #{@invoice.client.email}."
     else
       redirect_to invoices_path, alert: "Invoice has already been sent."
     end
@@ -124,8 +125,16 @@ class InvoicesController < ApplicationController
   end
 
   def download
-    # For now, redirect to preview - PDF generation can be added later
-    redirect_to preview_invoice_path(@invoice)
+    result = InvoicePdfGenerator.call(@invoice)
+
+    if result.success?
+      send_data result.pdf,
+                filename: result.filename,
+                type: "application/pdf",
+                disposition: "attachment"
+    else
+      redirect_to invoice_path(@invoice), alert: result.error
+    end
   end
 
   private

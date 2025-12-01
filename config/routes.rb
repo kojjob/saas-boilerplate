@@ -104,6 +104,22 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Owner Portal (Site Admins Only)
+  # ==================================
+  namespace :owner do
+    root "dashboard#index"
+    get "metrics", to: "dashboard#metrics"
+    resources :accounts, only: [ :index, :show ]
+    resources :reports, only: [ :index, :show ] do
+      collection do
+        get :mrr
+        get :customers
+        get :payments
+      end
+    end
+  end
+
+  # ==================================
   # Admin Dashboard
   # ==================================
   namespace :admin do
@@ -177,6 +193,19 @@ Rails.application.routes.draw do
       patch :send_invoice
       patch :mark_paid
       patch :mark_cancelled
+      get :preview
+      get :download
+    end
+  end
+
+  # Estimates/Quotes with nested line items
+  resources :estimates do
+    resources :line_items, controller: "estimate_line_items", only: [ :create, :update, :destroy ]
+    member do
+      post :send_estimate
+      post :accept
+      post :decline
+      post :convert_to_invoice
       get :preview
       get :download
     end

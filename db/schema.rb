@@ -10,17 +10,22 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_01_044914) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
   create_table "accounts", force: :cascade do |t|
+    t.string "address"
+    t.string "city"
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
     t.string "name", null: false
+    t.string "phone"
     t.bigint "plan_id"
+    t.string "postal_code"
     t.jsonb "settings", default: {}
     t.string "slug", null: false
+    t.string "state"
     t.string "subdomain"
     t.string "subscription_status", default: "trialing"
     t.datetime "trial_ends_at"
@@ -59,6 +64,31 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
     t.bigint "blob_id", null: false
     t.string "variation_digest", null: false
     t.index ["blob_id", "variation_digest"], name: "index_active_storage_variant_records_uniqueness", unique: true
+  end
+
+  create_table "alerts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.datetime "acknowledged_at"
+    t.string "alert_type", null: false
+    t.uuid "alertable_id"
+    t.string "alertable_type"
+    t.datetime "created_at", null: false
+    t.string "error_message"
+    t.text "message"
+    t.jsonb "metadata", default: {}
+    t.datetime "sent_at"
+    t.integer "severity", default: 0, null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "alert_type"], name: "index_alerts_on_account_id_and_alert_type"
+    t.index ["account_id", "status"], name: "index_alerts_on_account_id_and_status"
+    t.index ["account_id"], name: "index_alerts_on_account_id"
+    t.index ["alert_type"], name: "index_alerts_on_alert_type"
+    t.index ["alertable_type", "alertable_id"], name: "index_alerts_on_alertable"
+    t.index ["created_at"], name: "index_alerts_on_created_at"
+    t.index ["severity"], name: "index_alerts_on_severity"
+    t.index ["status"], name: "index_alerts_on_status"
   end
 
   create_table "api_tokens", force: :cascade do |t|
@@ -146,6 +176,51 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
     t.index ["uploaded_by_id"], name: "index_documents_on_uploaded_by_id"
   end
 
+  create_table "estimate_line_items", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, default: "0.0"
+    t.datetime "created_at", null: false
+    t.string "description", null: false
+    t.bigint "estimate_id", null: false
+    t.integer "position", default: 0
+    t.decimal "quantity", precision: 10, scale: 2, null: false
+    t.decimal "unit_price", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["estimate_id", "position"], name: "index_estimate_line_items_on_estimate_id_and_position"
+    t.index ["estimate_id"], name: "index_estimate_line_items_on_estimate_id"
+  end
+
+  create_table "estimates", force: :cascade do |t|
+    t.datetime "accepted_at"
+    t.bigint "account_id", null: false
+    t.bigint "client_id", null: false
+    t.datetime "converted_at"
+    t.bigint "converted_invoice_id"
+    t.datetime "created_at", null: false
+    t.datetime "declined_at"
+    t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0"
+    t.string "estimate_number", null: false
+    t.date "issue_date", null: false
+    t.text "notes"
+    t.bigint "project_id"
+    t.datetime "sent_at"
+    t.integer "status", default: 0, null: false
+    t.decimal "subtotal", precision: 10, scale: 2, default: "0.0"
+    t.decimal "tax_amount", precision: 10, scale: 2, default: "0.0"
+    t.decimal "tax_rate", precision: 5, scale: 2, default: "0.0"
+    t.text "terms"
+    t.decimal "total_amount", precision: 10, scale: 2, default: "0.0"
+    t.datetime "updated_at", null: false
+    t.date "valid_until", null: false
+    t.datetime "viewed_at"
+    t.index ["account_id", "estimate_number"], name: "index_estimates_on_account_id_and_estimate_number", unique: true
+    t.index ["account_id"], name: "index_estimates_on_account_id"
+    t.index ["client_id"], name: "index_estimates_on_client_id"
+    t.index ["converted_invoice_id"], name: "index_estimates_on_converted_invoice_id"
+    t.index ["project_id"], name: "index_estimates_on_project_id"
+    t.index ["status"], name: "index_estimates_on_status"
+    t.index ["valid_until"], name: "index_estimates_on_valid_until"
+  end
+
   create_table "invoice_line_items", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -172,6 +247,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
     t.string "payment_method"
     t.text "payment_notes"
     t.string "payment_reference"
+    t.string "payment_token", null: false
     t.bigint "project_id"
     t.datetime "sent_at"
     t.integer "status", default: 0, null: false
@@ -186,6 +262,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
     t.index ["client_id"], name: "index_invoices_on_client_id"
     t.index ["due_date"], name: "index_invoices_on_due_date"
     t.index ["issue_date"], name: "index_invoices_on_issue_date"
+    t.index ["payment_token"], name: "index_invoices_on_payment_token", unique: true
     t.index ["project_id"], name: "index_invoices_on_project_id"
     t.index ["status"], name: "index_invoices_on_status"
   end
@@ -595,6 +672,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
   add_foreign_key "accounts", "plans"
   add_foreign_key "active_storage_attachments", "active_storage_blobs", column: "blob_id"
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
+  add_foreign_key "alerts", "accounts"
   add_foreign_key "api_tokens", "users"
   add_foreign_key "clients", "accounts"
   add_foreign_key "conversations", "accounts"
@@ -603,6 +681,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_11_30_183205) do
   add_foreign_key "documents", "accounts"
   add_foreign_key "documents", "projects"
   add_foreign_key "documents", "users", column: "uploaded_by_id"
+  add_foreign_key "estimate_line_items", "estimates"
+  add_foreign_key "estimates", "accounts"
+  add_foreign_key "estimates", "clients"
+  add_foreign_key "estimates", "invoices", column: "converted_invoice_id"
+  add_foreign_key "estimates", "projects"
   add_foreign_key "invoice_line_items", "invoices"
   add_foreign_key "invoices", "accounts"
   add_foreign_key "invoices", "clients"

@@ -118,7 +118,7 @@ RSpec.describe "Invoices", type: :request do
       expect(response.body).to include(client.name)
     end
 
-    it "displays payment status section" do
+    it "displays invoice summary section" do
       get invoice_path(invoice)
 
       # The page shows "Due In" for unpaid invoices, "Payment Received" for paid, or "Days Overdue" for overdue
@@ -451,6 +451,18 @@ RSpec.describe "Invoices", type: :request do
 
         expect(flash[:notice]).to include("sent")
       end
+
+      it "enqueues an invoice email" do
+        expect {
+          patch send_invoice_invoice_path(invoice)
+        }.to have_enqueued_mail(InvoiceMailer, :send_invoice).with(invoice)
+      end
+
+      it "includes client's email in success message" do
+        patch send_invoice_invoice_path(invoice)
+
+        expect(flash[:notice]).to include(client.email)
+      end
     end
 
     context "when invoice is not draft" do
@@ -617,6 +629,47 @@ RSpec.describe "Invoices", type: :request do
 
       it "returns not found" do
         patch mark_cancelled_invoice_path(other_invoice)
+
+        expect(response).to have_http_status(:not_found)
+      end
+    end
+  end
+
+  describe "GET /invoices/:id/download" do
+    let!(:invoice) { create(:invoice, :sent, account: account, client: client) }
+    let!(:line_item) { create(:invoice_line_item, invoice: invoice, description: "Test Service", quantity: 1, unit_price: 100) }
+
+    it "returns http success" do
+      get download_invoice_path(invoice)
+
+      expect(response).to have_http_status(:ok)
+    end
+
+    it "returns PDF content type" do
+      get download_invoice_path(invoice)
+
+      expect(response.content_type).to include("application/pdf")
+    end
+
+    it "includes invoice number in filename" do
+      get download_invoice_path(invoice)
+
+      expect(response.headers["Content-Disposition"]).to include(invoice.invoice_number.downcase.gsub(/[^a-z0-9]/, "_"))
+    end
+
+    it "generates PDF using InvoicePdfGenerator" do
+      expect(InvoicePdfGenerator).to receive(:call).with(invoice).and_call_original
+
+      get download_invoice_path(invoice)
+    end
+
+    context "when invoice belongs to another account" do
+      let(:other_account) { create(:account) }
+      let(:other_client) { create(:client, account: other_account) }
+      let(:other_invoice) { create(:invoice, :sent, account: other_account, client: other_client) }
+
+      it "returns not found" do
+        get download_invoice_path(other_invoice)
 
         expect(response).to have_http_status(:not_found)
       end

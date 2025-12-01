@@ -1,0 +1,45 @@
+<%= email_heading "Daily Alert Digest" %>
+
+<%= email_paragraph "Here's a summary of alerts from the last 24 hours for #{@account&.name || 'your account'}." %>
+
+<%= email_spacer %>
+
+<%= email_info_box "Total Alerts: #{@alert_count}", type: :info %>
+
+<%= email_spacer %>
+
+<% if @severity_breakdown.any? %>
+  <%= email_heading "Breakdown by Severity", level: 2 %>
+
+  <table role="presentation" cellspacing="0" cellpadding="8" border="0" style="width: 100%; border: 1px solid #e5e7eb; border-radius: 8px; margin-bottom: 20px;">
+    <% @severity_breakdown.each do |severity, count| %>
+      <tr>
+        <td style="border-bottom: 1px solid #e5e7eb; font-weight: 600; color: #374151;"><%= severity.titleize %></td>
+        <td style="border-bottom: 1px solid #e5e7eb;"><%= count %></td>
+      </tr>
+    <% end %>
+  </table>
+<% end %>
+
+<%= email_heading "Recent Alerts", level: 2 %>
+
+<% @alerts.limit(10).each do |alert| %>
+  <div style="border: 1px solid #e5e7eb; border-radius: 8px; padding: 16px; margin-bottom: 12px;">
+    <div style="font-weight: 600; color: #111827; margin-bottom: 8px;">
+      <%= alert.title %>
+      <span style="font-size: 12px; padding: 2px 8px; border-radius: 4px; background-color: <%= severity_background_color(alert) %>; color: <%= severity_color(alert) %>; margin-left: 8px;">
+        <%= alert.severity.upcase %>
+      </span>
+    </div>
+    <div style="color: #6b7280; font-size: 14px;"><%= truncate(alert.message, length: 150) %></div>
+    <div style="color: #9ca3af; font-size: 12px; margin-top: 8px;"><%= alert.created_at.strftime('%I:%M %p') %></div>
+  </div>
+<% end %>
+
+<% if @alerts.count > 10 %>
+  <%= email_paragraph "...and #{@alerts.count - 10} more alerts. Please log in to see all alerts." %>
+<% end %>
+
+<%= email_divider %>
+
+<%= email_paragraph "This is an automated daily digest from #{company_name}. You can manage your notification preferences in your account settings." %>
