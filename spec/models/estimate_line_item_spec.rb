@@ -34,7 +34,8 @@ RSpec.describe EstimateLineItem, type: :model do
       item1 = create(:estimate_line_item, estimate: estimate, position: 1, description: "First")
       item2 = create(:estimate_line_item, estimate: estimate, position: 2, description: "Second")
 
-      expect(estimate.line_items.pluck(:description)).to eq(["First", "Second", "Third"])
+      # Reload estimate to get fresh line_items with default scope applied
+      expect(estimate.reload.line_items.pluck(:description)).to eq(["First", "Second", "Third"])
     end
   end
 end

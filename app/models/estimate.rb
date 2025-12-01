@@ -96,7 +96,8 @@ class Estimate < ApplicationRecord
         terms: terms
       )
 
-      line_items.each do |item|
+      # Reload line_items to ensure we have the latest data from the database
+      line_items.reload.each do |item|
         invoice.line_items.create!(
           description: item.description,
           quantity: item.quantity,
@@ -149,6 +150,8 @@ class Estimate < ApplicationRecord
   end
 
   def generate_estimate_number
+    return unless account.present?
+
     last_number = account.estimates.where.not(estimate_number: nil)
                          .order(Arel.sql("CAST(SUBSTRING(estimate_number FROM '[0-9]+') AS INTEGER) DESC NULLS LAST"))
                          .limit(1)

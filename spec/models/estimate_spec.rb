@@ -7,6 +7,8 @@ RSpec.describe Estimate, type: :model do
   let(:client) { create(:client, account: account) }
 
   describe "associations" do
+    subject { create(:estimate, account: account, client: client) }
+
     it { should belong_to(:account) }
     it { should belong_to(:client) }
     it { should belong_to(:project).optional }
@@ -15,12 +17,34 @@ RSpec.describe Estimate, type: :model do
   end
 
   describe "validations" do
-    subject { build(:estimate, account: account, client: client) }
+    subject { create(:estimate, account: account, client: client) }
 
-    it { should validate_presence_of(:estimate_number) }
+    # estimate_number is auto-generated, so we test uniqueness rather than presence
     it { should validate_uniqueness_of(:estimate_number).scoped_to(:account_id) }
-    it { should validate_presence_of(:issue_date) }
-    it { should validate_presence_of(:valid_until) }
+
+    context "estimate_number presence" do
+      it "generates estimate number automatically if not provided" do
+        estimate = build(:estimate, account: account, client: client, estimate_number: nil)
+        estimate.valid?
+        expect(estimate.estimate_number).to be_present
+      end
+    end
+
+    context "issue_date presence" do
+      it "defaults to current date if not provided" do
+        estimate = build(:estimate, account: account, client: client, issue_date: nil)
+        estimate.valid?
+        expect(estimate.issue_date).to eq(Date.current)
+      end
+    end
+
+    context "valid_until presence" do
+      it "defaults to 30 days from issue date if not provided" do
+        estimate = build(:estimate, account: account, client: client, valid_until: nil)
+        estimate.valid?
+        expect(estimate.valid_until).to eq(Date.current + 30.days)
+      end
+    end
 
     context "valid_until validation" do
       it "is invalid if valid_until is before issue_date" do
@@ -162,7 +186,10 @@ RSpec.describe Estimate, type: :model do
 
     describe "#expired?" do
       it "returns true if valid_until is in the past" do
-        estimate = create(:estimate, account: account, client: client, valid_until: Date.current - 1.day)
+        # Set issue_date in the past so valid_until can also be in the past while still being after issue_date
+        estimate = create(:estimate, account: account, client: client,
+                          issue_date: Date.current - 10.days,
+                          valid_until: Date.current - 1.day)
         expect(estimate.expired?).to be true
       end
 
@@ -179,7 +206,10 @@ RSpec.describe Estimate, type: :model do
       end
 
       it "returns 0 if already expired" do
-        estimate = create(:estimate, account: account, client: client, valid_until: Date.current - 5.days)
+        # Set issue_date in the past so valid_until can also be in the past while still being after issue_date
+        estimate = create(:estimate, account: account, client: client,
+                          issue_date: Date.current - 10.days,
+                          valid_until: Date.current - 5.days)
         expect(estimate.days_until_expiry).to eq(0)
       end
     end

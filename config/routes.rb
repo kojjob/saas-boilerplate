@@ -189,6 +189,19 @@ Rails.application.routes.draw do
     end
   end
 
+  # Estimates/Quotes with nested line items
+  resources :estimates do
+    resources :line_items, controller: "estimate_line_items", only: [ :create, :update, :destroy ]
+    member do
+      post :send_estimate
+      post :accept
+      post :decline
+      post :convert_to_invoice
+      get :preview
+      get :download
+    end
+  end
+
   # Documents (can be standalone or associated with project)
   resources :documents, only: [ :index, :show, :new, :create, :edit, :update, :destroy ] do
     member do
