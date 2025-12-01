@@ -82,6 +82,62 @@ module ApplicationHelper
     end
   end
 
+  # Invoice status icon background color
+  def invoice_status_bg_class(status)
+    case status.to_s
+    when "draft"
+      "bg-slate-100"
+    when "sent", "pending"
+      "bg-blue-100"
+    when "viewed"
+      "bg-purple-100"
+    when "paid"
+      "bg-green-100"
+    when "partial"
+      "bg-amber-100"
+    when "overdue"
+      "bg-red-100"
+    when "cancelled", "canceled"
+      "bg-slate-100"
+    else
+      "bg-slate-100"
+    end
+  end
+
+  # Invoice status icon color
+  def invoice_status_icon_class(status)
+    case status.to_s
+    when "draft"
+      "text-slate-600"
+    when "sent", "pending"
+      "text-blue-600"
+    when "viewed"
+      "text-purple-600"
+    when "paid"
+      "text-green-600"
+    when "partial"
+      "text-amber-600"
+    when "overdue"
+      "text-red-600"
+    when "cancelled", "canceled"
+      "text-slate-500"
+    else
+      "text-slate-600"
+    end
+  end
+
+  # Client status badge styling
+  def client_status_class(status)
+    case status.to_s
+    when "active"
+      "bg-green-100 text-green-800"
+    when "archived"
+      "bg-slate-100 text-slate-600"
+    else
+      "bg-slate-100 text-slate-800"
+    end
+  end
+
   # Sidebar icon SVG helper
   def sidebar_icon(icon_name, is_active = false)
     icon_class = is_active ? "w-5 h-5 text-white" : "w-5 h-5 text-slate-400 group-hover:text-white"
