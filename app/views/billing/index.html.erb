@@ -1,114 +1,168 @@
-<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-  <div class="text-center">
-    <h1 class="text-3xl font-bold text-gray-900">Billing & Subscription</h1>
-    <p class="mt-4 text-lg text-gray-600">
-      Manage your subscription and billing information
-    </p>
-  </div>
+<div class="min-h-screen bg-gradient-to-br from-slate-50 via-white to-indigo-50">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12" data-controller="billing-toggle">
+    <!-- Header Section -->
+    <div class="text-center max-w-3xl mx-auto">
+      <h1 class="text-4xl font-extrabold text-gray-900 sm:text-5xl tracking-tight">
+        Choose Your Plan
+      </h1>
+      <p class="mt-4 text-xl text-gray-500">
+        Simple, transparent pricing that grows with your business
+      </p>
+    </div>
 
-  <% if @current_plan.present? %>
-    <div class="mt-8 bg-white shadow overflow-hidden rounded-lg">
-      <div class="px-4 py-5 sm:p-6">
-        <h2 class="text-lg font-medium text-gray-900">Current Plan</h2>
-        <div class="mt-4 flex items-center justify-between">
-          <div>
-            <p class="text-2xl font-bold text-indigo-600"><%= @current_plan.name %></p>
-            <p class="text-sm text-gray-500">
-              <%= @current_plan.formatted_price %><%= " / #{@current_plan.interval}" unless @current_plan.free? %>
-            </p>
-          </div>
-          <div>
-            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
-              <%= current_account.subscription_status == 'active' ? 'bg-green-100 text-green-800' : 'bg-yellow-100 text-yellow-800' %>">
-              <%= current_account.subscription_status.humanize %>
-            </span>
+    <!-- Stripe Warning Banner -->
+    <% unless @stripe_configured %>
+      <div class="mt-8 max-w-2xl mx-auto">
+        <div class="bg-amber-50 border border-amber-200 rounded-xl p-4 shadow-sm">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+              <svg class="h-5 w-5 text-amber-600" viewBox="0 0 20 20" fill="currentColor">
+                <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
+              </svg>
+            </div>
+            <div>
+              <h3 class="text-sm font-semibold text-amber-800">Payment Setup Required</h3>
+              <p class="mt-1 text-sm text-amber-700">
+                The Free plan is available now. To unlock paid plans, configure your <code class="bg-amber-100 px-1.5 py-0.5 rounded font-mono text-xs">STRIPE_SECRET_KEY</code>.
+              </p>
+            </div>
           </div>
         </div>
-
-        <% if current_account.on_trial? %>
-          <div class="mt-4 p-4 bg-yellow-50 rounded-md">
-            <p class="text-sm text-yellow-700">
-              Your trial ends in <%= current_account.days_remaining_in_trial %> days
-            </p>
-          </div>
-        <% end %>
-
-        <% if current_account.payment_processor.present? %>
-          <div class="mt-6">
-            <%= link_to "Manage Billing", billing_portal_path,
-                class: "inline-flex items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-          </div>
-        <% end %>
       </div>
-    </div>
-  <% end %>
+    <% end %>
 
-  <div class="mt-12">
-    <h2 class="text-2xl font-bold text-gray-900 text-center">Available Plans</h2>
-    <p class="mt-4 text-center text-gray-600">Choose the plan that works best for you</p>
-
-    <div class="mt-8 grid gap-8 lg:grid-cols-3">
-      <% @plans.each do |plan| %>
-        <div class="relative bg-white rounded-lg shadow-lg overflow-hidden
-          <%= plan == @current_plan ? 'ring-2 ring-indigo-500' : '' %>">
-
-          <% if plan == @current_plan %>
-            <div class="absolute top-0 inset-x-0 h-1 bg-indigo-500"></div>
-          <% end %>
-
-          <div class="p-6">
-            <h3 class="text-xl font-semibold text-gray-900"><%= plan.name %></h3>
-
-            <div class="mt-4">
-              <span class="text-4xl font-extrabold text-gray-900"><%= plan.formatted_price %></span>
-              <% unless plan.free? %>
-                <span class="text-base font-medium text-gray-500">/ <%= plan.interval %></span>
-              <% end %>
+    <!-- Current Plan Status Card -->
+    <% if @current_plan.present? %>
+      <div class="mt-10 max-w-2xl mx-auto">
+        <div class="relative bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+          <div class="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-indigo-500 via-purple-500 to-pink-500"></div>
+          <div class="p-6 sm:p-8">
+            <div class="flex items-center justify-between flex-wrap gap-4">
+              <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg">
+                  <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z" />
+                  </svg>
+                </div>
+                <div>
+                  <p class="text-sm font-medium text-gray-500">Current Plan</p>
+                  <p class="text-2xl font-bold text-gray-900"><%= @current_plan.name %></p>
+                </div>
+              </div>
+              <div class="flex items-center gap-3">
+                <span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-medium
+                  <%= current_account.subscription_status == 'active' ? 'bg-emerald-100 text-emerald-700' : 'bg-amber-100 text-amber-700' %>">
+                  <span class="w-2 h-2 rounded-full <%= current_account.subscription_status == 'active' ? 'bg-emerald-500' : 'bg-amber-500' %>"></span>
+                  <%= current_account.subscription_status.humanize %>
+                </span>
+                <% if current_account.payment_processor.present? %>
+                  <%= link_to billing_portal_path,
+                      class: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-indigo-600 bg-indigo-50 rounded-lg hover:bg-indigo-100 transition-colors" do %>
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    Manage Billing
+                  <% end %>
+                <% end %>
+              </div>
             </div>
 
-            <% if plan.description.present? %>
-              <p class="mt-4 text-sm text-gray-500"><%= plan.description %></p>
-            <% end %>
-
-            <ul class="mt-6 space-y-4">
-              <% plan.feature_list.each do |feature| %>
-                <li class="flex items-start">
-                  <svg class="flex-shrink-0 h-5 w-5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
-                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                  </svg>
-                  <span class="ml-3 text-sm text-gray-700"><%= feature %></span>
-                </li>
-              <% end %>
-            </ul>
-
-            <% if plan.limits.present? %>
-              <div class="mt-6 pt-4 border-t border-gray-200">
-                <h4 class="text-sm font-medium text-gray-900">Limits</h4>
-                <ul class="mt-2 space-y-1">
-                  <% plan.limits.each do |resource, limit| %>
-                    <li class="text-sm text-gray-500">
-                      <%= resource.humanize %>: <%= limit == -1 ? 'Unlimited' : limit %>
-                    </li>
-                  <% end %>
-                </ul>
+            <% if current_account.on_trial? %>
+              <div class="mt-6 p-4 bg-gradient-to-r from-amber-50 to-orange-50 rounded-xl border border-amber-200">
+                <div class="flex items-center gap-3">
+                  <div class="flex-shrink-0 w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center">
+                    <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                  </div>
+                  <div>
+                    <p class="text-sm font-semibold text-amber-800">Trial Period Active</p>
+                    <p class="text-sm text-amber-700">
+                      <%= current_account.days_remaining_in_trial %> days remaining in your trial
+                    </p>
+                  </div>
+                </div>
               </div>
             <% end %>
           </div>
-
-          <div class="px-6 pb-6">
-            <% if plan == @current_plan %>
-              <button disabled
-                class="w-full px-4 py-2 text-sm font-medium text-gray-400 bg-gray-100 rounded-md cursor-not-allowed">
-                Current Plan
-              </button>
-            <% else %>
-              <%= button_to "Select #{plan.name}", billing_checkout_path(plan_id: plan.id),
-                  method: :post,
-                  class: "w-full px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500" %>
-            <% end %>
-          </div>
         </div>
-      <% end %>
+      </div>
+    <% end %>
+
+    <!-- Billing Interval Toggle -->
+    <div class="mt-12 flex justify-center">
+      <div class="inline-flex items-center p-1 bg-gray-100 rounded-xl">
+        <button type="button"
+                data-billing-toggle-target="monthlyBtn"
+                data-action="click->billing-toggle#showMonthly"
+                class="px-6 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 text-white bg-indigo-600 shadow-sm">
+          Monthly
+        </button>
+        <button type="button"
+                data-billing-toggle-target="yearlyBtn"
+                data-action="click->billing-toggle#showYearly"
+                class="px-6 py-2.5 text-sm font-semibold rounded-lg transition-all duration-200 text-gray-600">
+          Yearly
+          <span class="ml-1.5 inline-flex items-center px-2 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-700">
+            Save 17%
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <% monthly_plans = @plans.select { |p| p.interval == 'month' } %>
+    <% yearly_plans = @plans.select { |p| p.interval == 'year' } %>
+
+    <!-- Monthly Pricing Cards -->
+    <div data-billing-toggle-target="monthlyPlans" class="mt-12 grid gap-8 lg:grid-cols-3 lg:gap-6 max-w-7xl mx-auto">
+      <%= render partial: 'billing/plan_cards', locals: { plans: monthly_plans, current_plan: @current_plan, stripe_configured: @stripe_configured } %>
+    </div>
+
+    <!-- Yearly Pricing Cards -->
+    <div data-billing-toggle-target="yearlyPlans" class="hidden mt-12 grid gap-8 lg:grid-cols-2 lg:gap-6 max-w-4xl mx-auto">
+      <%= render partial: 'billing/plan_cards', locals: { plans: yearly_plans, current_plan: @current_plan, stripe_configured: @stripe_configured } %>
+    </div>
+
+    <!-- Trust Badges -->
+    <div class="mt-16 text-center">
+      <div class="flex flex-wrap items-center justify-center gap-8 text-gray-400">
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-sm font-medium">SSL Secure</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M4 4a2 2 0 00-2 2v1h16V6a2 2 0 00-2-2H4z" />
+            <path fill-rule="evenodd" d="M18 9H2v5a2 2 0 002 2h12a2 2 0 002-2V9zM4 13a1 1 0 011-1h1a1 1 0 110 2H5a1 1 0 01-1-1zm5-1a1 1 0 100 2h1a1 1 0 100-2H9z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-sm font-medium">Secure Payment</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd" />
+          </svg>
+          <span class="text-sm font-medium">Cancel Anytime</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+            <path d="M2 10.5a1.5 1.5 0 113 0v6a1.5 1.5 0 01-3 0v-6zM6 10.333v5.43a2 2 0 001.106 1.79l.05.025A4 4 0 008.943 18h5.416a2 2 0 001.962-1.608l1.2-6A2 2 0 0015.56 8H12V4a2 2 0 00-2-2 1 1 0 00-1 1v.667a4 4 0 01-.8 2.4L6.8 7.933a4 4 0 00-.8 2.4z" />
+          </svg>
+          <span class="text-sm font-medium">30-Day Guarantee</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- FAQ Preview -->
+    <div class="mt-16 max-w-3xl mx-auto text-center">
+      <p class="text-gray-500">
+        Have questions?
+        <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">Contact our sales team</a>
+        or check out our
+        <a href="#" class="text-indigo-600 hover:text-indigo-700 font-medium">FAQ</a>
+      </p>
     </div>
   </div>
 </div>

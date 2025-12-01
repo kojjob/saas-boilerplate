@@ -44,6 +44,8 @@ RSpec.describe 'Billing', type: :request do
   describe 'GET /billing/portal' do
     context 'when account has payment processor' do
       before do
+        # Stub stripe_configured? to return true
+        allow_any_instance_of(BillingController).to receive(:stripe_configured?).and_return(true)
         # Create a mock payment processor with flexible double
         payment_processor = double('PayCustomer',
           present?: true,
@@ -76,6 +78,8 @@ RSpec.describe 'Billing', type: :request do
 
     context 'with valid paid plan' do
       before do
+        # Stub stripe_configured? to return true
+        allow_any_instance_of(BillingController).to receive(:stripe_configured?).and_return(true)
         # Create a mock payment processor with flexible double
         payment_processor = double('PayCustomer',
           checkout: double(url: 'https://checkout.stripe.com/session/test_checkout')
