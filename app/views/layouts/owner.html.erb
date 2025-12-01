@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html class="h-full">
+  <head>
+    <title><%= content_for(:title) || "Owner Portal - Deployable" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1">
+    <meta name="robots" content="noindex, nofollow">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+
+    <%= yield :head %>
+
+    <link rel="icon" href="/icon.png" type="image/png">
+    <%= stylesheet_link_tag :app, "data-turbo-track": "reload" %>
+    <%= javascript_importmap_tags %>
+  </head>
+
+  <body class="min-h-full flex flex-col bg-slate-900 text-white antialiased">
+    <%# Owner Portal Navigation %>
+    <nav class="bg-indigo-900">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div class="flex items-center justify-between h-16">
+          <div class="flex items-center">
+            <%= link_to "Owner Portal", owner_root_path, class: "text-xl font-bold text-white" %>
+            <div class="hidden md:block ml-10">
+              <div class="flex items-baseline space-x-4">
+                <%= link_to "Dashboard", owner_root_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 #{request.path == owner_root_path ? 'bg-indigo-800' : ''}" %>
+                <%= link_to "Accounts", owner_accounts_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 #{request.path.start_with?('/owner/accounts') ? 'bg-indigo-800' : ''}" %>
+                <%= link_to "Reports", owner_reports_path, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800 #{request.path.start_with?('/owner/reports') ? 'bg-indigo-800' : ''}" %>
+              </div>
+            </div>
+          </div>
+          <div class="flex items-center space-x-4">
+            <span class="text-sm text-indigo-200">Site Owner: <%= current_user.email %></span>
+            <%= link_to "Back to App", dashboard_path, class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700" %>
+            <%= button_to "Sign Out", sign_out_path, method: :delete, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-indigo-800" %>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <%# Flash messages %>
+    <%= render "shared/flash" %>
+
+    <%# Main content area %>
+    <main id="main-content" class="flex-1 py-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <%= yield %>
+      </div>
+    </main>
+
+    <%# Footer %>
+    <footer class="bg-indigo-900 text-indigo-300 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center text-sm">
+        Owner Portal &copy; <%= Date.current.year %> - Site Administration
+      </div>
+    </footer>
+  </body>
+</html>

@@ -95,6 +95,22 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Owner Portal (Site Admins Only)
+  # ==================================
+  namespace :owner do
+    root "dashboard#index"
+    get "metrics", to: "dashboard#metrics"
+    resources :accounts, only: [ :index, :show ]
+    resources :reports, only: [ :index, :show ] do
+      collection do
+        get :mrr
+        get :customers
+        get :payments
+      end
+    end
+  end
+
+  # ==================================
   # Admin Dashboard
   # ==================================
   namespace :admin do

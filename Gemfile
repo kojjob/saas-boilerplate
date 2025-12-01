@@ -86,6 +86,10 @@ gem "rack-attack"
 # Soft deletes
 gem "discard", "~> 1.4"
 
+# PDF generation
+gem "prawn", "~> 2.4"
+gem "prawn-table", "~> 0.2"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri windows ], require: "debug/prelude"
@@ -121,6 +125,9 @@ group :test do
 
   # Time manipulation for tests
   gem "timecop"
+
+  # PDF testing
+  gem "pdf-inspector", require: "pdf/inspector"
 end
 
 group :development do
