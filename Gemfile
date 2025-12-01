@@ -56,7 +56,7 @@ gem "pundit", "~> 2.4"
 
 # Billing - Stripe subscription management
 gem "pay", "~> 11.4"
-gem "stripe", "~> 13.0"
+gem "stripe", "~> 18.0"
 
 # Audit logging - Version tracking for models
 # Note: paper_trail ~> 16.0 is not compatible with Rails 8.1
@@ -64,7 +64,7 @@ gem "stripe", "~> 13.0"
 gem "audited", "~> 5.6"
 
 # Pagination
-gem "pagy", "~> 43.1"
+gem "pagy", "~> 9.3"
 
 # OAuth providers
 gem "omniauth", "~> 2.1"

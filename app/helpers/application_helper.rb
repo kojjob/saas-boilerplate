@@ -6,15 +6,15 @@ module ApplicationHelper
     is_active = current_page?(path)
 
     link_classes = if is_active
-      "flex items-center px-3 py-2.5 text-sm font-medium rounded-lg bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-lg shadow-indigo-500/25"
+      "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/25 transition-all duration-200"
     else
-      "flex items-center px-3 py-2.5 text-sm font-medium rounded-lg text-slate-300 hover:bg-slate-800 hover:text-white transition-colors"
+      "group flex items-center px-3 py-2.5 text-sm font-medium rounded-xl text-slate-300 hover:bg-slate-800/80 hover:text-white transition-all duration-200"
     end
 
     link_to path, class: link_classes do
       concat(sidebar_icon(icon, is_active)) if icon.present?
       concat(content_tag(:span, name, class: "ml-3"))
-      concat(content_tag(:span, badge, class: "ml-auto bg-indigo-500 text-white text-xs px-2 py-0.5 rounded-full")) if badge.present?
+      concat(content_tag(:span, badge, class: "ml-auto bg-amber-500 text-white text-xs px-2 py-0.5 rounded-full")) if badge.present?
     end
   end
 

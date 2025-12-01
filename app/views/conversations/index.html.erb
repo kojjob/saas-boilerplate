@@ -1,89 +1,166 @@
-<div class="max-w-4xl mx-auto">
-  <!-- Header -->
-  <div class="flex items-center justify-between mb-6">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Messages</h1>
-      <p class="mt-1 text-sm text-gray-500">Communicate with your team members</p>
-    </div>
-    <%= link_to new_conversation_path, class: "inline-flex items-center px-4 py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-sm font-medium rounded-lg shadow-sm hover:from-indigo-700 hover:to-purple-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all duration-200", data: { turbo_frame: "modal" } do %>
-      <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+<% content_for :page_title, "Messages" %>
+
+<div class="space-y-6">
+  <%# Hero Header with Dark Background %>
+  <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl">
+    <%# Decorative grid pattern %>
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="messages-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#messages-grid)"/>
       </svg>
-      New Conversation
-    <% end %>
+    </div>
+
+    <%# Gradient orbs %>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/20 rounded-full blur-3xl"></div>
+
+    <div class="relative px-6 py-8 sm:px-8 sm:py-10">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <%# Title and stats %>
+        <div class="flex items-start gap-4">
+          <div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+            <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+            </svg>
+          </div>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">Messages</h1>
+            <p class="mt-1 text-slate-400">Communicate with your clients and team</p>
+            <div class="mt-3 flex items-center gap-4">
+              <div class="flex items-center gap-2">
+                <span class="text-2xl font-bold text-white"><%= @conversations.count %></span>
+                <span class="text-sm text-slate-400">Conversations</span>
+              </div>
+              <% total_unread = @conversations.sum { |c| c.unread_count_for(current_user) } %>
+              <% if total_unread > 0 %>
+                <div class="w-px h-6 bg-slate-700"></div>
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-amber-400"><%= total_unread %></span>
+                  <span class="text-sm text-slate-400">Unread</span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+
+        <%# Action button %>
+        <div class="flex-shrink-0">
+          <%= link_to new_conversation_path, data: { turbo_frame: "modal" }, class: "inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            New Message
+          <% end %>
+        </div>
+      </div>
+    </div>
   </div>
 
-  <!-- Conversations List -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
-    <% if @conversations.any? %>
-      <ul class="divide-y divide-gray-200">
+  <%# Conversations List %>
+  <% if @conversations.any? %>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="divide-y divide-slate-100">
         <% @conversations.each do |conversation| %>
-          <li>
-            <%= link_to conversation_path(conversation), class: "block hover:bg-gray-50 transition-colors duration-200" do %>
-              <div class="flex items-center px-6 py-4">
-                <!-- Avatar -->
-                <div class="flex-shrink-0">
-                  <% other_user = conversation.other_participant(current_user) %>
-                  <div class="w-12 h-12 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-semibold text-lg">
+          <% other_user = conversation.other_participant(current_user) %>
+          <% unread_count = conversation.unread_count_for(current_user) %>
+          <%= link_to conversation_path(conversation), class: "group block hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 transition-all duration-200" do %>
+            <div class="flex items-center px-6 py-5">
+              <%# Avatar %>
+              <div class="relative flex-shrink-0">
+                <div class="w-14 h-14 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
+                  <span class="text-lg font-bold text-white">
                     <%= other_user.initials %>
-                  </div>
+                  </span>
                 </div>
+                <% if unread_count > 0 %>
+                  <div class="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center ring-2 ring-white">
+                    <span class="text-[10px] font-bold text-white"><%= unread_count > 9 ? '9+' : unread_count %></span>
+                  </div>
+                <% end %>
+              </div>
 
-                <!-- Conversation Details -->
-                <div class="ml-4 flex-1 min-w-0">
-                  <div class="flex items-center justify-between">
-                    <p class="text-sm font-semibold text-gray-900 truncate">
+              <%# Conversation Details %>
+              <div class="ml-4 flex-1 min-w-0">
+                <div class="flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <p class="text-base font-semibold text-slate-900 group-hover:text-amber-600 transition-colors truncate">
                       <%= other_user.full_name %>
                     </p>
-                    <% if conversation.last_message %>
-                      <span class="text-xs text-gray-500">
-                        <%= time_ago_in_words(conversation.last_message.created_at) %> ago
+                    <% if unread_count > 0 %>
+                      <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium bg-amber-100 text-amber-800">
+                        New
                       </span>
                     <% end %>
                   </div>
                   <% if conversation.last_message %>
-                    <p class="mt-1 text-sm text-gray-500 truncate">
-                      <% if conversation.last_message.sender == current_user %>
-                        <span class="text-gray-400">You: </span>
-                      <% end %>
-                      <%= truncate(conversation.last_message.body, length: 60) %>
-                    </p>
-                  <% else %>
-                    <p class="mt-1 text-sm text-gray-400 italic">No messages yet</p>
+                    <span class="text-xs text-slate-500 flex-shrink-0 ml-2">
+                      <%= time_ago_in_words(conversation.last_message.created_at) %> ago
+                    </span>
                   <% end %>
                 </div>
-
-                <!-- Unread Badge -->
-                <% unread_count = conversation.unread_count_for(current_user) %>
-                <% if unread_count > 0 %>
-                  <div class="ml-4 flex-shrink-0">
-                    <span class="inline-flex items-center justify-center min-w-[1.5rem] h-6 px-2 rounded-full bg-indigo-600 text-white text-xs font-medium">
-                      <%= unread_count %>
-                    </span>
-                  </div>
+                <% if conversation.last_message %>
+                  <p class="mt-1 text-sm text-slate-600 truncate">
+                    <% if conversation.last_message.sender == current_user %>
+                      <span class="text-slate-400">You: </span>
+                    <% end %>
+                    <%= truncate(conversation.last_message.body, length: 80) %>
+                  </p>
+                <% else %>
+                  <p class="mt-1 text-sm text-slate-400 italic">No messages yet - start the conversation!</p>
                 <% end %>
               </div>
-            <% end %>
-          </li>
-        <% end %>
-      </ul>
-    <% else %>
-      <!-- Empty State -->
-      <div class="px-6 py-16 text-center">
-        <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
-        </svg>
-        <h3 class="mt-4 text-lg font-medium text-gray-900">No conversations yet</h3>
-        <p class="mt-2 text-sm text-gray-500">Start a conversation with a team member to get started.</p>
-        <div class="mt-6">
-          <%= link_to new_conversation_path, class: "inline-flex items-center px-4 py-2 bg-indigo-600 text-white text-sm font-medium rounded-lg hover:bg-indigo-700 transition-colors", data: { turbo_frame: "modal" } do %>
-            <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
-            </svg>
-            Start a Conversation
+
+              <%# Arrow indicator %>
+              <div class="ml-4 flex-shrink-0 opacity-0 group-hover:opacity-100 transition-opacity duration-200">
+                <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/>
+                </svg>
+              </div>
+            </div>
           <% end %>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Pagination %>
+    <% if @conversations.respond_to?(:total_pages) && @conversations.total_pages > 1 %>
+      <div class="flex justify-center">
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-200 px-6 py-4">
+          <%== pagy_nav(@pagy) if defined?(@pagy) %>
         </div>
       </div>
     <% end %>
-  </div>
+  <% else %>
+    <%# Empty State %>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+      <div class="px-6 py-16 text-center">
+        <div class="mx-auto w-20 h-20 rounded-2xl bg-gradient-to-br from-amber-100 to-orange-100 flex items-center justify-center mb-6">
+          <svg class="w-10 h-10 text-amber-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"/>
+          </svg>
+        </div>
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">No conversations yet</h3>
+        <p class="text-slate-500 mb-8 max-w-sm mx-auto">Start a conversation with a client or team member to keep everyone in the loop.</p>
+        <div class="flex flex-col sm:flex-row items-center justify-center gap-3">
+          <%= link_to new_conversation_path, data: { turbo_frame: "modal" }, class: "inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/>
+            </svg>
+            Start a Conversation
+          <% end %>
+          <%= link_to clients_path, class: "inline-flex items-center gap-2 px-6 py-3 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl transition-colors" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0z"/>
+            </svg>
+            View Clients
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% end %>
 </div>

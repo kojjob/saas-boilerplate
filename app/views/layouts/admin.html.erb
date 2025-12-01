@@ -39,7 +39,7 @@
           </div>
           <div class="flex items-center space-x-4">
             <%= link_to "Back to App", root_path, class: "px-3 py-2 rounded-md text-sm font-medium bg-indigo-600 hover:bg-indigo-700" %>
-            <%= link_to "Sign Out", sign_out_path, data: { turbo_method: :delete }, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" %>
+            <%= button_to "Sign Out", sign_out_path, method: :delete, class: "px-3 py-2 rounded-md text-sm font-medium hover:bg-slate-700" %>
           </div>
         </div>
       </div>
