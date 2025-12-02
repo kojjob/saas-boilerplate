@@ -1,0 +1,69 @@
+<% content_for :page_title, "MRR Report" %>
+
+<div class="space-y-6">
+  <%# Header %>
+  <div class="flex items-center gap-4">
+    <%= link_to owner_reports_path, class: "p-2 text-slate-400 hover:text-slate-600 hover:bg-slate-100 rounded-lg transition-colors" do %>
+      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+      </svg>
+    <% end %>
+    <div>
+      <h1 class="text-2xl font-bold text-slate-900">MRR Report</h1>
+      <p class="text-sm text-slate-500 mt-1">Monthly recurring revenue breakdown</p>
+    </div>
+  </div>
+
+  <%# Stats Cards %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">MRR</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1"><%= number_to_currency(@mrr) %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">ARR</p>
+      <p class="text-2xl font-bold text-slate-900 mt-1"><%= number_to_currency(@arr) %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Growth Rate</p>
+      <p class="text-2xl font-bold <%= @mrr_growth_rate >= 0 ? 'text-green-600' : 'text-red-600' %> mt-1"><%= number_to_percentage(@mrr_growth_rate, precision: 1) %></p>
+    </div>
+    <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-5">
+      <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Net Movement</p>
+      <p class="text-2xl font-bold <%= @net_mrr_movement >= 0 ? 'text-green-600' : 'text-red-600' %> mt-1"><%= number_to_currency(@net_mrr_movement) %></p>
+    </div>
+  </div>
+
+  <%# MRR by Plan %>
+  <div class="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200">
+      <h2 class="text-lg font-semibold text-slate-900">MRR by Plan</h2>
+    </div>
+    <table class="min-w-full divide-y divide-slate-200">
+      <thead class="bg-slate-50">
+        <tr>
+          <th class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Plan</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">MRR</th>
+          <th class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">% of Total</th>
+        </tr>
+      </thead>
+      <tbody class="bg-white divide-y divide-slate-200">
+        <% @mrr_by_plan.each do |plan_name, mrr| %>
+          <tr class="hover:bg-slate-50">
+            <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900"><%= plan_name %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-900 text-right"><%= number_to_currency(mrr) %></td>
+            <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 text-right">
+              <%= @mrr > 0 ? number_to_percentage((mrr / @mrr) * 100, precision: 1) : "0%" %>
+            </td>
+          </tr>
+        <% end %>
+        <% if @mrr_by_plan.empty? %>
+          <tr>
+            <td colspan="3" class="px-6 py-8 text-center text-sm text-slate-500">No revenue data available</td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
