@@ -2,7 +2,7 @@
 
 <div class="space-y-6">
   <%# Hero Header with Dark Background %>
-  <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl">
+  <div class="relative overflow-hidden bg-linear-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl">
     <%# Decorative grid pattern %>
     <div class="absolute inset-0 opacity-10">
       <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
@@ -23,7 +23,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
         <%# Title and stats %>
         <div class="flex items-start gap-4">
-          <div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+          <div class="shrink-0 w-14 h-14 rounded-2xl bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
             <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
             </svg>
@@ -50,8 +50,8 @@
 
         <%# Action button %>
         <% if @current_membership&.can_manage_members? %>
-          <div class="flex-shrink-0">
-            <%= link_to new_account_invitation_path, data: { turbo_frame: "modal" }, class: "inline-flex items-center gap-2 px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105" do %>
+          <div class="shrink-0">
+            <%= link_to new_account_invitation_path, data: { turbo_frame: "modal" }, class: "inline-flex items-center gap-2 px-5 py-3 bg-linear-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white font-semibold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all duration-300 hover:scale-105" do %>
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
               </svg>
@@ -65,9 +65,9 @@
 
   <%# Active Members Section %>
   <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+    <div class="px-6 py-4 border-b border-slate-200 bg-linear-to-r from-slate-50 to-slate-100">
       <div class="flex items-center gap-3">
-        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center">
+        <div class="w-8 h-8 rounded-lg bg-linear-to-br from-green-500 to-emerald-600 flex items-center justify-center">
           <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
           </svg>
@@ -82,11 +82,11 @@
     <% if @memberships.active.any? %>
       <div class="divide-y divide-slate-100">
         <% @memberships.active.each do |membership| %>
-          <div class="group px-6 py-4 hover:bg-gradient-to-r hover:from-amber-50/50 hover:to-orange-50/50 transition-all duration-200">
+          <div class="group px-6 py-4 hover:bg-linear-to-r hover:from-amber-50/50 hover:to-orange-50/50 transition-all duration-200">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
-                <div class="relative flex-shrink-0">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
+                <div class="relative shrink-0">
+                  <div class="w-12 h-12 rounded-xl bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20 group-hover:scale-110 transition-transform duration-300">
                     <span class="text-sm font-bold text-white">
                       <%= membership.user.first_name[0].upcase %><%= membership.user.last_name[0].upcase %>
                     </span>
@@ -142,7 +142,7 @@
       </div>
     <% else %>
       <div class="px-6 py-12 text-center">
-        <div class="mx-auto w-16 h-16 rounded-2xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center mb-4">
+        <div class="mx-auto w-16 h-16 rounded-2xl bg-linear-to-br from-slate-100 to-slate-200 flex items-center justify-center mb-4">
           <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
           </svg>
@@ -156,9 +156,9 @@
   <% pending_invitations = @memberships.pending %>
   <% if pending_invitations.any? %>
     <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
-      <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-amber-50 to-orange-50">
+      <div class="px-6 py-4 border-b border-slate-200 bg-linear-to-r from-amber-50 to-orange-50">
         <div class="flex items-center gap-3">
-          <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+          <div class="w-8 h-8 rounded-lg bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center">
             <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
             </svg>
@@ -172,11 +172,11 @@
 
       <div class="divide-y divide-slate-100">
         <% pending_invitations.each do |invitation| %>
-          <div class="group px-6 py-4 hover:bg-gradient-to-r hover:from-amber-50/30 hover:to-orange-50/30 transition-all duration-200">
+          <div class="group px-6 py-4 hover:bg-linear-to-r hover:from-amber-50/30 hover:to-orange-50/30 transition-all duration-200">
             <div class="flex items-center justify-between">
               <div class="flex items-center gap-4">
-                <div class="flex-shrink-0">
-                  <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-slate-200 to-slate-300 flex items-center justify-center">
+                <div class="shrink-0">
+                  <div class="w-12 h-12 rounded-xl bg-linear-to-br from-slate-200 to-slate-300 flex items-center justify-center">
                     <svg class="w-6 h-6 text-slate-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"/>
                     </svg>
@@ -230,9 +230,9 @@
   <% end %>
 
   <%# Tips Section %>
-  <div class="bg-gradient-to-r from-slate-50 to-slate-100 rounded-2xl border border-slate-200 p-6">
+  <div class="bg-linear-to-r from-slate-50 to-slate-100 rounded-2xl border border-slate-200 p-6">
     <div class="flex items-start gap-4">
-      <div class="flex-shrink-0 w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+      <div class="shrink-0 w-10 h-10 rounded-xl bg-linear-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
         <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
         </svg>

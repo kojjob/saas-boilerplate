@@ -101,10 +101,14 @@ export default class extends Controller {
     this.dotTargets.forEach((dot, i) => {
       if (i === index) {
         dot.classList.add("bg-amber-500", "w-8")
-        dot.classList.remove("bg-slate-300", "w-2")
+        dot.classList.remove("bg-slate-300", "bg-slate-600", "w-2")
       } else {
         dot.classList.remove("bg-amber-500", "w-8")
-        dot.classList.add("bg-slate-300", "w-2")
+        // Support both light and dark theme dot styles
+        if (!dot.classList.contains("bg-slate-300") && !dot.classList.contains("bg-slate-600")) {
+          dot.classList.add("bg-slate-600")
+        }
+        dot.classList.add("w-2")
       }
     })
   }
