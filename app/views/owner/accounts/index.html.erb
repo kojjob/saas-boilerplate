@@ -1,0 +1,279 @@
+<% content_for :page_title, "All Accounts" %>
+
+<div class="space-y-8">
+  <%# Hero Header - Dark Slate Theme %>
+  <div class="relative overflow-hidden bg-linear-to-r from-gray-950 via-gray-800 to-gray-950 rounded-2xl shadow-2xl">
+    <%# Decorative grid pattern %>
+    <div class="absolute inset-0 opacity-10">
+      <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+        <defs>
+          <pattern id="accounts-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+            <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+          </pattern>
+        </defs>
+        <rect width="100%" height="100%" fill="url(#accounts-grid)"/>
+      </svg>
+    </div>
+
+    <%# Gradient orbs %>
+    <div class="absolute top-0 right-0 w-72 h-72 bg-blue-500/20 rounded-full blur-3xl"></div>
+    <div class="absolute bottom-0 left-0 w-48 h-48 bg-indigo-500/20 rounded-full blur-3xl"></div>
+
+    <div class="relative px-4 py-6 sm:px-8 sm:py-10">
+      <%# Header with back button and title %>
+      <div class="flex flex-col gap-4 mb-6 sm:mb-8">
+        <%# Top row - back button and timestamp %>
+        <div class="flex items-center justify-between">
+          <%= link_to owner_root_path, class: "inline-flex items-center gap-2 p-2 sm:p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-200 backdrop-blur-sm min-h-[44px] min-w-[44px]" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <span class="hidden sm:inline text-sm font-medium">Back</span>
+          <% end %>
+          <div class="flex items-center gap-2 text-xs sm:text-sm text-slate-400">
+            <svg class="w-4 h-4 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span><%= Time.current.strftime("%b %d, %Y") %></span>
+          </div>
+        </div>
+
+        <%# Title row %>
+        <div class="flex items-center gap-3 sm:gap-4">
+          <div class="shrink-0 w-12 h-12 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/30">
+            <svg class="w-6 h-6 sm:w-7 sm:h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <h1 class="text-xl sm:text-2xl md:text-3xl font-bold text-white truncate">All Accounts</h1>
+            <p class="text-sm sm:text-base text-slate-400 mt-0.5 sm:mt-1 truncate">Manage and monitor customer accounts</p>
+          </div>
+        </div>
+      </div>
+
+      <%# Hero Stats %>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 lg:gap-6">
+        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-5 border border-white/10">
+          <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-slate-700 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+              </svg>
+            </div>
+            <span class="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">Total</span>
+          </div>
+          <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white"><%= number_with_delimiter(@pagy.count) %></p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 truncate">All accounts</p>
+        </div>
+
+        <% active_count = Account.where(subscription_status: 'active').count %>
+        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-5 border border-white/10">
+          <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-emerald-500/20 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">Active</span>
+          </div>
+          <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-emerald-400"><%= number_with_delimiter(active_count) %></p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 truncate">Paying</p>
+        </div>
+
+        <% trialing_count = Account.where(subscription_status: 'trialing').count %>
+        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-5 border border-white/10">
+          <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg bg-blue-500/20 flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">Trialing</span>
+          </div>
+          <p class="text-2xl sm:text-3xl lg:text-4xl font-bold text-blue-400"><%= number_with_delimiter(trialing_count) %></p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 truncate">In trial</p>
+        </div>
+
+        <% past_due_count = Account.where(subscription_status: 'past_due').count %>
+        <div class="bg-white/5 backdrop-blur-sm rounded-xl p-3 sm:p-4 lg:p-5 border border-white/10">
+          <div class="flex items-center gap-2 sm:gap-3 mb-2 sm:mb-3">
+            <div class="w-8 h-8 sm:w-10 sm:h-10 rounded-lg <%= past_due_count > 0 ? 'bg-red-500/20' : 'bg-slate-700' %> flex items-center justify-center shrink-0">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 <%= past_due_count > 0 ? 'text-red-400' : 'text-slate-300' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <span class="text-[10px] sm:text-xs font-medium text-slate-400 uppercase tracking-wider">Past Due</span>
+          </div>
+          <p class="text-2xl sm:text-3xl lg:text-4xl font-bold <%= past_due_count > 0 ? 'text-red-400' : 'text-white' %>"><%= number_with_delimiter(past_due_count) %></p>
+          <p class="text-xs sm:text-sm text-slate-500 mt-1 truncate">Attention</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Filters %>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 p-4 sm:p-5">
+    <%= form_with url: owner_accounts_path, method: :get, class: "space-y-4 sm:space-y-0 sm:flex sm:flex-wrap sm:items-end sm:gap-4" do |f| %>
+      <%# Search field - full width on mobile %>
+      <div class="w-full sm:flex-1 sm:min-w-[200px]">
+        <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Search</label>
+        <div class="relative">
+          <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+          </svg>
+          <%= text_field_tag :search, params[:search], placeholder: "Search accounts...", class: "w-full pl-10 pr-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow min-h-[44px]" %>
+        </div>
+      </div>
+
+      <%# Status & Plan filters - side by side on mobile, inline on desktop %>
+      <div class="flex gap-3 sm:gap-4">
+        <div class="flex-1 sm:flex-none sm:w-36 lg:w-44">
+          <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Status</label>
+          <%= select_tag :status, options_for_select([["All", ""]] + @statuses.map { |s| [s.titleize, s] }, params[:status]), class: "w-full px-3 sm:px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white min-h-[44px]" %>
+        </div>
+
+        <div class="flex-1 sm:flex-none sm:w-36 lg:w-44">
+          <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Plan</label>
+          <%= select_tag :plan_id, options_for_select([["All", ""]] + @plans.map { |p| [p.name, p.id] }, params[:plan_id]), class: "w-full px-3 sm:px-4 py-2.5 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-shadow bg-white min-h-[44px]" %>
+        </div>
+      </div>
+
+      <%# Action buttons - full width on mobile %>
+      <div class="flex gap-2 w-full sm:w-auto">
+        <%= submit_tag "Filter", class: "flex-1 sm:flex-none px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-xl transition-colors cursor-pointer shadow-sm min-h-[44px]" %>
+        <%= link_to "Clear", owner_accounts_path, class: "flex-1 sm:flex-none px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 text-sm font-medium rounded-xl transition-colors text-center min-h-[44px] flex items-center justify-center" %>
+      </div>
+    <% end %>
+  </div>
+
+  <%# Accounts Table %>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200/80 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 bg-slate-50/50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-10 h-10 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-sm">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+            </svg>
+          </div>
+          <div>
+            <h2 class="text-lg font-semibold text-slate-900">Account Directory</h2>
+            <p class="text-sm text-slate-500">
+              <% if params[:status].present? || params[:plan_id].present? || params[:search].present? %>
+                Showing <%= @accounts.size %> filtered result<%= @accounts.size == 1 ? '' : 's' %>
+              <% else %>
+                <%= @pagy.count %> total account<%= @pagy.count == 1 ? '' : 's' %>
+              <% end %>
+            </p>
+          </div>
+        </div>
+        <% if @pagy.pages > 1 %>
+          <span class="text-sm text-slate-500">Page <%= @pagy.page %> of <%= @pagy.pages %></span>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="min-w-full divide-y divide-slate-200">
+        <thead class="bg-slate-50/50">
+          <tr>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Account</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Plan</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Status</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Team</th>
+            <th class="px-6 py-3.5 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Created</th>
+            <th class="px-6 py-3.5 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider"></th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-slate-100">
+          <% @accounts.each do |account| %>
+            <tr class="hover:bg-slate-50/50 transition-colors">
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-4">
+                  <div class="w-11 h-11 rounded-xl bg-linear-to-br from-blue-500 to-indigo-600 flex items-center justify-center text-white font-semibold text-sm shadow-sm">
+                    <%= account.name.first.upcase %>
+                  </div>
+                  <div>
+                    <div class="text-sm font-semibold text-slate-900"><%= account.name %></div>
+                    <div class="text-xs text-slate-500 font-mono"><%= account.slug %></div>
+                  </div>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% plan_colors = {
+                     'Enterprise' => 'bg-amber-50 text-amber-700 border-amber-200',
+                     'Pro' => 'bg-blue-50 text-blue-700 border-blue-200',
+                     'Starter' => 'bg-slate-50 text-slate-700 border-slate-200'
+                   }
+                   plan_color = plan_colors[account.plan&.name] || 'bg-slate-50 text-slate-600 border-slate-200' %>
+                <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-medium border <%= plan_color %>">
+                  <%= account.plan&.name || "No Plan" %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <% status_config = {
+                     'active' => { bg: 'bg-emerald-50', text: 'text-emerald-700', border: 'border-emerald-200', dot: 'bg-emerald-500' },
+                     'trialing' => { bg: 'bg-blue-50', text: 'text-blue-700', border: 'border-blue-200', dot: 'bg-blue-500' },
+                     'past_due' => { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', dot: 'bg-red-500' },
+                     'canceled' => { bg: 'bg-slate-50', text: 'text-slate-600', border: 'border-slate-200', dot: 'bg-slate-400' }
+                   }
+                   config = status_config[account.subscription_status] || status_config['canceled'] %>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-medium border <%= config[:bg] %> <%= config[:text] %> <%= config[:border] %>">
+                  <span class="w-1.5 h-1.5 rounded-full <%= config[:dot] %>"></span>
+                  <%= account.subscription_status&.titleize || "Unknown" %>
+                </span>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="flex items-center gap-2">
+                  <svg class="w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <span class="text-sm text-slate-600"><%= account.users.count %></span>
+                </div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap">
+                <div class="text-sm text-slate-600"><%= account.created_at.strftime("%b %d, %Y") %></div>
+                <div class="text-xs text-slate-400"><%= time_ago_in_words(account.created_at) %> ago</div>
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-right">
+                <%= link_to owner_account_path(account), class: "inline-flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" do %>
+                  <span>View</span>
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+
+          <% if @accounts.empty? %>
+            <tr>
+              <td colspan="6" class="px-6 py-16 text-center">
+                <div class="flex flex-col items-center">
+                  <div class="w-16 h-16 rounded-2xl bg-slate-100 flex items-center justify-center mb-4">
+                    <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                  </div>
+                  <p class="text-slate-900 font-medium">No accounts found</p>
+                  <p class="text-sm text-slate-500 mt-1">Try adjusting your search or filter criteria</p>
+                  <% if params[:status].present? || params[:plan_id].present? || params[:search].present? %>
+                    <%= link_to "Clear all filters", owner_accounts_path, class: "mt-4 inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-blue-600 hover:text-blue-700 hover:bg-blue-50 rounded-lg transition-colors" %>
+                  <% end %>
+                </div>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <%# Pagination %>
+  <% if @pagy.pages > 1 %>
+    <div class="flex justify-center">
+      <%== pagy_nav(@pagy) %>
+    </div>
+  <% end %>
+</div>

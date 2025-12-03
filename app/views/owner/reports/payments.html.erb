@@ -1,0 +1,158 @@
+<% content_for :page_title, "Payments Report" %>
+
+<div class="space-y-8">
+  <%# Hero Header %>
+  <div class="relative overflow-hidden bg-gradient-to-br from-amber-500 via-orange-500 to-rose-600 rounded-2xl shadow-xl">
+    <div class="absolute inset-0 bg-grid-white/10 [mask-image:linear-gradient(0deg,transparent,rgba(255,255,255,0.5))]"></div>
+    <div class="absolute -top-24 -right-24 w-96 h-96 bg-white/10 rounded-full blur-3xl"></div>
+    <div class="absolute -bottom-24 -left-24 w-96 h-96 bg-orange-500/20 rounded-full blur-3xl"></div>
+
+    <div class="relative px-6 py-8 sm:px-8 sm:py-10">
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+        <div class="flex items-center gap-4">
+          <%= link_to owner_reports_path, class: "p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all duration-200 backdrop-blur-sm" do %>
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+          <% end %>
+          <div>
+            <h1 class="text-2xl sm:text-3xl font-bold text-white">Payment Health</h1>
+            <p class="text-orange-100 mt-1">Monitor payment status and revenue at risk</p>
+          </div>
+        </div>
+        <div class="flex items-center gap-2 text-sm text-orange-100">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <span>Real-time data</span>
+        </div>
+      </div>
+
+      <%# Hero Stats %>
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+        <%# Health Score %>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/10">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg <%= @revenue_health_score >= 90 ? 'bg-emerald-500/30' : @revenue_health_score >= 70 ? 'bg-amber-500/30' : 'bg-red-500/30' %> flex items-center justify-center">
+              <svg class="w-5 h-5 <%= @revenue_health_score >= 90 ? 'text-emerald-300' : @revenue_health_score >= 70 ? 'text-amber-300' : 'text-red-300' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+              </svg>
+            </div>
+            <span class="text-xs font-medium text-orange-100 uppercase tracking-wider">Health</span>
+          </div>
+          <p class="text-3xl sm:text-4xl font-bold text-white"><%= number_to_percentage(@revenue_health_score, precision: 0) %></p>
+          <p class="text-sm text-orange-200 mt-1">Revenue health</p>
+        </div>
+
+        <%# Past Due %>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/10">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg <%= @past_due_accounts_count == 0 ? 'bg-emerald-500/30' : 'bg-red-500/30' %> flex items-center justify-center">
+              <svg class="w-5 h-5 <%= @past_due_accounts_count == 0 ? 'text-emerald-300' : 'text-red-300' %>" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-xs font-medium text-orange-100 uppercase tracking-wider">Past Due</span>
+          </div>
+          <p class="text-3xl sm:text-4xl font-bold text-white"><%= @past_due_accounts_count %></p>
+          <p class="text-sm text-orange-200 mt-1">Accounts</p>
+        </div>
+
+        <%# At Risk Revenue %>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/10">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-white/20 flex items-center justify-center">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-xs font-medium text-orange-100 uppercase tracking-wider">At Risk</span>
+          </div>
+          <p class="text-3xl sm:text-4xl font-bold text-white"><%= number_to_currency(@at_risk_revenue, precision: 0) %></p>
+          <p class="text-sm text-orange-200 mt-1">Monthly revenue</p>
+        </div>
+
+        <%# Healthy MRR %>
+        <div class="bg-white/10 backdrop-blur-sm rounded-xl p-4 sm:p-5 border border-white/10">
+          <div class="flex items-center gap-3 mb-3">
+            <div class="w-10 h-10 rounded-lg bg-emerald-500/30 flex items-center justify-center">
+              <svg class="w-5 h-5 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-xs font-medium text-orange-100 uppercase tracking-wider">Healthy</span>
+          </div>
+          <p class="text-3xl sm:text-4xl font-bold text-white"><%= number_to_currency(@healthy_mrr, precision: 0) %></p>
+          <p class="text-sm text-orange-200 mt-1">Secure MRR</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Health Status Alert %>
+  <% if @past_due_accounts_count == 0 %>
+    <div class="relative overflow-hidden bg-gradient-to-r from-emerald-50 to-teal-50 rounded-2xl border border-emerald-200 p-6">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-emerald-100 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+      <div class="relative flex items-start gap-4">
+        <div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-lg shadow-emerald-500/20">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </div>
+        <div>
+          <h3 class="text-xl font-bold text-emerald-900">Excellent Payment Health</h3>
+          <p class="text-emerald-700 mt-1">All accounts are current with payments. Your revenue is fully secure.</p>
+          <div class="flex items-center gap-4 mt-4">
+            <div class="flex items-center gap-2 text-sm text-emerald-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span><%= @total_active_accounts %> active accounts</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-emerald-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+              </svg>
+              <span>0% failure rate</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <div class="relative overflow-hidden bg-gradient-to-r from-red-50 to-rose-50 rounded-2xl border border-red-200 p-6">
+      <div class="absolute top-0 right-0 w-32 h-32 bg-red-100 rounded-full -translate-y-1/2 translate-x-1/2 blur-2xl"></div>
+      <div class="relative flex items-start gap-4">
+        <div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-red-500 to-rose-600 flex items-center justify-center shadow-lg shadow-red-500/20">
+          <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="flex-1">
+          <div class="flex items-start justify-between">
+            <div>
+              <h3 class="text-xl font-bold text-red-900">Payment Issues Detected</h3>
+              <p class="text-red-700 mt-1"><%= @past_due_accounts_count %> account<%= @past_due_accounts_count == 1 ? ' has' : 's have' %> past due payments requiring attention.</p>
+            </div>
+            <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-semibold bg-red-100 text-red-800">
+              <%= number_to_currency(@at_risk_revenue) %> at risk
+            </span>
+          </div>
+          <div class="flex items-center gap-4 mt-4">
+            <div class="flex items-center gap-2 text-sm text-red-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span><%= @accounts_needing_attention %> need urgent attention</span>
+            </div>
+            <div class="flex items-center gap-2 text-sm text-red-600">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 17h8m0 0v-8m0 8l-8-8-4 4-6-6" />
+              </svg>
+              <span><%= number_to_currency(@projected_churn_from_past_due) %> projected churn</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
