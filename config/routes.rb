@@ -43,6 +43,17 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # User Profile Routes
+  # ==================================
+  resource :profile, only: [ :edit, :update ] do
+    patch :password, to: "profiles#update_password", as: :update_password
+    patch :avatar, to: "profiles#update_avatar", as: :update_avatar
+    delete :avatar, to: "profiles#remove_avatar", as: :remove_avatar
+    patch :notifications, to: "profiles#update_notifications", as: :update_notifications
+    delete "sessions/:session_id", to: "profiles#revoke_session", as: :revoke_session
+  end
+
+  # ==================================
   # Public Invitation Acceptance
   # ==================================
   get "invitations/:token/accept", to: "invitation_acceptances#show", as: :accept_invitation
