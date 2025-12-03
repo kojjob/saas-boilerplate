@@ -6,7 +6,7 @@ module Authentication
   extend ActiveSupport::Concern
 
   included do
-    helper_method :current_user, :signed_in?
+    helper_method :current_user, :signed_in?, :current_session_id
   end
 
   private
@@ -26,6 +26,11 @@ module Authentication
     return @current_session if defined?(@current_session)
 
     @current_session = Session.find_by(id: session[:user_session_id])
+  end
+
+  # Returns the current session ID for comparison in views
+  def current_session_id
+    current_session&.id
   end
 
   # Signs in the given user by creating a new session

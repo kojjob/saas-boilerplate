@@ -1,0 +1,120 @@
+#!/usr/bin/env ruby
+# frozen_string_literal: true
+
+require_relative "../lib/benchmarks/load_test"
+
+puts <<~BANNER
+  ╔══════════════════════════════════════════════════════════════════════╗
+  ║          SUBCONTRACTOR COMMAND - LOAD BENCHMARK SUITE                ║
+  ║                                                                      ║
+  ║  Tests concurrent user capacity and system performance limits        ║
+  ╚══════════════════════════════════════════════════════════════════════╝
+BANNER
+
+# Parse command line arguments
+base_url = ENV["BASE_URL"] || "http://127.0.0.1:3000"
+test_type = ARGV[0] || "quick"
+
+benchmark = Benchmarks::LoadTest.new(base_url: base_url)
+
+case test_type
+when "quick"
+  puts "\nRunning QUICK benchmark (10 users, 10 requests each)..."
+  benchmark.run_concurrent_users(
+    user_count: 10,
+    requests_per_user: 10,
+    endpoints: [:api_health]
+  )
+
+when "standard"
+  puts "\nRunning STANDARD benchmark (50 users, 20 requests each)..."
+  benchmark.run_concurrent_users(
+    user_count: 50,
+    requests_per_user: 20,
+    endpoints: [:api_health]
+  )
+
+when "stress"
+  puts "\nRunning STRESS TEST (finding breaking point)..."
+  result = benchmark.run_stress_test(
+    start_users: 10,
+    max_users: 300,
+    increment: 20,
+    target_error_rate: 5.0
+  )
+  puts "\n" + "=" * 70
+  puts "STRESS TEST CONCLUSION"
+  puts "=" * 70
+  puts "Breaking point: #{result[:breaking_point]}"
+  puts "Max successful: #{result[:max_successful_users]} users"
+  puts "Recommendation: #{result[:recommendation]}"
+  puts "=" * 70
+
+when "ramp"
+  puts "\nRunning RAMP-UP TEST (gradually increasing load)..."
+  benchmark.run_ramp_test(
+    max_users: 100,
+    step_size: 10,
+    requests_per_step: 100,
+    endpoint: :api_health
+  )
+
+when "full"
+  puts "\nRunning FULL BENCHMARK SUITE..."
+
+  puts "\n[1/3] Quick Concurrent Test"
+  benchmark.run_concurrent_users(
+    user_count: 20,
+    requests_per_user: 10,
+    endpoints: [:api_health]
+  )
+
+  puts "\n[2/3] Ramp-Up Test"
+  benchmark.run_ramp_test(
+    max_users: 100,
+    step_size: 10,
+    requests_per_step: 50,
+    endpoint: :api_health
+  )
+
+  puts "\n[3/3] Stress Test"
+  result = benchmark.run_stress_test(
+    start_users: 10,
+    max_users: 200,
+    increment: 10,
+    target_error_rate: 5.0
+  )
+
+  puts "\n" + "=" * 70
+  puts "FULL BENCHMARK COMPLETE"
+  puts "=" * 70
+  puts "System can safely handle approximately #{result[:max_successful_users]} concurrent users"
+  puts "=" * 70
+
+when "help", "-h", "--help"
+  puts <<~HELP
+
+    Usage: bin/benchmark [TYPE]
+
+    Test Types:
+      quick     - Quick test with 10 users (default)
+      standard  - Standard test with 50 users
+      ramp      - Gradually increase load from 10-100 users
+      stress    - Find breaking point (up to 300 users)
+      full      - Run all tests in sequence
+
+    Environment Variables:
+      BASE_URL  - Target server URL (default: http://127.0.0.1:3000)
+
+    Examples:
+      bin/benchmark quick
+      bin/benchmark stress
+      BASE_URL=https://staging.example.com bin/benchmark standard
+
+  HELP
+
+else
+  puts "Unknown test type: #{test_type}"
+  puts "Run 'bin/benchmark help' for usage information."
+  exit 1
+end
