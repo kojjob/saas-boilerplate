@@ -87,5 +87,10 @@ class ApplicationPolicy
     private
 
     attr_reader :user, :scope
+
+    # Returns the current tenant/account
+    def current_account
+      ActsAsTenant.current_tenant
+    end
   end
 end
