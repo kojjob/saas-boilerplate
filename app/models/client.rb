@@ -55,11 +55,13 @@ class Client < ApplicationRecord
   end
 
   def initials
+    return "??" if name.blank?
+
     parts = name.split
     if parts.length >= 2
       "#{parts.first[0]}#{parts.last[0]}".upcase
     else
-      name[0..1].upcase
+      name.first(2).upcase
     end
   end
 end

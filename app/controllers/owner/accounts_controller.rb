@@ -32,7 +32,11 @@ module Owner
       @account = Account.includes(:plan, :users, :memberships).find(params[:id])
       @owner = @account.memberships.find_by(role: :owner)&.user
       @members_count = @account.memberships.count
-      @recent_activity = @account.audits.order(created_at: :desc).limit(10) rescue []
+      @recent_activity = if @account.respond_to?(:audits)
+        @account.audits.order(created_at: :desc).limit(10)
+      else
+        []
+      end
     end
   end
 end

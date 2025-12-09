@@ -70,6 +70,22 @@ class Rack::Attack
     end
   end
 
+  # Throttle invoice payment checkout requests (10 per minute per IP)
+  # Protects against enumeration attacks and payment abuse
+  throttle("invoice_payments/checkout/ip", limit: 10, period: 1.minute) do |req|
+    if req.path.match?(%r{^/pay/[a-f0-9]+/checkout$}) && req.post?
+      req.ip
+    end
+  end
+
+  # Throttle invoice payment view requests (30 per minute per IP)
+  # Prevents enumeration of payment tokens
+  throttle("invoice_payments/view/ip", limit: 30, period: 1.minute) do |req|
+    if req.path.match?(%r{^/pay/[a-f0-9]+$}) && req.get?
+      req.ip
+    end
+  end
+
   ### Blocklist IPs ###
 
   # Block requests from localhost in production (customize as needed)
