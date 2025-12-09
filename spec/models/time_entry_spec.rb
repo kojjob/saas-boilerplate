@@ -40,8 +40,9 @@ RSpec.describe TimeEntry, type: :model do
       end
 
       it "uses effective hourly rate when entry rate is nil" do
-        project = create(:project, hourly_rate: 75)
-        entry = create(:time_entry, :billable, project: project, hours: 4, hourly_rate: nil)
+        account = create(:account)
+        project = create(:project, account: account, hourly_rate: 75)
+        entry = create(:time_entry, :billable, account: account, project: project, hours: 4, hourly_rate: nil)
         expect(entry.total_amount).to eq(300)
       end
 

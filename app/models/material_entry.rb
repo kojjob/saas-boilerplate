@@ -11,6 +11,7 @@ class MaterialEntry < ApplicationRecord
   validates :date, presence: true
   validates :quantity, presence: true, numericality: { greater_than: 0 }
   validates :unit_cost, presence: true, numericality: { greater_than_or_equal_to: 0 }
+  validate :project_belongs_to_same_account
 
   # Callbacks
   before_save :calculate_total_amount
@@ -42,5 +43,12 @@ class MaterialEntry < ApplicationRecord
 
   def calculate_total_amount
     self.total_amount = subtotal + markup_amount if billable?
+  end
+
+  def project_belongs_to_same_account
+    return unless project_id.present? && account_id.present?
+    return if project&.account_id == account_id
+
+    errors.add(:project, "must belong to the same account")
   end
 end
