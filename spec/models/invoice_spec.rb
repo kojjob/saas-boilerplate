@@ -83,7 +83,7 @@ RSpec.describe Invoice, type: :model do
     it "generates payment token on create" do
       invoice = create(:invoice)
       expect(invoice.payment_token).to be_present
-      expect(invoice.payment_token.length).to eq(32)
+      expect(invoice.payment_token.length).to eq(24) # has_secure_token generates 24 char tokens
     end
 
     it "generates unique payment tokens for each invoice" do

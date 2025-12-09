@@ -2,9 +2,9 @@
 
 FactoryBot.define do
   factory :material_entry do
-    association :account
-    association :project
-    association :user
+    account
+    project { association :project, account: account }
+    user { association :user }
     date { Date.current }
     name { Faker::Commerce.product_name }
     description { Faker::Lorem.sentence }

@@ -17,7 +17,7 @@ FactoryBot.define do
     notes { Faker::Lorem.sentence }
 
     trait :with_project do
-      association :project
+      project { association :project, account: account, client: client }
     end
 
     trait :draft do
