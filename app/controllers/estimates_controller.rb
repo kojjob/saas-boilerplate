@@ -87,9 +87,13 @@ class EstimatesController < ApplicationController
 
   def send_estimate
     if @estimate.draft?
-      # TODO: Add EstimateMailer for sending estimates
+      EstimateMailer.send_estimate(
+        @estimate,
+        recipient: params[:recipient],
+        message: params[:message]
+      ).deliver_later
       @estimate.mark_as_sent!
-      redirect_to estimates_path, notice: "Estimate was sent to #{@estimate.client.email}."
+      redirect_to estimates_path, notice: "Estimate was sent to #{params[:recipient] || @estimate.client.email}."
     else
       redirect_to estimates_path, alert: "Estimate has already been sent."
     end
@@ -127,8 +131,16 @@ class EstimatesController < ApplicationController
   end
 
   def download
-    # TODO: Implement EstimatePdfGenerator similar to InvoicePdfGenerator
-    redirect_to estimate_path(@estimate), alert: "PDF download not yet implemented."
+    pdf_result = Pdf::EstimatePdfGenerator.call(estimate: @estimate)
+
+    if pdf_result.success?
+      send_data pdf_result.data[:pdf],
+                filename: pdf_result.data[:filename],
+                type: "application/pdf",
+                disposition: "attachment"
+    else
+      redirect_to estimate_path(@estimate), alert: "Failed to generate PDF: #{pdf_result.error}"
+    end
   end
 
   private
