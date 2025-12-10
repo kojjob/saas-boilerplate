@@ -1509,97 +1509,216 @@
 </section>
 
 <%# ==================== PRICING SECTION ==================== %>
-<section id="pricing" class="py-24 bg-white">
+<section id="pricing" class="py-24 bg-white" data-controller="pricing-toggle">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="text-center max-w-3xl mx-auto mb-16">
+    <%# Header %>
+    <div class="text-center max-w-3xl mx-auto mb-12">
       <span class="inline-block px-4 py-1.5 rounded-full bg-indigo-100 text-indigo-700 text-sm font-semibold mb-4">
         Simple Pricing
       </span>
       <h2 class="text-3xl sm:text-4xl font-bold text-slate-900 mb-4">
-        One Price. Everything Included.
+        Choose the Plan That Fits Your Business
       </h2>
       <p class="text-xl text-slate-600">
-        No hidden fees. No per-invoice charges. No surprises on your bill.
+        Start free, upgrade as you grow. No hidden fees, no surprises.
       </p>
     </div>
 
-    <div class="max-w-lg mx-auto">
-      <%# Single pricing card %>
-      <div class="bg-linear-to-br from-slate-900 to-indigo-900 rounded-3xl p-1">
-        <div class="bg-linear-to-br from-slate-900 to-indigo-900 rounded-3xl p-8 md:p-12 text-center relative overflow-hidden">
-          <%# Background decoration %>
-          <div class="absolute top-0 right-0 w-40 h-40 bg-amber-500/20 rounded-full blur-3xl"></div>
-          <div class="absolute bottom-0 left-0 w-32 h-32 bg-indigo-500/30 rounded-full blur-3xl"></div>
+    <%# Billing Toggle %>
+    <div class="flex items-center justify-center gap-4 mb-12">
+      <span class="text-slate-700 font-medium">Monthly</span>
+      <button
+        type="button"
+        data-action="click->pricing-toggle#toggle"
+        class="relative inline-flex h-8 w-14 items-center rounded-full bg-slate-200 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2"
+        role="switch"
+        aria-checked="false"
+      >
+        <span
+          data-pricing-toggle-target="toggle"
+          class="inline-block h-6 w-6 transform rounded-full bg-white shadow-lg ring-0 transition-transform translate-x-1"
+        ></span>
+      </button>
+      <span class="text-slate-700 font-medium">Yearly</span>
+      <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-emerald-100 text-emerald-800">
+        Save 20%
+      </span>
+    </div>
 
-          <div class="relative z-10">
-            <div class="inline-block px-4 py-1 rounded-full bg-amber-400/20 text-amber-300 text-sm font-semibold mb-6">
-              14-Day Free Trial
+    <%# Pricing Cards Grid %>
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
+      <% @monthly_plans.each_with_index do |plan, index| %>
+        <% yearly_plan = @yearly_plans.find { |yp| yp.name.start_with?(plan.name.split(' ').first) } %>
+        <% is_popular = plan.name == "Pro" %>
+
+        <%# Monthly pricing card %>
+        <div
+          data-pricing-toggle-target="monthly"
+          class="<%= is_popular ? 'md:order-none order-first' : '' %> relative flex flex-col rounded-2xl <%= is_popular ? 'border-2 border-amber-400 bg-linear-to-br from-slate-900 to-indigo-900 shadow-2xl shadow-indigo-500/25 scale-105' : 'border border-slate-200 bg-white shadow-lg' %> overflow-hidden"
+        >
+          <% if is_popular %>
+            <div class="absolute top-0 right-0 -mr-1 -mt-1">
+              <span class="inline-flex items-center px-4 py-1 rounded-bl-xl rounded-tr-xl text-sm font-bold bg-amber-400 text-slate-900">
+                Most Popular
+              </span>
             </div>
+          <% end %>
 
+          <div class="p-8 flex-1 flex flex-col">
+            <%# Plan name %>
+            <h3 class="text-xl font-bold <%= is_popular ? 'text-white' : 'text-slate-900' %> mb-2">
+              <%= plan.name %>
+            </h3>
+            <p class="<%= is_popular ? 'text-slate-300' : 'text-slate-600' %> text-sm mb-6">
+              <%= plan.description %>
+            </p>
+
+            <%# Price %>
             <div class="mb-6">
-              <span class="text-6xl font-bold text-white">$29</span>
-              <span class="text-xl text-slate-400">/month</span>
+              <% if plan.free? %>
+                <span class="text-5xl font-bold <%= is_popular ? 'text-white' : 'text-slate-900' %>">$0</span>
+                <span class="<%= is_popular ? 'text-slate-400' : 'text-slate-500' %>">/month</span>
+              <% else %>
+                <span class="text-5xl font-bold <%= is_popular ? 'text-white' : 'text-slate-900' %>">$<%= (plan.price_cents / 100).to_i %></span>
+                <span class="<%= is_popular ? 'text-slate-400' : 'text-slate-500' %>">/month</span>
+              <% end %>
             </div>
 
-            <p class="text-slate-300 mb-8">Everything you need to run your contracting business</p>
-
-            <ul class="space-y-4 text-left mb-10 max-w-sm mx-auto">
-              <li class="flex items-center gap-3 text-white">
-                <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                Unlimited invoices
-              </li>
-              <li class="flex items-center gap-3 text-white">
-                <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                Unlimited clients
-              </li>
-              <li class="flex items-center gap-3 text-white">
-                <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                Unlimited projects
-              </li>
-              <li class="flex items-center gap-3 text-white">
-                <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                Payment reminders
-              </li>
-              <li class="flex items-center gap-3 text-white">
-                <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                PDF downloads
-              </li>
-              <li class="flex items-center gap-3 text-white">
-                <svg class="w-5 h-5 text-emerald-400 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
-                </svg>
-                Email support
-              </li>
-            </ul>
-
-            <%= link_to sign_up_path, class: 'block w-full py-4 px-8 bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-lg rounded-xl shadow-xl shadow-amber-500/30 hover:shadow-amber-500/50 transition-all' do %>
-              Start Your Free Trial
+            <%# Trial badge %>
+            <% if plan.trial_days > 0 %>
+              <div class="inline-flex items-center px-3 py-1 rounded-full <%= is_popular ? 'bg-amber-400/20 text-amber-300' : 'bg-indigo-100 text-indigo-700' %> text-sm font-medium mb-6 w-fit">
+                <%= plan.trial_days %>-Day Free Trial
+              </div>
             <% end %>
 
-            <p class="text-sm text-slate-400 mt-4">No credit card required. Cancel anytime.</p>
+            <%# Features list %>
+            <ul class="space-y-3 mb-8 flex-1">
+              <% plan.feature_list.first(6).each do |feature| %>
+                <li class="flex items-start gap-3">
+                  <svg class="w-5 h-5 <%= is_popular ? 'text-emerald-400' : 'text-emerald-500' %> shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                  </svg>
+                  <span class="<%= is_popular ? 'text-slate-200' : 'text-slate-700' %> text-sm"><%= feature %></span>
+                </li>
+              <% end %>
+            </ul>
+
+            <%# CTA Button %>
+            <% if is_popular %>
+              <%= link_to sign_up_path, class: 'block w-full py-3.5 px-6 text-center bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all' do %>
+                Start Free Trial
+              <% end %>
+            <% elsif plan.free? %>
+              <%= link_to sign_up_path, class: 'block w-full py-3.5 px-6 text-center bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors' do %>
+                Get Started Free
+              <% end %>
+            <% else %>
+              <%= link_to sign_up_path, class: 'block w-full py-3.5 px-6 text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors' do %>
+                Start Free Trial
+              <% end %>
+            <% end %>
           </div>
         </div>
-      </div>
+
+        <%# Yearly pricing card (hidden by default) %>
+        <% if yearly_plan %>
+          <div
+            data-pricing-toggle-target="annual"
+            class="hidden <%= is_popular ? 'md:order-none order-first' : '' %> relative flex flex-col rounded-2xl <%= is_popular ? 'border-2 border-amber-400 bg-linear-to-br from-slate-900 to-indigo-900 shadow-2xl shadow-indigo-500/25 scale-105' : 'border border-slate-200 bg-white shadow-lg' %> overflow-hidden"
+          >
+            <% if is_popular %>
+              <div class="absolute top-0 right-0 -mr-1 -mt-1">
+                <span class="inline-flex items-center px-4 py-1 rounded-bl-xl rounded-tr-xl text-sm font-bold bg-amber-400 text-slate-900">
+                  Most Popular
+                </span>
+              </div>
+            <% end %>
+
+            <%# Savings badge %>
+            <% unless yearly_plan.free? %>
+              <div
+                data-pricing-toggle-target="savings"
+                class="absolute top-4 left-4 transform opacity-0 scale-0 transition-all duration-300"
+              >
+                <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-500 text-white">
+                  Save $<%= yearly_plan.yearly_savings.to_i %>
+                </span>
+              </div>
+            <% end %>
+
+            <div class="p-8 flex-1 flex flex-col">
+              <%# Plan name %>
+              <h3 class="text-xl font-bold <%= is_popular ? 'text-white' : 'text-slate-900' %> mb-2">
+                <%= yearly_plan.name.gsub(' (Yearly)', '') %>
+              </h3>
+              <p class="<%= is_popular ? 'text-slate-300' : 'text-slate-600' %> text-sm mb-6">
+                <%= yearly_plan.description.gsub(' - save 2 months!', '') %>
+              </p>
+
+              <%# Price %>
+              <div class="mb-6">
+                <% if yearly_plan.free? %>
+                  <span class="text-5xl font-bold <%= is_popular ? 'text-white' : 'text-slate-900' %>">$0</span>
+                  <span class="<%= is_popular ? 'text-slate-400' : 'text-slate-500' %>">/year</span>
+                <% else %>
+                  <span class="text-5xl font-bold <%= is_popular ? 'text-white' : 'text-slate-900' %>">$<%= (yearly_plan.price_cents / 100).to_i %></span>
+                  <span class="<%= is_popular ? 'text-slate-400' : 'text-slate-500' %>">/year</span>
+                <% end %>
+              </div>
+
+              <%# Trial badge %>
+              <% if yearly_plan.trial_days > 0 %>
+                <div class="inline-flex items-center px-3 py-1 rounded-full <%= is_popular ? 'bg-amber-400/20 text-amber-300' : 'bg-indigo-100 text-indigo-700' %> text-sm font-medium mb-6 w-fit">
+                  <%= yearly_plan.trial_days %>-Day Free Trial
+                </div>
+              <% end %>
+
+              <%# Features list %>
+              <ul class="space-y-3 mb-8 flex-1">
+                <% yearly_plan.feature_list.first(6).each do |feature| %>
+                  <% next if feature.include?("Save $") %>
+                  <li class="flex items-start gap-3">
+                    <svg class="w-5 h-5 <%= is_popular ? 'text-emerald-400' : 'text-emerald-500' %> shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
+                      <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"/>
+                    </svg>
+                    <span class="<%= is_popular ? 'text-slate-200' : 'text-slate-700' %> text-sm"><%= feature %></span>
+                  </li>
+                <% end %>
+              </ul>
+
+              <%# CTA Button %>
+              <% if is_popular %>
+                <%= link_to sign_up_path, class: 'block w-full py-3.5 px-6 text-center bg-linear-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold rounded-xl shadow-lg shadow-amber-500/30 hover:shadow-amber-500/50 transition-all' do %>
+                  Start Free Trial
+                <% end %>
+              <% elsif yearly_plan.free? %>
+                <%= link_to sign_up_path, class: 'block w-full py-3.5 px-6 text-center bg-slate-900 hover:bg-slate-800 text-white font-bold rounded-xl transition-colors' do %>
+                  Get Started Free
+                <% end %>
+              <% else %>
+                <%= link_to sign_up_path, class: 'block w-full py-3.5 px-6 text-center bg-indigo-600 hover:bg-indigo-700 text-white font-bold rounded-xl transition-colors' do %>
+                  Start Free Trial
+                <% end %>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
     </div>
 
     <%# Money back guarantee %>
-    <div class="mt-12 text-center">
+    <div class="mt-16 text-center">
       <div class="inline-flex items-center gap-3 px-6 py-3 bg-emerald-50 rounded-full">
         <svg class="w-6 h-6 text-emerald-600" fill="currentColor" viewBox="0 0 20 20">
           <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
         </svg>
         <span class="text-emerald-800 font-medium">30-Day Money Back Guarantee</span>
       </div>
+    </div>
+
+    <%# Trust indicators %>
+    <div class="mt-8 text-center text-sm text-slate-500">
+      <p>No credit card required to start. Cancel anytime.</p>
     </div>
   </div>
 </section>
