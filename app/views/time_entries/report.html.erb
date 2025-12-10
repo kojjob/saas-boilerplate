@@ -1,177 +1,250 @@
-<div class="space-y-6">
-  <%# Header %>
-  <div class="flex items-center justify-between">
-    <div>
-      <h1 class="text-2xl font-bold text-gray-900">Time Report</h1>
-      <p class="mt-1 text-sm text-gray-500">
-        <%= @start_date.strftime("%b %d, %Y") %> - <%= @end_date.strftime("%b %d, %Y") %>
-      </p>
+<% content_for :page_title, "Time Report" %>
+
+<%# Report Content - Updates via Turbo Frame %>
+<%= turbo_frame_tag "time_report_content" do %>
+  <div class="space-y-6">
+    <%# Hero Header with Dark Background %>
+    <div class="relative overflow-hidden bg-gradient-to-r from-slate-900 via-slate-800 to-slate-900 rounded-2xl shadow-2xl">
+      <%# Decorative grid pattern %>
+      <div class="absolute inset-0 opacity-10">
+        <svg class="w-full h-full" viewBox="0 0 100 100" preserveAspectRatio="none">
+          <defs>
+            <pattern id="time-report-grid" width="10" height="10" patternUnits="userSpaceOnUse">
+              <path d="M 10 0 L 0 0 0 10" fill="none" stroke="currentColor" stroke-width="0.5"/>
+            </pattern>
+          </defs>
+          <rect width="100%" height="100%" fill="url(#time-report-grid)"/>
+        </svg>
+      </div>
+
+      <%# Gradient orbs %>
+      <div class="absolute top-0 right-0 w-72 h-72 bg-amber-500/20 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 w-48 h-48 bg-orange-500/20 rounded-full blur-3xl"></div>
+
+      <div class="relative px-6 py-8 sm:px-8 sm:py-10">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+          <%# Title and stats %>
+          <div class="flex items-start gap-4">
+            <div class="flex-shrink-0 w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/30">
+              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+              </svg>
+            </div>
+            <div>
+              <h1 class="text-2xl sm:text-3xl font-bold text-white">Time Report</h1>
+              <p class="mt-1 text-slate-400"><%= @start_date.strftime("%b %d, %Y") %> - <%= @end_date.strftime("%b %d, %Y") %></p>
+              <div class="mt-3 flex items-center gap-4">
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-white"><%= number_with_precision(@total_hours, precision: 1) %></span>
+                  <span class="text-sm text-slate-400">hours</span>
+                </div>
+                <div class="w-px h-6 bg-slate-700"></div>
+                <div class="flex items-center gap-2">
+                  <span class="text-2xl font-bold text-amber-400"><%= number_to_currency(@total_billable, precision: 0) %></span>
+                  <span class="text-sm text-slate-400">billable</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <%# Back button %>
+          <div class="flex-shrink-0">
+            <%= link_to time_entries_path, class: "inline-flex items-center gap-2 px-4 py-2.5 bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white font-medium rounded-xl border border-slate-700/50 transition-all duration-200" do %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+              Back to entries
+            <% end %>
+          </div>
+        </div>
+      </div>
     </div>
-    <%= link_to time_entries_path, class: "inline-flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-700 bg-white border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors" do %>
-      <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
-      </svg>
-      Back to entries
-    <% end %>
-  </div>
 
-  <%# Date Range Filter %>
-  <div class="bg-white rounded-xl border border-gray-200 p-4">
-    <%= form_with url: report_time_entries_path, method: :get, class: "flex flex-wrap items-end gap-4" do |f| %>
-      <div class="flex-1 min-w-[150px]">
-        <label class="block text-sm font-medium text-gray-700 mb-1">Start Date</label>
-        <%= date_field_tag :start_date, @start_date,
-            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-      </div>
+    <%# Date Range Filter %>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-4">
+      <%= form_with url: report_time_entries_path, method: :get, class: "flex flex-wrap items-end gap-4", data: { turbo_frame: "time_report_content", turbo_action: "advance" } do |f| %>
+        <div class="flex-1 min-w-[150px]">
+          <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">Start Date</label>
+          <%= date_field_tag :start_date, @start_date,
+              class: "w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white" %>
+        </div>
 
-      <div class="flex-1 min-w-[150px]">
-        <label class="block text-sm font-medium text-gray-700 mb-1">End Date</label>
-        <%= date_field_tag :end_date, @end_date,
-            class: "w-full px-3 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent" %>
-      </div>
+        <div class="flex-1 min-w-[150px]">
+          <label class="block text-xs font-medium text-slate-500 uppercase tracking-wider mb-2">End Date</label>
+          <%= date_field_tag :end_date, @end_date,
+              class: "w-full px-4 py-3 border border-slate-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500 transition-all bg-white" %>
+        </div>
 
-      <div class="flex gap-2">
-        <%= submit_tag "Update Report", class: "px-4 py-2 text-sm font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 transition-colors cursor-pointer" %>
-      </div>
-    <% end %>
-  </div>
+        <div class="flex gap-2">
+          <%= submit_tag "Update Report", class: "px-5 py-3 bg-gradient-to-r from-amber-500 to-orange-600 hover:from-amber-600 hover:to-orange-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-amber-500/25 hover:shadow-amber-500/40 transition-all cursor-pointer", data: { turbo_submits_with: "Loading..." } %>
+        </div>
+      <% end %>
+    </div>
 
-  <%# Summary Cards %>
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+  <%# Stats Cards %>
+  <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+    <%# Total Hours %>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg hover:border-amber-200 transition-all duration-300 group">
       <div class="flex items-center gap-4">
-        <div class="p-3 rounded-lg bg-blue-50">
-          <svg class="w-6 h-6 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 flex items-center justify-center shadow-lg shadow-blue-500/25 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div>
-          <p class="text-sm text-gray-500">Total Hours</p>
-          <p class="text-2xl font-bold text-gray-900"><%= number_with_precision(@total_hours, precision: 1) %></p>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Total Hours</p>
+          <p class="text-2xl font-bold text-slate-900"><%= number_with_precision(@total_hours, precision: 1) %> <span class="text-sm font-medium text-slate-500">hrs</span></p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <%# Billable Amount %>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg hover:border-amber-200 transition-all duration-300 group">
       <div class="flex items-center gap-4">
-        <div class="p-3 rounded-lg bg-green-50">
-          <svg class="w-6 h-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-green-500 to-emerald-600 flex items-center justify-center shadow-lg shadow-green-500/25 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </div>
         <div>
-          <p class="text-sm text-gray-500">Billable Amount</p>
-          <p class="text-2xl font-bold text-gray-900"><%= number_to_currency(@total_billable) %></p>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Billable Amount</p>
+          <p class="text-2xl font-bold text-slate-900"><%= number_to_currency(@total_billable) %></p>
         </div>
       </div>
     </div>
 
-    <div class="bg-white rounded-xl border border-gray-200 p-6">
+    <%# Projects %>
+    <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-5 hover:shadow-lg hover:border-amber-200 transition-all duration-300 group">
       <div class="flex items-center gap-4">
-        <div class="p-3 rounded-lg bg-indigo-50">
-          <svg class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+        <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-purple-600 flex items-center justify-center shadow-lg shadow-purple-500/25 group-hover:scale-110 transition-transform duration-300">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
           </svg>
         </div>
         <div>
-          <p class="text-sm text-gray-500">Projects</p>
-          <p class="text-2xl font-bold text-gray-900"><%= @project_summary.keys.count %></p>
+          <p class="text-xs font-medium text-slate-500 uppercase tracking-wider">Projects</p>
+          <p class="text-2xl font-bold text-slate-900"><%= @project_summary.keys.count %></p>
         </div>
       </div>
     </div>
   </div>
 
   <%# Project Breakdown %>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100">
-      <h2 class="text-lg font-semibold text-gray-900">Hours by Project</h2>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 7v10a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-6l-2-2H5a2 2 0 00-2 2z"/>
+          </svg>
+        </div>
+        <h2 class="text-lg font-semibold text-slate-900">Hours by Project</h2>
+      </div>
     </div>
     <% if @project_summary.any? %>
-      <div class="divide-y divide-gray-100">
+      <div class="divide-y divide-slate-100">
         <% @project_summary.each do |project_id, hours| %>
           <% project = Project.find_by(id: project_id) %>
           <% next unless project %>
-          <div class="px-6 py-4 flex items-center justify-between">
+          <div class="px-6 py-4 flex items-center justify-between hover:bg-amber-50/50 transition-colors group">
             <div class="flex items-center gap-3">
-              <div class="p-2 rounded-lg bg-gray-100">
-                <svg class="w-4 h-4 text-gray-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+              <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-100 to-indigo-100 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <svg class="w-5 h-5 text-blue-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12.75V12A2.25 2.25 0 014.5 9.75h15A2.25 2.25 0 0121.75 12v.75m-8.69-6.44l-2.12-2.12a1.5 1.5 0 00-1.061-.44H4.5A2.25 2.25 0 002.25 6v12a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9a2.25 2.25 0 00-2.25-2.25h-5.379a1.5 1.5 0 01-1.06-.44z" />
                 </svg>
               </div>
               <div>
-                <p class="text-sm font-medium text-gray-900"><%= project.name %></p>
-                <p class="text-xs text-gray-500"><%= project.client&.name %></p>
+                <p class="text-sm font-semibold text-slate-900 group-hover:text-amber-600 transition-colors"><%= project.name %></p>
+                <p class="text-xs text-slate-500"><%= project.client&.name %></p>
               </div>
             </div>
             <div class="text-right">
-              <p class="text-sm font-medium text-gray-900"><%= number_with_precision(hours, precision: 1) %> hrs</p>
-              <p class="text-xs text-gray-500"><%= number_with_precision((hours / @total_hours * 100), precision: 0) %>% of total</p>
+              <p class="text-sm font-bold text-slate-900"><%= number_with_precision(hours, precision: 1) %> hrs</p>
+              <p class="text-xs text-slate-500"><%= @total_hours > 0 ? number_with_precision((hours / @total_hours * 100), precision: 0) : 0 %>% of total</p>
             </div>
           </div>
         <% end %>
       </div>
     <% else %>
       <div class="text-center py-12">
-        <p class="text-sm text-gray-500">No time entries for this period.</p>
+        <p class="text-sm text-slate-500">No time entries for this period.</p>
       </div>
     <% end %>
   </div>
 
   <%# Detailed Entries %>
-  <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-    <div class="px-6 py-4 border-b border-gray-100">
-      <h2 class="text-lg font-semibold text-gray-900">Detailed Entries</h2>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-200 bg-gradient-to-r from-slate-50 to-slate-100">
+      <div class="flex items-center gap-3">
+        <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center">
+          <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+          </svg>
+        </div>
+        <h2 class="text-lg font-semibold text-slate-900">Detailed Entries</h2>
+      </div>
     </div>
     <% if @time_entries.any? %>
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200">
-          <thead class="bg-gray-50">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Date</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Project</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Hours</th>
-              <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+        <table class="min-w-full">
+          <thead>
+            <tr class="bg-gradient-to-r from-slate-50 to-slate-100 border-b border-slate-200">
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Date</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Project</th>
+              <th class="px-6 py-4 text-left text-xs font-semibold text-slate-600 uppercase tracking-wider">Description</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Hours</th>
+              <th class="px-6 py-4 text-right text-xs font-semibold text-slate-600 uppercase tracking-wider">Amount</th>
             </tr>
           </thead>
-          <tbody class="bg-white divide-y divide-gray-200">
+          <tbody class="divide-y divide-slate-100">
             <% @time_entries.each do |entry| %>
-              <tr class="hover:bg-gray-50">
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                  <%= entry.date.strftime("%b %d") %>
+              <tr class="hover:bg-amber-50/50 transition-colors group">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center gap-3">
+                    <div class="w-8 h-8 rounded-lg bg-slate-100 flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+                      <span class="text-xs font-bold text-slate-600 group-hover:text-amber-600"><%= entry.date.strftime("%d") %></span>
+                    </div>
+                    <span class="text-sm font-medium text-slate-900"><%= entry.date.strftime("%b %d") %></span>
+                  </div>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
                   <%= entry.project.name %>
                 </td>
-                <td class="px-6 py-4 text-sm text-gray-500 max-w-xs truncate">
+                <td class="px-6 py-4 text-sm text-slate-600 max-w-xs truncate">
                   <%= entry.description.presence || "-" %>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-slate-900">
                   <%= number_with_precision(entry.hours, precision: 2) %>
                 </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-right text-gray-900">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-right font-semibold text-slate-900">
                   <% if entry.billable? %>
                     <%= number_to_currency(entry.total_amount) %>
                   <% else %>
-                    <span class="text-gray-400">-</span>
+                    <span class="text-slate-400">—</span>
                   <% end %>
                 </td>
               </tr>
             <% end %>
           </tbody>
-          <tfoot class="bg-gray-50">
-            <tr>
-              <td colspan="3" class="px-6 py-3 text-sm font-medium text-gray-900">Total</td>
-              <td class="px-6 py-3 text-sm font-bold text-right text-gray-900"><%= number_with_precision(@total_hours, precision: 2) %></td>
-              <td class="px-6 py-3 text-sm font-bold text-right text-gray-900"><%= number_to_currency(@total_billable) %></td>
+          <tfoot>
+            <tr class="bg-gradient-to-r from-amber-50 to-orange-50 border-t-2 border-amber-200">
+              <td colspan="3" class="px-6 py-4 text-sm font-bold text-slate-900">Total</td>
+              <td class="px-6 py-4 text-sm font-bold text-right text-slate-900"><%= number_with_precision(@total_hours, precision: 2) %> hrs</td>
+              <td class="px-6 py-4 text-sm font-bold text-right text-amber-600"><%= number_to_currency(@total_billable) %></td>
             </tr>
           </tfoot>
         </table>
       </div>
     <% else %>
       <div class="text-center py-12">
-        <p class="text-sm text-gray-500">No time entries for this period.</p>
+        <div class="mx-auto w-16 h-16 rounded-xl bg-gradient-to-br from-slate-100 to-slate-200 flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <p class="text-sm text-slate-500">No time entries for this period.</p>
       </div>
     <% end %>
   </div>
-</div>
+  </div>
+<% end %>

@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+
 class User < ApplicationRecord
   include Discard::Model
   include Cacheable
@@ -7,7 +8,14 @@ class User < ApplicationRecord
   has_secure_password
 
   # Audit logging - exclude sensitive fields
-  audited except: %i[password_digest password reset_password_token confirmation_token]
+  audited except: %i[password_digest password reset_password_token confirmation_token otp_secret]
+
+  # Avatar attachment
+  has_one_attached :avatar do |attachable|
+    attachable.variant :thumb, resize_to_fill: [ 80, 80 ]
+    attachable.variant :medium, resize_to_fill: [ 150, 150 ]
+    attachable.variant :large, resize_to_fill: [ 300, 300 ]
+  end
 
   # Associations
   has_many :memberships, dependent: :destroy
@@ -34,6 +42,10 @@ class User < ApplicationRecord
                     uniqueness: { case_sensitive: false },
                     format: { with: URI::MailTo::EMAIL_REGEXP }
   validates :password, length: { minimum: 8 }, if: -> { password.present? }
+  validates :phone_number, format: { with: /\A[\d\s\-\+\(\)]+\z/, message: "is not a valid phone number" }, allow_blank: true
+  validates :avatar, content_type: %w[image/jpeg image/png image/gif image/webp],
+                     size: { less_than: 5.megabytes },
+                     if: -> { avatar.attached? }
 
   # Callbacks
   normalizes :email, with: ->(email) { email.strip.downcase }
@@ -111,6 +123,72 @@ class User < ApplicationRecord
   # Site-wide admin check (separate from account membership roles)
   def site_admin?
     site_admin == true
+  end
+
+  # Avatar helper methods
+  def avatar_url(variant: :thumb)
+    if avatar.attached?
+      avatar.variant(variant)
+    else
+      nil
+    end
+  end
+
+  def has_avatar?
+    avatar.attached?
+  end
+
+  # Profile completeness
+  def profile_complete?
+    first_name.present? && last_name.present? && email.present? && phone_number.present?
+  end
+
+  def profile_completion_percentage
+    fields = [ first_name, last_name, email, phone_number, job_title, time_zone ]
+    completed = fields.count(&:present?)
+    ((completed.to_f / fields.size) * 100).round
+  end
+
+  # Time zone helpers
+  def formatted_time_zone
+    time_zone.presence || "UTC"
+  end
+
+  def time_zone_object
+    ActiveSupport::TimeZone[formatted_time_zone] || ActiveSupport::TimeZone["UTC"]
+  end
+
+  # Two-factor authentication helpers
+  def two_factor_enabled?
+    otp_required_for_login? && otp_secret.present?
+  end
+
+  def enable_two_factor!
+    update!(
+      otp_secret: ROTP::Base32.random,
+      otp_required_for_login: true
+    )
+  end
+
+  def disable_two_factor!
+    update!(
+      otp_secret: nil,
+      otp_required_for_login: false
+    )
+  end
+
+  def otp_provisioning_uri
+    return nil unless otp_secret.present?
+
+    issuer = Rails.application.class.module_parent_name
+    ROTP::TOTP.new(otp_secret, issuer: issuer).provisioning_uri(email)
+  end
+
+  def verify_otp(code)
+    return false unless otp_secret.present?
+
+    totp = ROTP::TOTP.new(otp_secret)
+    totp.verify(code, drift_behind: 30, drift_ahead: 30).present?
   end
 
   private
