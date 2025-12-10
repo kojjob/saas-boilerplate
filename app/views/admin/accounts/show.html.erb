@@ -106,6 +106,7 @@
       </thead>
       <tbody class="bg-white divide-y divide-slate-200">
         <% @account.memberships.includes(:user).each do |membership| %>
+          <% next unless membership.user %>
           <tr>
             <td class="px-6 py-4 whitespace-nowrap">
               <div class="flex items-center">
