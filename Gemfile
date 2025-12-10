@@ -100,6 +100,10 @@ gem "active_storage_validations", "~> 1.1"
 gem "rotp", "~> 6.3"
 gem "rqrcode", "~> 2.2"
 
+# AWS SDK for S3 storage and SES email
+gem "aws-sdk-s3", "~> 1.0"
+gem "aws-sdk-ses", "~> 1.0"
+
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem
   gem "debug", platforms: %i[ mri mingw x64_mingw ], require: "debug/prelude"
