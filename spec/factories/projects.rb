@@ -2,8 +2,8 @@
 
 FactoryBot.define do
   factory :project do
-    association :account
-    association :client
+    account
+    client { association :client, account: account }
     name { Faker::Company.catch_phrase }
     description { Faker::Lorem.paragraph }
     status { :draft }

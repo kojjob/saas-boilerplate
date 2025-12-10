@@ -24,6 +24,24 @@ development: {}
 test: {}
 
 production:
+  # Send payment reminders for invoices due within 7 days
+  # Runs daily at 9am to catch business hours
+  payment_reminders_due_soon:
+    class: PaymentReminderJob
+    queue: mailers
+    args:
+      - due_soon
+    schedule: every day at 9am
+
+  # Send payment reminders for overdue invoices
+  # Runs daily at 10am, after due_soon reminders
+  payment_reminders_overdue:
+    class: PaymentReminderJob
+    queue: mailers
+    args:
+      - overdue
+    schedule: every day at 10am
+
   # Clean up expired user sessions daily at 3am
   # Removes sessions older than 30 days and inactive sessions (no activity for 7 days)
   cleanup_expired_sessions:

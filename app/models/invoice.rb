@@ -27,6 +27,8 @@ class Invoice < ApplicationRecord
   validates :issue_date, presence: true
   validates :due_date, presence: true
   validate :due_date_after_issue_date
+  validate :client_belongs_to_same_account
+  validate :project_belongs_to_same_account
 
   # Callbacks
   before_validation :set_default_dates, on: :create
@@ -159,5 +161,19 @@ class Invoice < ApplicationRecord
       self.tax_amount ||= 0
       self.total_amount ||= subtotal + tax_amount - (discount_amount || 0)
     end
+  end
+
+  def client_belongs_to_same_account
+    return unless client_id.present? && account_id.present?
+    return if client&.account_id == account_id
+
+    errors.add(:client, "must belong to the same account")
+  end
+
+  def project_belongs_to_same_account
+    return unless project_id.present? && account_id.present?
+    return if project&.account_id == account_id
+
+    errors.add(:project, "must belong to the same account")
   end
 end

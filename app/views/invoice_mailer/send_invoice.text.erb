@@ -1,0 +1,21 @@
+INVOICE <%= @invoice.invoice_number %>
+===================================
+
+Dear <%= @client.name %>,
+
+Please find attached your invoice from <%= @account.name %>.
+
+INVOICE DETAILS
+---------------
+Invoice Number: <%= @invoice.invoice_number %>
+Issue Date: <%= @invoice.issue_date.strftime('%B %d, %Y') %>
+Due Date: <%= @invoice.due_date.strftime('%B %d, %Y') %>
+Total Amount: <%= number_to_currency(@invoice.total_amount) %>
+
+Payment is due by <%= @invoice.due_date.strftime('%B %d, %Y') %>.
+
+---
+
+If you have any questions about this invoice, please don't hesitate to contact us.
+
+Thank you for your business!

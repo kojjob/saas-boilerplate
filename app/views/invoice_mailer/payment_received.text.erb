@@ -1,0 +1,27 @@
+PAYMENT RECEIVED
+================
+
+Dear <%= @client.name %>,
+
+Thank you! Your payment has been received.
+
+We have received your payment for Invoice <%= @invoice.invoice_number %>.
+
+PAYMENT DETAILS
+---------------
+Invoice Number: <%= @invoice.invoice_number %>
+<% if @invoice.paid_at %>
+Payment Date: <%= @invoice.paid_at.strftime('%B %d, %Y') %>
+<% end %>
+<% if @invoice.payment_method.present? %>
+Payment Method: <%= @invoice.payment_method.titleize %>
+<% end %>
+Amount Paid: <%= number_to_currency(@invoice.total_amount) %>
+
+---
+
+If you have any questions, please don't hesitate to contact us.
+
+Thank you for your business!
+
+<%= @account.name %>
