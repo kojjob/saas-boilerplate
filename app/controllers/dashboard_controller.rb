@@ -1,12 +1,16 @@
 # frozen_string_literal: true
 
 class DashboardController < ApplicationController
+  include OnboardingTrackable
+
   layout "dashboard"
 
   before_action :authenticate_user!
   before_action :set_account
 
   def show
+    # Initialize onboarding for new users
+    current_onboarding
     # Business metrics
     @clients_count = @account.clients.count
     @active_clients = @account.clients.where(status: "active").count
