@@ -1,0 +1,65 @@
+<% content_for :title, "Projects - #{@client.display_name}" %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-900">Projects</h1>
+    <p class="text-sm text-slate-600">
+      <%= @projects.count %> <%= "project".pluralize(@projects.count) %>
+    </p>
+  </div>
+
+  <% if @projects.any? %>
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <% @projects.each do |project| %>
+        <%= link_to portal_project_path(token: @client.portal_token, id: project.id), class: "block bg-white rounded-lg shadow-sm border border-slate-200 hover:border-indigo-300 hover:shadow-md transition-all" do %>
+          <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+              <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                <%= case project.status.to_sym
+                    when :draft then 'bg-slate-100 text-slate-800'
+                    when :active then 'bg-blue-100 text-blue-800'
+                    when :on_hold then 'bg-yellow-100 text-yellow-800'
+                    when :completed then 'bg-green-100 text-green-800'
+                    when :cancelled then 'bg-red-100 text-red-800'
+                    else 'bg-slate-100 text-slate-800'
+                    end %>">
+                <%= project.status.humanize %>
+              </span>
+              <% if project.start_date.present? %>
+                <span class="text-xs text-slate-500">
+                  Started <%= project.start_date.strftime("%b %Y") %>
+                </span>
+              <% end %>
+            </div>
+
+            <h3 class="text-lg font-semibold text-slate-900 mb-2"><%= project.name %></h3>
+            <% if project.description.present? %>
+              <p class="text-sm text-slate-600 line-clamp-2 mb-4"><%= project.description.truncate(100) %></p>
+            <% end %>
+
+            <div class="flex items-center justify-between pt-4 border-t border-slate-100">
+              <div class="text-sm">
+                <span class="text-slate-500">Invoices:</span>
+                <span class="font-medium text-slate-900 ml-1"><%= project.invoices.count %></span>
+              </div>
+              <% if project.budget.present? && project.budget > 0 %>
+                <div class="text-sm">
+                  <span class="text-slate-500">Budget:</span>
+                  <span class="font-medium text-slate-900 ml-1"><%= number_to_currency(project.budget) %></span>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+      <% end %>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 px-6 py-12 text-center">
+      <svg class="mx-auto h-12 w-12 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+      </svg>
+      <h3 class="mt-4 text-lg font-medium text-slate-900">No projects yet</h3>
+      <p class="mt-2 text-sm text-slate-500">You don't have any projects at the moment.</p>
+    </div>
+  <% end %>
+</div>

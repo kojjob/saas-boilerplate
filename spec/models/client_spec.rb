@@ -155,5 +155,140 @@ RSpec.describe Client, type: :model do
         expect(client.outstanding_balance).to eq(1500)
       end
     end
+
+    describe "#initials" do
+      it "returns first letters of first and last name" do
+        client = build(:client, name: "John Doe")
+        expect(client.initials).to eq("JD")
+      end
+
+      it "returns first two letters for single name" do
+        client = build(:client, name: "John")
+        expect(client.initials).to eq("JO")
+      end
+
+      it "returns ?? for blank name" do
+        client = build(:client, name: "")
+        expect(client.initials).to eq("??")
+      end
+    end
+  end
+
+  describe "portal token functionality" do
+    describe "#generate_portal_token!" do
+      it "generates a secure random token" do
+        client = create(:client)
+        expect { client.generate_portal_token! }.to change { client.portal_token }.from(nil)
+        expect(client.portal_token).to be_present
+        expect(client.portal_token.length).to eq(32)
+      end
+
+      it "sets portal_token_generated_at timestamp" do
+        client = create(:client)
+        freeze_time do
+          client.generate_portal_token!
+          expect(client.portal_token_generated_at).to eq(Time.current)
+        end
+      end
+
+      it "generates unique tokens for different clients" do
+        client1 = create(:client)
+        client2 = create(:client)
+
+        client1.generate_portal_token!
+        client2.generate_portal_token!
+
+        expect(client1.portal_token).not_to eq(client2.portal_token)
+      end
+    end
+
+    describe "#regenerate_portal_token!" do
+      it "replaces existing token with new one" do
+        client = create(:client)
+        client.generate_portal_token!
+        old_token = client.portal_token
+
+        client.regenerate_portal_token!
+        expect(client.portal_token).not_to eq(old_token)
+      end
+
+      it "updates portal_token_generated_at" do
+        client = create(:client)
+        client.generate_portal_token!
+        old_time = client.portal_token_generated_at
+
+        travel_to 1.hour.from_now do
+          client.regenerate_portal_token!
+          expect(client.portal_token_generated_at).to be > old_time
+        end
+      end
+    end
+
+    describe "#revoke_portal_token!" do
+      it "clears the portal token" do
+        client = create(:client)
+        client.generate_portal_token!
+
+        client.revoke_portal_token!
+        expect(client.portal_token).to be_nil
+        expect(client.portal_token_generated_at).to be_nil
+      end
+    end
+
+    describe "#portal_url" do
+      it "returns the portal URL with token" do
+        client = create(:client)
+        client.generate_portal_token!
+
+        expect(client.portal_url).to include("/portal/#{client.portal_token}")
+      end
+
+      it "returns nil if no token exists" do
+        client = create(:client)
+        expect(client.portal_url).to be_nil
+      end
+    end
+
+    describe "#portal_access_enabled?" do
+      it "returns true when portal_enabled is true and token exists" do
+        client = create(:client, portal_enabled: true)
+        client.generate_portal_token!
+
+        expect(client.portal_access_enabled?).to be true
+      end
+
+      it "returns false when portal_enabled is false" do
+        client = create(:client, portal_enabled: false)
+        client.generate_portal_token!
+
+        expect(client.portal_access_enabled?).to be false
+      end
+
+      it "returns false when no token exists" do
+        client = create(:client, portal_enabled: true)
+        expect(client.portal_access_enabled?).to be false
+      end
+    end
+
+    describe ".find_by_portal_token" do
+      it "finds client by valid token" do
+        client = create(:client)
+        client.generate_portal_token!
+
+        found = Client.find_by_portal_token(client.portal_token)
+        expect(found).to eq(client)
+      end
+
+      it "returns nil for invalid token" do
+        expect(Client.find_by_portal_token("invalid_token")).to be_nil
+      end
+
+      it "returns nil for disabled portal access" do
+        client = create(:client, portal_enabled: false)
+        client.generate_portal_token!
+
+        expect(Client.find_by_portal_token(client.portal_token)).to be_nil
+      end
+    end
   end
 end

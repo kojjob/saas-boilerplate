@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -204,6 +204,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
     t.string "name", null: false
     t.text "notes"
     t.string "phone"
+    t.boolean "portal_enabled", default: true, null: false
+    t.string "portal_token"
+    t.datetime "portal_token_generated_at"
     t.string "postal_code"
     t.string "state"
     t.integer "status", default: 0, null: false
@@ -211,6 +214,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
     t.index ["account_id", "email"], name: "index_clients_on_account_id_and_email", unique: true
     t.index ["account_id", "name"], name: "index_clients_on_account_id_and_name"
     t.index ["account_id"], name: "index_clients_on_account_id"
+    t.index ["portal_token"], name: "index_clients_on_portal_token", unique: true
     t.index ["status"], name: "index_clients_on_status"
   end
 
@@ -413,6 +417,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "onboarding_progresses", force: :cascade do |t|
+    t.datetime "completed_at"
+    t.datetime "created_at", null: false
+    t.datetime "created_client_at"
+    t.datetime "created_invoice_at"
+    t.datetime "created_project_at"
+    t.datetime "dismissed_at"
+    t.datetime "sent_invoice_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_onboarding_progresses_on_user_id", unique: true
   end
 
   create_table "pay_charges", force: :cascade do |t|
@@ -720,19 +737,28 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
     t.string "email", null: false
+    t.boolean "email_notifications", default: true, null: false
     t.string "first_name", null: false
+    t.string "job_title"
     t.string "last_name", null: false
+    t.string "locale", default: "en"
+    t.boolean "otp_required_for_login", default: false, null: false
+    t.string "otp_secret"
     t.string "password_digest", null: false
+    t.string "phone_number"
     t.string "provider"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.boolean "site_admin"
+    t.boolean "sms_notifications", default: false, null: false
+    t.string "time_zone", default: "UTC"
     t.string "uid"
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, where: "(confirmation_token IS NOT NULL)"
     t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
+    t.index ["phone_number"], name: "index_users_on_phone_number"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, where: "(reset_password_token IS NOT NULL)"
   end
@@ -775,6 +801,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "notifications", "accounts"
   add_foreign_key "notifications", "users"
+  add_foreign_key "onboarding_progresses", "users"
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
   add_foreign_key "pay_charges", "pay_subscriptions", column: "subscription_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"

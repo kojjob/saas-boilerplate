@@ -1,0 +1,165 @@
+<% content_for :title, "Dashboard - #{@client.display_name}" %>
+
+<div class="space-y-8">
+  <div class="flex items-center justify-between">
+    <h1 class="text-2xl font-bold text-slate-900">Welcome, <%= @client.name %></h1>
+  </div>
+
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-indigo-100">
+          <svg class="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Total Invoices</p>
+          <p class="text-2xl font-bold text-slate-900"><%= @client.invoices.count %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-green-100">
+          <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Outstanding Balance</p>
+          <p class="text-2xl font-bold text-slate-900"><%= number_to_currency(@client.outstanding_balance) %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 p-6">
+      <div class="flex items-center">
+        <div class="p-3 rounded-full bg-blue-100">
+          <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"/>
+          </svg>
+        </div>
+        <div class="ml-4">
+          <p class="text-sm font-medium text-slate-600">Active Projects</p>
+          <p class="text-2xl font-bold text-slate-900"><%= @client.projects.active.count %></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Recent Invoices</h2>
+        <%= link_to "View All", portal_invoices_path(token: @client.portal_token), class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+      </div>
+      <div class="divide-y divide-slate-200">
+        <% if @recent_invoices.any? %>
+          <% @recent_invoices.each do |invoice| %>
+            <%= link_to portal_invoice_path(token: @client.portal_token, id: invoice.id), class: "block px-6 py-4 hover:bg-slate-50 transition-colors" do %>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-slate-900"><%= invoice.invoice_number %></p>
+                  <p class="text-sm text-slate-500"><%= invoice.issue_date&.strftime("%B %d, %Y") %></p>
+                </div>
+                <div class="text-right">
+                  <p class="font-medium text-slate-900"><%= number_to_currency(invoice.total_amount) %></p>
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <%= case invoice.status.to_sym
+                        when :draft then 'bg-slate-100 text-slate-800'
+                        when :sent then 'bg-blue-100 text-blue-800'
+                        when :viewed then 'bg-yellow-100 text-yellow-800'
+                        when :paid then 'bg-green-100 text-green-800'
+                        when :overdue then 'bg-red-100 text-red-800'
+                        when :cancelled then 'bg-slate-100 text-slate-800'
+                        else 'bg-slate-100 text-slate-800'
+                        end %>">
+                    <%= invoice.status.humanize %>
+                  </span>
+                </div>
+              </div>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="px-6 py-8 text-center text-slate-500">
+            <p>No invoices yet</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Recent Projects</h2>
+        <%= link_to "View All", portal_projects_path(token: @client.portal_token), class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+      </div>
+      <div class="divide-y divide-slate-200">
+        <% if @recent_projects.any? %>
+          <% @recent_projects.each do |project| %>
+            <%= link_to portal_project_path(token: @client.portal_token, id: project.id), class: "block px-6 py-4 hover:bg-slate-50 transition-colors" do %>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-slate-900"><%= project.name %></p>
+                  <p class="text-sm text-slate-500"><%= project.description.to_s.truncate(50) %></p>
+                </div>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= case project.status.to_sym
+                      when :draft then 'bg-slate-100 text-slate-800'
+                      when :active then 'bg-blue-100 text-blue-800'
+                      when :on_hold then 'bg-yellow-100 text-yellow-800'
+                      when :completed then 'bg-green-100 text-green-800'
+                      when :cancelled then 'bg-red-100 text-red-800'
+                      else 'bg-slate-100 text-slate-800'
+                      end %>">
+                  <%= project.status.humanize %>
+                </span>
+              </div>
+            <% end %>
+          <% end %>
+        <% else %>
+          <div class="px-6 py-8 text-center text-slate-500">
+            <p>No projects yet</p>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <% if @recent_estimates.any? %>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200 flex items-center justify-between">
+        <h2 class="text-lg font-semibold text-slate-900">Recent Estimates</h2>
+        <%= link_to "View All", portal_estimates_path(token: @client.portal_token), class: "text-sm text-indigo-600 hover:text-indigo-800" %>
+      </div>
+      <div class="divide-y divide-slate-200">
+        <% @recent_estimates.each do |estimate| %>
+          <%= link_to portal_estimate_path(token: @client.portal_token, id: estimate.id), class: "block px-6 py-4 hover:bg-slate-50 transition-colors" do %>
+            <div class="flex items-center justify-between">
+              <div>
+                <p class="font-medium text-slate-900"><%= estimate.estimate_number %></p>
+                <p class="text-sm text-slate-500"><%= estimate.issue_date&.strftime("%B %d, %Y") %></p>
+              </div>
+              <div class="text-right">
+                <p class="font-medium text-slate-900"><%= number_to_currency(estimate.total_amount) %></p>
+                <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                  <%= case estimate.status.to_sym
+                      when :draft then 'bg-slate-100 text-slate-800'
+                      when :sent then 'bg-blue-100 text-blue-800'
+                      when :viewed then 'bg-yellow-100 text-yellow-800'
+                      when :accepted then 'bg-green-100 text-green-800'
+                      when :declined then 'bg-red-100 text-red-800'
+                      when :expired then 'bg-slate-100 text-slate-800'
+                      else 'bg-slate-100 text-slate-800'
+                      end %>">
+                  <%= estimate.status.humanize %>
+                </span>
+              </div>
+            </div>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

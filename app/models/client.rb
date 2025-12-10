@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Client < ApplicationRecord
+  include Rails.application.routes.url_helpers
+
   # Associations
   belongs_to :account
   has_many :projects, dependent: :destroy
@@ -25,6 +27,14 @@ class Client < ApplicationRecord
     return all if query.blank?
     where("name ILIKE :query OR email ILIKE :query OR company ILIKE :query", query: "%#{query}%")
   }
+  scope :with_portal_access, -> { where(portal_enabled: true).where.not(portal_token: nil) }
+
+  # Class Methods
+  def self.find_by_portal_token(token)
+    return nil if token.blank?
+
+    with_portal_access.find_by(portal_token: token)
+  end
 
   # Instance Methods
   def display_name
@@ -63,5 +73,34 @@ class Client < ApplicationRecord
     else
       name.first(2).upcase
     end
+  end
+
+  # Portal Access Methods
+  def generate_portal_token!
+    update!(
+      portal_token: SecureRandom.hex(16),
+      portal_token_generated_at: Time.current
+    )
+  end
+
+  def regenerate_portal_token!
+    generate_portal_token!
+  end
+
+  def revoke_portal_token!
+    update!(
+      portal_token: nil,
+      portal_token_generated_at: nil
+    )
+  end
+
+  def portal_url
+    return nil if portal_token.blank?
+
+    portal_dashboard_path(token: portal_token)
+  end
+
+  def portal_access_enabled?
+    portal_enabled? && portal_token.present?
   end
 end
