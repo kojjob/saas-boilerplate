@@ -170,6 +170,11 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Onboarding
+  # ==================================
+  delete "onboarding/dismiss", to: "onboarding#dismiss", as: :dismiss_onboarding
+
+  # ==================================
   # Dashboard
   # ==================================
   get "dashboard", to: "dashboard#show", as: :dashboard

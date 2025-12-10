@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class InvoicesController < ApplicationController
+  include OnboardingTrackable
+
   layout "dashboard"
 
   before_action :authenticate_user!
@@ -44,6 +46,7 @@ class InvoicesController < ApplicationController
     @invoice = current_account.invoices.build(invoice_params)
 
     if @invoice.save
+      track_onboarding_step(:created_invoice)
       respond_to do |format|
         format.html { redirect_to invoices_path, notice: "Invoice was successfully created." }
         format.turbo_stream { redirect_to invoices_path, notice: "Invoice was successfully created." }

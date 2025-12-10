@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class ProjectsController < ApplicationController
+  include OnboardingTrackable
+
   layout "dashboard"
 
   before_action :authenticate_user!
@@ -30,6 +32,7 @@ class ProjectsController < ApplicationController
     @project = current_account.projects.build(project_params)
 
     if @project.save
+      track_onboarding_step(:created_project)
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Project was successfully created." }
         format.turbo_stream { redirect_to projects_path, notice: "Project was successfully created." }

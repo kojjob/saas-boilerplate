@@ -1,0 +1,135 @@
+<%# Onboarding Checklist - Progressive disclosure for new users %>
+<% if show_onboarding_checklist? %>
+  <div class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden mb-6"
+       data-controller="onboarding"
+       data-onboarding-dismiss-url-value="<%= dismiss_onboarding_path %>">
+    <%# Header with progress %>
+    <div class="px-6 py-5 border-b border-slate-200 bg-gradient-to-r from-indigo-50 to-purple-50">
+      <div class="flex items-center justify-between">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-lg shadow-indigo-500/25">
+            <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-slate-900">Getting Started</h3>
+            <p class="text-sm text-slate-500">Complete these steps to set up your account</p>
+          </div>
+        </div>
+
+        <div class="flex items-center gap-4">
+          <%# Progress indicator %>
+          <div class="flex items-center gap-2">
+            <div class="text-sm font-medium text-indigo-600">
+              <%= current_onboarding.completion_percentage %>%
+            </div>
+            <div class="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+              <div class="h-full bg-gradient-to-r from-indigo-500 to-purple-600 rounded-full transition-all duration-500"
+                   style="width: <%= current_onboarding.completion_percentage %>%"></div>
+            </div>
+          </div>
+
+          <%# Dismiss button %>
+          <%= button_to dismiss_onboarding_path,
+                        method: :delete,
+                        class: "p-2 rounded-lg text-slate-400 hover:text-slate-600 hover:bg-white/50 transition-colors",
+                        title: "Dismiss checklist",
+                        data: { turbo_confirm: "Are you sure you want to dismiss the getting started checklist?" } do %>
+            <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <%# Steps list %>
+    <div class="divide-y divide-slate-100">
+      <% OnboardingProgress::STEPS.each_with_index do |step, index| %>
+        <% completed = current_onboarding.step_completed?(step[:key]) %>
+        <% is_next = current_onboarding.next_step == step[:key] %>
+
+        <div class="px-6 py-4 flex items-center gap-4 <%= is_next ? 'bg-indigo-50/50' : '' %> transition-colors">
+          <%# Step indicator %>
+          <div class="relative">
+            <% if completed %>
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center shadow-md shadow-emerald-500/25">
+                <svg class="w-5 h-5 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+              </div>
+            <% elsif is_next %>
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center shadow-md shadow-indigo-500/25 animate-pulse">
+                <span class="text-white font-bold"><%= index + 1 %></span>
+              </div>
+            <% else %>
+              <div class="w-10 h-10 rounded-full bg-slate-200 flex items-center justify-center">
+                <span class="text-slate-500 font-medium"><%= index + 1 %></span>
+              </div>
+            <% end %>
+          </div>
+
+          <%# Step content %>
+          <div class="flex-1 min-w-0">
+            <h4 class="font-medium <%= completed ? 'text-emerald-700 line-through' : 'text-slate-900' %>">
+              <%= step[:title] %>
+            </h4>
+            <p class="text-sm <%= completed ? 'text-slate-400' : 'text-slate-500' %>">
+              <%= step[:description] %>
+            </p>
+          </div>
+
+          <%# Action button %>
+          <% unless completed %>
+            <%
+              action_path = case step[:key]
+                            when :created_client then new_client_path
+                            when :created_project then new_project_path
+                            when :created_invoice then new_invoice_path
+                            when :sent_invoice then invoices_path
+                            end
+
+              button_text = case step[:key]
+                            when :created_client then "Add Client"
+                            when :created_project then "Create Project"
+                            when :created_invoice then "Create Invoice"
+                            when :sent_invoice then "View Invoices"
+                            end
+            %>
+            <%= link_to action_path,
+                        class: "inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-medium transition-colors #{is_next ? 'bg-indigo-600 text-white hover:bg-indigo-700 shadow-md shadow-indigo-500/25' : 'bg-slate-100 text-slate-600 hover:bg-slate-200'}" do %>
+              <%= button_text %>
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              </svg>
+            <% end %>
+          <% else %>
+            <span class="text-sm text-emerald-600 font-medium">Completed</span>
+          <% end %>
+        </div>
+      <% end %>
+    </div>
+
+    <%# Completion celebration (hidden until all steps complete) %>
+    <% if current_onboarding.completed? %>
+      <div class="px-6 py-8 text-center bg-gradient-to-r from-emerald-50 to-teal-50 border-t border-emerald-100">
+        <div class="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-emerald-500/25">
+          <svg class="w-8 h-8 text-white" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456zM16.894 20.567L16.5 21.75l-.394-1.183a2.25 2.25 0 00-1.423-1.423L13.5 18.75l1.183-.394a2.25 2.25 0 001.423-1.423l.394-1.183.394 1.183a2.25 2.25 0 001.423 1.423l1.183.394-1.183.394a2.25 2.25 0 00-1.423 1.423z" />
+          </svg>
+        </div>
+        <h4 class="text-xl font-bold text-emerald-800 mb-2">You're All Set!</h4>
+        <p class="text-emerald-600 mb-4">You've completed all the getting started steps. You're ready to manage your business like a pro!</p>
+        <%= button_to dismiss_onboarding_path,
+                      method: :delete,
+                      class: "inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-emerald-600 text-white text-sm font-medium hover:bg-emerald-700 transition-colors" do %>
+          <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+          </svg>
+          Got it, thanks!
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+<% end %>
