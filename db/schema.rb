@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.string "address"
     t.string "city"
     t.datetime "created_at", null: false
+    t.string "default_currency", default: "USD"
     t.datetime "discarded_at"
     t.string "name", null: false
     t.string "phone"
@@ -31,6 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.datetime "trial_ends_at"
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_accounts_on_created_at"
+    t.index ["default_currency"], name: "index_accounts_on_default_currency"
     t.index ["discarded_at"], name: "index_accounts_on_discarded_at"
     t.index ["plan_id"], name: "index_accounts_on_plan_id"
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
@@ -126,6 +128,72 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "blog_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.text "meta_description"
+    t.string "meta_title"
+    t.string "name", null: false
+    t.uuid "parent_id"
+    t.integer "position", default: 0
+    t.integer "posts_count", default: 0
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_blog_categories_on_parent_id"
+    t.index ["position"], name: "index_blog_categories_on_position"
+    t.index ["slug"], name: "index_blog_categories_on_slug", unique: true
+  end
+
+  create_table "blog_post_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "blog_post_id", null: false
+    t.uuid "blog_tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blog_post_id", "blog_tag_id"], name: "index_blog_post_tags_on_blog_post_id_and_blog_tag_id", unique: true
+    t.index ["blog_post_id"], name: "index_blog_post_tags_on_blog_post_id"
+    t.index ["blog_tag_id"], name: "index_blog_post_tags_on_blog_tag_id"
+  end
+
+  create_table "blog_posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "allow_comments", default: true
+    t.bigint "author_id", null: false
+    t.uuid "blog_category_id"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.text "excerpt"
+    t.boolean "featured", default: false
+    t.string "featured_image_url"
+    t.text "meta_description"
+    t.string "meta_keywords"
+    t.string "meta_title"
+    t.datetime "published_at"
+    t.integer "reading_time", default: 0
+    t.string "slug", null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "views_count", default: 0
+    t.index ["author_id"], name: "index_blog_posts_on_author_id"
+    t.index ["blog_category_id", "status"], name: "index_blog_posts_on_blog_category_id_and_status"
+    t.index ["blog_category_id"], name: "index_blog_posts_on_blog_category_id"
+    t.index ["featured"], name: "index_blog_posts_on_featured"
+    t.index ["published_at"], name: "index_blog_posts_on_published_at"
+    t.index ["slug"], name: "index_blog_posts_on_slug", unique: true
+    t.index ["status", "published_at"], name: "index_blog_posts_on_status_and_published_at"
+    t.index ["status"], name: "index_blog_posts_on_status"
+  end
+
+  create_table "blog_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "posts_count", default: 0
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_blog_tags_on_name"
+    t.index ["slug"], name: "index_blog_tags_on_slug", unique: true
+  end
+
   create_table "clients", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "address_line1"
@@ -138,13 +206,18 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.string "name", null: false
     t.text "notes"
     t.string "phone"
+    t.boolean "portal_enabled", default: true, null: false
+    t.string "portal_token"
+    t.datetime "portal_token_generated_at"
     t.string "postal_code"
+    t.string "preferred_currency"
     t.string "state"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
     t.index ["account_id", "email"], name: "index_clients_on_account_id_and_email", unique: true
     t.index ["account_id", "name"], name: "index_clients_on_account_id_and_name"
     t.index ["account_id"], name: "index_clients_on_account_id"
+    t.index ["portal_token"], name: "index_clients_on_portal_token", unique: true
     t.index ["status"], name: "index_clients_on_status"
   end
 
@@ -221,6 +294,31 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.index ["valid_until"], name: "index_estimates_on_valid_until"
   end
 
+  create_table "expenses", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.boolean "billable", default: false
+    t.integer "category", default: 0, null: false
+    t.bigint "client_id"
+    t.datetime "created_at", null: false
+    t.string "currency", default: "USD"
+    t.string "description", null: false
+    t.date "expense_date", null: false
+    t.text "notes"
+    t.bigint "project_id"
+    t.boolean "reimbursable", default: false
+    t.datetime "updated_at", null: false
+    t.string "vendor"
+    t.index ["account_id", "expense_date"], name: "index_expenses_on_account_id_and_expense_date"
+    t.index ["account_id"], name: "index_expenses_on_account_id"
+    t.index ["billable"], name: "index_expenses_on_billable"
+    t.index ["category"], name: "index_expenses_on_category"
+    t.index ["client_id"], name: "index_expenses_on_client_id"
+    t.index ["expense_date"], name: "index_expenses_on_expense_date"
+    t.index ["project_id"], name: "index_expenses_on_project_id"
+    t.index ["reimbursable"], name: "index_expenses_on_reimbursable"
+  end
+
   create_table "invoice_line_items", force: :cascade do |t|
     t.decimal "amount", precision: 10, scale: 2, null: false
     t.datetime "created_at", null: false
@@ -238,6 +336,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.bigint "account_id", null: false
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
+    t.string "currency", default: "USD", null: false
     t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0"
     t.date "due_date", null: false
     t.string "invoice_number", null: false
@@ -262,6 +361,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.index ["account_id", "invoice_number"], name: "index_invoices_on_account_id_and_invoice_number", unique: true
     t.index ["account_id"], name: "index_invoices_on_account_id"
     t.index ["client_id"], name: "index_invoices_on_client_id"
+    t.index ["currency"], name: "index_invoices_on_currency"
     t.index ["due_date"], name: "index_invoices_on_due_date"
     t.index ["issue_date"], name: "index_invoices_on_issue_date"
     t.index ["payment_token"], name: "index_invoices_on_payment_token", unique: true
@@ -347,6 +447,23 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
     t.index ["user_id", "created_at"], name: "index_notifications_on_user_id_and_created_at"
     t.index ["user_id", "read_at"], name: "index_notifications_on_user_id_and_read_at"
     t.index ["user_id"], name: "index_notifications_on_user_id"
+  end
+
+  create_table "onboarding_progresses", force: :cascade do |t|
+    t.boolean "client_created", default: false, null: false
+    t.datetime "client_created_at"
+    t.datetime "created_at", null: false
+    t.boolean "dismissed", default: false, null: false
+    t.datetime "dismissed_at"
+    t.boolean "invoice_created", default: false, null: false
+    t.datetime "invoice_created_at"
+    t.boolean "invoice_sent", default: false, null: false
+    t.datetime "invoice_sent_at"
+    t.boolean "project_created", default: false, null: false
+    t.datetime "project_created_at"
+    t.datetime "updated_at", null: false
+    t.bigint "user_id", null: false
+    t.index ["user_id"], name: "index_onboarding_progresses_on_user_id", unique: true
   end
 
   create_table "pay_charges", force: :cascade do |t|
@@ -685,6 +802,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "alerts", "accounts"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "blog_categories", "blog_categories", column: "parent_id"
+  add_foreign_key "blog_post_tags", "blog_posts"
+  add_foreign_key "blog_post_tags", "blog_tags"
+  add_foreign_key "blog_posts", "blog_categories"
+  add_foreign_key "blog_posts", "users", column: "author_id"
   add_foreign_key "clients", "accounts"
   add_foreign_key "conversations", "accounts"
   add_foreign_key "conversations", "users", column: "participant_1_id"
@@ -697,6 +819,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
   add_foreign_key "estimates", "clients"
   add_foreign_key "estimates", "invoices", column: "converted_invoice_id"
   add_foreign_key "estimates", "projects"
+  add_foreign_key "expenses", "accounts"
+  add_foreign_key "expenses", "clients"
+  add_foreign_key "expenses", "projects"
   add_foreign_key "invoice_line_items", "invoices"
   add_foreign_key "invoices", "accounts"
   add_foreign_key "invoices", "clients"
@@ -713,6 +838,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_02_101406) do
   add_foreign_key "messages", "users", column: "sender_id"
   add_foreign_key "notifications", "accounts"
   add_foreign_key "notifications", "users"
+  add_foreign_key "onboarding_progresses", "users"
   add_foreign_key "pay_charges", "pay_customers", column: "customer_id"
   add_foreign_key "pay_charges", "pay_subscriptions", column: "subscription_id"
   add_foreign_key "pay_payment_methods", "pay_customers", column: "customer_id"

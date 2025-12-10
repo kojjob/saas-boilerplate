@@ -249,6 +249,13 @@ Rails.application.routes.draw do
     end
   end
 
+  # Expenses
+  resources :expenses do
+    collection do
+      get :report
+    end
+  end
+
   # ==================================
   # Health Check
   # ==================================
