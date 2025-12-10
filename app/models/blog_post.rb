@@ -8,6 +8,9 @@ class BlogPost < ApplicationRecord
   has_many :blog_post_tags, dependent: :destroy
   has_many :blog_tags, through: :blog_post_tags
 
+  # Alias for convenience in views
+  alias_method :tags, :blog_tags
+
   # Enums
   enum :status, { draft: 0, published: 1, scheduled: 2, archived: 3 }
 
