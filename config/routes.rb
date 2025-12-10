@@ -250,6 +250,35 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Public Blog Routes
+  # ==================================
+  scope module: :blog do
+    resources :posts, only: [:index, :show], path: 'blog' do
+      collection do
+        get :search
+      end
+    end
+    resources :categories, only: [:index, :show], path: 'blog/categories'
+    resources :tags, only: [:show], path: 'blog/tags'
+  end
+
+  # ==================================
+  # Admin Blog Management
+  # ==================================
+  namespace :admin do
+    namespace :blog do
+      resources :posts
+      resources :categories
+      resources :tags
+    end
+  end
+
+  # ==================================
+  # SEO Routes
+  # ==================================
+  get "sitemap.xml", to: "sitemaps#index", defaults: { format: "xml" }
+
+  # ==================================
   # Health Check
   # ==================================
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
