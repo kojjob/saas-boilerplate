@@ -2,14 +2,15 @@
 
 module Blog
   class PostsController < ApplicationController
-    skip_before_action :authenticate!, only: [:index, :show, :search]
+    include Pagy::Backend
+
+    # Public blog - no authentication required
 
     def index
-      @posts = BlogPost.published
-                       .includes(:author, :blog_category, :blog_tags)
-                       .recent
-                       .page(params[:page])
-                       .per(12)
+      posts = BlogPost.published
+                      .includes(:author, :blog_category, :blog_tags)
+                      .recent
+      @pagy, @posts = pagy(posts, limit: 12)
 
       @featured_posts = BlogPost.published.featured.recent.limit(3) if params[:page].blank?
       @categories = BlogCategory.with_posts.ordered
@@ -29,12 +30,11 @@ module Blog
       @query = params[:q].to_s.strip
       return redirect_to posts_path if @query.blank?
 
-      @posts = BlogPost.published
-                       .search(@query)
-                       .includes(:author, :blog_category)
-                       .recent
-                       .page(params[:page])
-                       .per(12)
+      posts = BlogPost.published
+                      .search(@query)
+                      .includes(:author, :blog_category)
+                      .recent
+      @pagy, @posts = pagy(posts, limit: 12)
     end
 
     private
