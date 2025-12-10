@@ -30,6 +30,7 @@ class ProjectsController < ApplicationController
     @project = current_account.projects.build(project_params)
 
     if @project.save
+      track_project_created
       respond_to do |format|
         format.html { redirect_to projects_path, notice: "Project was successfully created." }
         format.turbo_stream { redirect_to projects_path, notice: "Project was successfully created." }

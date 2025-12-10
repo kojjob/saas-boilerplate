@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_10_125511) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -18,6 +18,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
     t.string "address"
     t.string "city"
     t.datetime "created_at", null: false
+    t.string "default_currency", default: "USD"
     t.datetime "discarded_at"
     t.string "name", null: false
     t.string "phone"
@@ -31,6 +32,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
     t.datetime "trial_ends_at"
     t.datetime "updated_at", null: false
     t.index ["created_at"], name: "index_accounts_on_created_at"
+    t.index ["default_currency"], name: "index_accounts_on_default_currency"
     t.index ["discarded_at"], name: "index_accounts_on_discarded_at"
     t.index ["plan_id"], name: "index_accounts_on_plan_id"
     t.index ["slug"], name: "index_accounts_on_slug", unique: true
@@ -208,6 +210,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
     t.string "portal_token"
     t.datetime "portal_token_generated_at"
     t.string "postal_code"
+    t.string "preferred_currency"
     t.string "state"
     t.integer "status", default: 0, null: false
     t.datetime "updated_at", null: false
@@ -308,6 +311,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
     t.bigint "account_id", null: false
     t.bigint "client_id", null: false
     t.datetime "created_at", null: false
+    t.string "currency", default: "USD", null: false
     t.decimal "discount_amount", precision: 10, scale: 2, default: "0.0"
     t.date "due_date", null: false
     t.string "invoice_number", null: false
@@ -332,6 +336,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
     t.index ["account_id", "invoice_number"], name: "index_invoices_on_account_id_and_invoice_number", unique: true
     t.index ["account_id"], name: "index_invoices_on_account_id"
     t.index ["client_id"], name: "index_invoices_on_client_id"
+    t.index ["currency"], name: "index_invoices_on_currency"
     t.index ["due_date"], name: "index_invoices_on_due_date"
     t.index ["issue_date"], name: "index_invoices_on_issue_date"
     t.index ["payment_token"], name: "index_invoices_on_payment_token", unique: true
@@ -420,13 +425,17 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_113655) do
   end
 
   create_table "onboarding_progresses", force: :cascade do |t|
-    t.datetime "completed_at"
+    t.boolean "client_created", default: false, null: false
+    t.datetime "client_created_at"
     t.datetime "created_at", null: false
-    t.datetime "created_client_at"
-    t.datetime "created_invoice_at"
-    t.datetime "created_project_at"
+    t.boolean "dismissed", default: false, null: false
     t.datetime "dismissed_at"
-    t.datetime "sent_invoice_at"
+    t.boolean "invoice_created", default: false, null: false
+    t.datetime "invoice_created_at"
+    t.boolean "invoice_sent", default: false, null: false
+    t.datetime "invoice_sent_at"
+    t.boolean "project_created", default: false, null: false
+    t.datetime "project_created_at"
     t.datetime "updated_at", null: false
     t.bigint "user_id", null: false
     t.index ["user_id"], name: "index_onboarding_progresses_on_user_id", unique: true

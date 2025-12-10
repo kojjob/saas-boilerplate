@@ -44,6 +44,7 @@ class InvoicesController < ApplicationController
     @invoice = current_account.invoices.build(invoice_params)
 
     if @invoice.save
+      track_invoice_created
       respond_to do |format|
         format.html { redirect_to invoices_path, notice: "Invoice was successfully created." }
         format.turbo_stream { redirect_to invoices_path, notice: "Invoice was successfully created." }
@@ -89,6 +90,7 @@ class InvoicesController < ApplicationController
     if @invoice.draft?
       InvoiceMailer.send_invoice(@invoice).deliver_later
       @invoice.mark_as_sent!
+      track_invoice_sent
       redirect_to invoices_path, notice: "Invoice was sent to #{@invoice.client.email}."
     else
       redirect_to invoices_path, alert: "Invoice has already been sent."

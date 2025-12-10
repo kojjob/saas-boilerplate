@@ -2,6 +2,7 @@ class ApplicationController < ActionController::Base
   include Authentication
   include TenantScoping
   include Pundit::Authorization
+  include OnboardingTrackable
 
   # Verify tenant access for authenticated users accessing tenant-scoped resources
   after_action :verify_tenant_access_for_user, if: -> { current_user && current_account }

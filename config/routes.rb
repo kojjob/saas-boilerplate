@@ -60,6 +60,11 @@ Rails.application.routes.draw do
   post "invitations/:token/accept", to: "invitation_acceptances#create"
 
   # ==================================
+  # Onboarding
+  # ==================================
+  post "onboarding/dismiss", to: "onboarding#dismiss", as: :dismiss_onboarding
+
+  # ==================================
   # Billing Routes
   # ==================================
   get "billing", to: "billing#index", as: :billing

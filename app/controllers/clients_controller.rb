@@ -26,6 +26,7 @@ class ClientsController < ApplicationController
     @client = current_account.clients.build(client_params)
 
     if @client.save
+      track_client_created
       respond_to do |format|
         format.html { redirect_to clients_path, notice: "Client was successfully created." }
         format.turbo_stream { redirect_to clients_path, notice: "Client was successfully created." }
