@@ -1,0 +1,27 @@
+ESTIMATE <%= @estimate.estimate_number %>
+===================================
+
+Dear <%= @client.name %>,
+
+<% if @custom_message.present? %>
+<%= @custom_message %>
+
+<% else %>
+Please find attached your estimate from <%= @account.name %>.
+
+<% end %>
+ESTIMATE DETAILS
+----------------
+Estimate Number: <%= @estimate.estimate_number %>
+Issue Date: <%= @estimate.issue_date.strftime('%B %d, %Y') %>
+Valid Until: <%= @estimate.valid_until.strftime('%B %d, %Y') %>
+Total Amount: <%= number_to_currency(@estimate.total_amount) %>
+
+This estimate is valid until <%= @estimate.valid_until.strftime('%B %d, %Y') %>.
+Please respond before this date to proceed with the quoted services.
+
+---
+
+If you have any questions about this estimate, please don't hesitate to contact us.
+
+We look forward to working with you!
