@@ -265,6 +265,9 @@ Rails.application.routes.draw do
     end
   end
 
+  # Accountant Export
+  resources :exports, only: [ :new, :create ]
+
   # ==================================
   # Static Pages
   # ==================================
