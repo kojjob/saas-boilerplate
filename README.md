@@ -82,6 +82,8 @@ Visit `http://localhost:3000` to see the application.
 |----------|-------------|----------|
 | `DATABASE_URL` | PostgreSQL connection URL | Yes |
 | `RAILS_MASTER_KEY` | Rails credentials key | Yes |
+| `APP_HOST` | Production hostname for mailer URLs | Yes |
+| `DEFAULT_FROM_EMAIL` | Default email sender address | Yes |
 | `STRIPE_PUBLISHABLE_KEY` | Stripe public key | For billing |
 | `STRIPE_SECRET_KEY` | Stripe secret key | For billing |
 | `STRIPE_WEBHOOK_SECRET` | Stripe webhook signing secret | For billing |
@@ -89,6 +91,47 @@ Visit `http://localhost:3000` to see the application.
 | `GOOGLE_CLIENT_SECRET` | Google OAuth client secret | For OAuth |
 | `GITHUB_CLIENT_ID` | GitHub OAuth client ID | For OAuth |
 | `GITHUB_CLIENT_SECRET` | GitHub OAuth client secret | For OAuth |
+
+### AWS Credentials (via Rails credentials)
+
+AWS credentials are stored securely in Rails encrypted credentials:
+
+```bash
+bin/rails credentials:edit
+```
+
+Add the following structure:
+
+```yaml
+# AWS S3 Storage Configuration
+aws:
+  access_key_id: YOUR_AWS_ACCESS_KEY
+  secret_access_key: YOUR_AWS_SECRET_KEY
+  region: us-east-1
+  bucket: your-s3-bucket-name
+
+# AWS SES Email Configuration
+ses:
+  smtp_username: YOUR_SES_SMTP_USERNAME
+  smtp_password: YOUR_SES_SMTP_PASSWORD
+  region: us-east-1
+  from_email: noreply@yourdomain.com
+```
+
+### AWS S3 Setup
+
+1. Create an S3 bucket in AWS Console
+2. Create an IAM user with S3 access permissions
+3. Add credentials to Rails credentials (see above)
+4. Bucket is configured in `config/storage.yml`
+
+### AWS SES Setup
+
+1. Verify your domain in AWS SES Console
+2. Request production access (to send to any email)
+3. Create SMTP credentials in SES Console
+4. Add SMTP credentials to Rails credentials (see above)
+5. SES is configured in `config/environments/production.rb`
 
 ### Stripe Setup
 

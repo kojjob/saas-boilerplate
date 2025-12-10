@@ -100,7 +100,7 @@ plans_data = [
   {
     name: "Enterprise",
     stripe_price_id: stripe_price_id(:enterprise_monthly, "price_enterprise_monthly"),
-    price_cents: 9900, # $99.00/month
+    price_cents: 7900, # $79.00/month
     trial_days: 14,
     interval: "month",
     description: "For established teams requiring advanced features and support",
@@ -130,7 +130,7 @@ plans_data = [
   {
     name: "Enterprise (Yearly)",
     stripe_price_id: stripe_price_id(:enterprise_yearly, "price_enterprise_yearly"),
-    price_cents: 99000, # $990.00/year (save $198/year)
+    price_cents: 75800, # $758.00/year (save $190/year - ~20% off)
     trial_days: 14,
     interval: "year",
     description: "Enterprise plan with annual billing - save 2 months!",

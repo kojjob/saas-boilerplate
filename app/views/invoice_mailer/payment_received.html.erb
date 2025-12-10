@@ -77,6 +77,12 @@
         <td class="label">Payment Date:</td>
         <td><%= @invoice.paid_at&.strftime("%B %d, %Y") || Date.current.strftime("%B %d, %Y") %></td>
       </tr>
+      <% if @invoice.payment_method.present? %>
+      <tr>
+        <td class="label">Payment Method:</td>
+        <td><%= @invoice.payment_method.titleize %></td>
+      </tr>
+      <% end %>
       <tr>
         <td class="label">Amount Paid:</td>
         <td class="amount"><%= number_to_currency(@invoice.total_amount) %></td>

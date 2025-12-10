@@ -21,6 +21,7 @@ class Project < ApplicationRecord
   # Validations
   validates :name, presence: true
   validates :project_number, uniqueness: { scope: :account_id, allow_nil: true }
+  validate :client_belongs_to_same_account
 
   # Callbacks
   before_create :generate_project_number, if: -> { project_number.blank? }
@@ -74,7 +75,7 @@ class Project < ApplicationRecord
 
   def budget_percentage_used
     return 0 unless budget && budget > 0
-    ((total_project_cost / budget) * 100).round(1)
+    ((total_project_cost.to_f / budget) * 100).round(1)
   end
 
   def overdue?
@@ -101,5 +102,12 @@ class Project < ApplicationRecord
     end
 
     self.project_number = "PRJ-#{next_number.to_s.rjust(5, '0')}"
+  end
+
+  def client_belongs_to_same_account
+    return unless client_id.present? && account_id.present?
+    return if client&.account_id == account_id
+
+    errors.add(:client, "must belong to the same account")
   end
 end

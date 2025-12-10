@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_10_032048) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -720,28 +720,19 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_032048) do
     t.datetime "created_at", null: false
     t.datetime "discarded_at"
     t.string "email", null: false
-    t.boolean "email_notifications", default: true, null: false
     t.string "first_name", null: false
-    t.string "job_title"
     t.string "last_name", null: false
-    t.string "locale", default: "en"
-    t.boolean "otp_required_for_login", default: false, null: false
-    t.string "otp_secret"
     t.string "password_digest", null: false
-    t.string "phone_number"
     t.string "provider"
     t.datetime "reset_password_sent_at"
     t.string "reset_password_token"
     t.boolean "site_admin"
-    t.boolean "sms_notifications", default: false, null: false
-    t.string "time_zone", default: "UTC"
     t.string "uid"
     t.datetime "updated_at", null: false
     t.index ["confirmation_token"], name: "index_users_on_confirmation_token", unique: true, where: "(confirmation_token IS NOT NULL)"
     t.index ["created_at"], name: "index_users_on_created_at"
     t.index ["discarded_at"], name: "index_users_on_discarded_at"
     t.index ["email"], name: "index_users_on_email", unique: true
-    t.index ["phone_number"], name: "index_users_on_phone_number"
     t.index ["provider", "uid"], name: "index_users_on_provider_and_uid", unique: true, where: "((provider IS NOT NULL) AND (uid IS NOT NULL))"
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true, where: "(reset_password_token IS NOT NULL)"
   end

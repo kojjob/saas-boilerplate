@@ -464,6 +464,55 @@ RSpec.describe "MaterialEntries", type: :request do
         expect(response).to have_http_status(:ok)
       end
     end
+
+    context "when start_date is after end_date" do
+      it "swaps the dates automatically" do
+        get report_material_entries_path, params: {
+          start_date: Date.current.end_of_month,
+          end_date: Date.current.beginning_of_month
+        }
+
+        expect(response).to have_http_status(:ok)
+      end
+    end
+
+    context "with multiple projects in report" do
+      let!(:project2) { create(:project, account: account, client: client, name: "Second Project") }
+      let!(:project_entries) do
+        [
+          create(:material_entry, :this_month, account: account, project: project, user: user, name: "Project 1 Material"),
+          create(:material_entry, :this_month, account: account, project: project2, user: user, name: "Project 2 Material")
+        ]
+      end
+
+      it "displays project names in the report without N+1 queries" do
+        get report_material_entries_path
+
+        expect(response.body).to include(project.name)
+        expect(response.body).to include(project2.name)
+      end
+
+      it "shows project breakdown with amounts" do
+        get report_material_entries_path
+
+        expect(response.body).to include("Materials by Project")
+        expect(response.body).to include(project.name)
+      end
+    end
+
+    context "with only current account data" do
+      let(:other_account) { create(:account) }
+      let(:other_user) { create(:user, :confirmed) }
+      let(:other_client) { create(:client, account: other_account) }
+      let(:other_project) { create(:project, account: other_account, client: other_client) }
+      let!(:other_entry) { create(:material_entry, :this_month, account: other_account, project: other_project, user: other_user, name: "Other Account Material") }
+
+      it "does not include material entries from other accounts" do
+        get report_material_entries_path
+
+        expect(response.body).not_to include("Other Account Material")
+      end
+    end
   end
 
   describe "billable vs non-billable entries" do

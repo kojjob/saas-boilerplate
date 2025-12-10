@@ -250,37 +250,11 @@ Rails.application.routes.draw do
   end
 
   # ==================================
-  # Public Blog Routes
+  # Static Pages
   # ==================================
-  scope module: :blog do
-    resources :posts, only: [:index, :show], path: 'blog' do
-      collection do
-        get :search
-      end
-    end
-    resources :categories, only: [:index, :show], path: 'blog/categories'
-    resources :tags, only: [:show], path: 'blog/tags'
-  end
-
-  # ==================================
-  # Admin Blog Management
-  # ==================================
-  namespace :admin do
-    namespace :blog do
-      resources :posts do
-        member do
-          delete :purge_attachment
-        end
-      end
-      resources :categories
-      resources :tags
-    end
-  end
-
-  # ==================================
-  # SEO Routes
-  # ==================================
-  get "sitemap.xml", to: "sitemaps#index", defaults: { format: "xml" }
+  get "about", to: "pages#about", as: :about
+  get "contact", to: "pages#contact", as: :contact
+  post "contact", to: "pages#send_contact", as: :send_contact
 
   # ==================================
   # Health Check

@@ -64,7 +64,7 @@ gem "stripe", "~> 18.0"
 gem "audited", "~> 5.6"
 
 # Pagination
-gem "pagy", "~> 9.3"
+gem "pagy", "~> 9.0"
 
 # OAuth providers
 gem "omniauth", "~> 2.1"
@@ -89,12 +89,20 @@ gem "discard", "~> 1.4"
 # PDF Generation - HTML to PDF using Chrome/Puppeteer
 gem "grover"
 
+# PDF Generation - Native Ruby PDF generation
+gem "prawn", "~> 2.5"
+gem "prawn-table", "~> 0.2.2"
+
 # Active Storage validations
 gem "active_storage_validations", "~> 1.1"
 
 # Two-factor authentication
 gem "rotp", "~> 6.3"
 gem "rqrcode", "~> 2.2"
+
+# AWS SDK for S3 storage and SES email
+gem "aws-sdk-s3", "~> 1.0"
+gem "aws-sdk-ses", "~> 1.0"
 
 group :development, :test do
   # See https://guides.rubyonrails.org/debugging_rails_applications.html#debugging-with-the-debug-gem

@@ -26,9 +26,10 @@ RSpec.describe "Delete actions", type: :system do
 
       expect(page).to have_content("Client To Delete")
 
-      # Click delete button - Turbo will handle the confirmation
-      # Note: In headless Chrome, Turbo confirmations auto-accept
-      click_button "Delete Client"
+      # Click delete button and accept the browser confirm dialog
+      accept_confirm do
+        click_button "Delete Client"
+      end
 
       # Should redirect to clients index and show success message
       expect(page).to have_current_path(clients_path, wait: 10)
@@ -66,8 +67,10 @@ RSpec.describe "Delete actions", type: :system do
 
       expect(page).to have_content("Project To Delete")
 
-      # Click delete button - Turbo handles confirmation
-      click_button "Delete Project"
+      # Click delete button and accept the browser confirm dialog
+      accept_confirm do
+        click_button "Delete Project"
+      end
 
       expect(page).to have_current_path(projects_path, wait: 10)
       # Flash message animation starts at opacity: 0, use visible: :all to find it
@@ -114,8 +117,10 @@ RSpec.describe "Delete actions", type: :system do
 
       expect(page).to have_content("Document To Delete")
 
-      # Click delete button - Turbo handles confirmation
-      click_button "Delete Document"
+      # Click delete button and accept the browser confirm dialog
+      accept_confirm do
+        click_button "Delete Document"
+      end
 
       expect(page).to have_current_path(documents_path, wait: 10)
       # Flash message animation starts at opacity: 0, use visible: :all to find it
@@ -132,8 +137,10 @@ RSpec.describe "Delete actions", type: :system do
       # Delete button is on the show page
       visit time_entry_path(time_entry)
 
-      # Click delete button - Turbo handles confirmation
-      click_button "Delete"
+      # Click delete button and accept the browser confirm dialog
+      accept_confirm do
+        click_button "Delete"
+      end
 
       expect(page).to have_current_path(time_entries_path, wait: 10)
       # Wait for flash message element with animation
@@ -152,8 +159,10 @@ RSpec.describe "Delete actions", type: :system do
 
       expect(page).to have_content("Material To Delete")
 
-      # Click delete button - Turbo handles confirmation
-      click_button "Delete"
+      # Click delete button and accept the browser confirm dialog
+      accept_confirm do
+        click_button "Delete"
+      end
 
       expect(page).to have_current_path(material_entries_path, wait: 10)
       # Wait for flash message element with animation

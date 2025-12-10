@@ -104,13 +104,23 @@ class MaterialEntriesController < ApplicationController
     @start_date = params[:start_date].present? ? Date.parse(params[:start_date]) : Date.current.beginning_of_month
     @end_date = params[:end_date].present? ? Date.parse(params[:end_date]) : Date.current.end_of_month
 
+    # Validate and swap dates if start_date > end_date
+    if @start_date > @end_date
+      @start_date, @end_date = @end_date, @start_date
+    end
+
     base_entries = current_account.material_entries.for_date_range(@start_date, @end_date)
 
-    # For display
-    @material_entries = base_entries.includes(:project, :user).recent
+    # For display - includes project and client for N+1 prevention
+    @material_entries = base_entries.includes(project: :client).includes(:user).recent
 
     # Group by project for summary - use reorder to avoid ORDER BY conflict
     @project_summary = base_entries.reorder(nil).group(:project_id).sum(:total_amount)
+
+    # Preload projects for the summary section to avoid N+1 queries
+    project_ids = @project_summary.keys.compact
+    @projects_lookup = current_account.projects.includes(:client).where(id: project_ids).index_by(&:id)
+
     @total_amount = base_entries.sum(:total_amount)
     @total_billable = base_entries.billable.sum(:total_amount)
   end
