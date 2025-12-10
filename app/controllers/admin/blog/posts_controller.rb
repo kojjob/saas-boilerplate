@@ -3,16 +3,17 @@
 module Admin
   module Blog
     class PostsController < Admin::BaseController
+      include Pagy::Backend
+
       before_action :set_post, only: [:show, :edit, :update, :destroy]
       before_action :load_form_resources, only: [:new, :edit, :create, :update]
 
       def index
-        @posts = BlogPost.includes(:author, :blog_category, :blog_tags)
-                         .order(created_at: :desc)
-                         .page(params[:page])
-                         .per(20)
+        posts = BlogPost.includes(:author, :blog_category, :blog_tags)
+                        .order(created_at: :desc)
 
-        filter_posts if params[:status].present? || params[:category].present?
+        posts = filter_posts(posts) if params[:status].present? || params[:category].present?
+        @pagy, @posts = pagy(posts, limit: 20)
       end
 
       def show; end
@@ -76,9 +77,10 @@ module Admin
         @post.blog_tag_ids = tag_ids
       end
 
-      def filter_posts
-        @posts = @posts.where(status: params[:status]) if params[:status].present?
-        @posts = @posts.where(blog_category_id: params[:category]) if params[:category].present?
+      def filter_posts(posts)
+        posts = posts.where(status: params[:status]) if params[:status].present?
+        posts = posts.where(blog_category_id: params[:category]) if params[:category].present?
+        posts
       end
     end
   end

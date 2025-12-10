@@ -3,13 +3,14 @@
 module Admin
   module Blog
     class CategoriesController < Admin::BaseController
+      include Pagy::Backend
+
       before_action :set_category, only: [:show, :edit, :update, :destroy]
 
       def index
-        @categories = BlogCategory.includes(:parent, :children)
-                                  .order(position: :asc, name: :asc)
-                                  .page(params[:page])
-                                  .per(20)
+        categories = BlogCategory.includes(:parent, :children)
+                                 .order(position: :asc, name: :asc)
+        @pagy, @categories = pagy(categories, limit: 20)
       end
 
       def show

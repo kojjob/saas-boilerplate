@@ -111,20 +111,20 @@
     </table>
 
     <%# Pagination %>
-    <% if @posts.total_pages > 1 %>
+    <% if @pagy.pages > 1 %>
       <div class="bg-white px-4 py-3 border-t border-slate-200 sm:px-6">
         <div class="flex items-center justify-between">
           <div class="text-sm text-slate-700">
-            Showing <%= @posts.offset_value + 1 %> to <%= [@posts.offset_value + @posts.length, @posts.total_count].min %> of <%= @posts.total_count %> posts
+            Showing <%= @pagy.from %> to <%= @pagy.to %> of <%= @pagy.count %> posts
           </div>
           <nav class="flex space-x-2">
-            <% if @posts.current_page > 1 %>
-              <%= link_to admin_blog_posts_path(page: @posts.current_page - 1, status: params[:status], category: params[:category]), class: "px-3 py-1 border border-slate-300 rounded text-sm text-slate-700 hover:bg-slate-50" do %>
+            <% if @pagy.page > 1 %>
+              <%= link_to admin_blog_posts_path(page: @pagy.page - 1, status: params[:status], category: params[:category]), class: "px-3 py-1 border border-slate-300 rounded text-sm text-slate-700 hover:bg-slate-50" do %>
                 Previous
               <% end %>
             <% end %>
-            <% if @posts.current_page < @posts.total_pages %>
-              <%= link_to admin_blog_posts_path(page: @posts.current_page + 1, status: params[:status], category: params[:category]), class: "px-3 py-1 border border-slate-300 rounded text-sm text-slate-700 hover:bg-slate-50" do %>
+            <% if @pagy.page < @pagy.pages %>
+              <%= link_to admin_blog_posts_path(page: @pagy.page + 1, status: params[:status], category: params[:category]), class: "px-3 py-1 border border-slate-300 rounded text-sm text-slate-700 hover:bg-slate-50" do %>
                 Next
               <% end %>
             <% end %>

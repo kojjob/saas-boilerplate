@@ -3,12 +3,13 @@
 module Admin
   module Blog
     class TagsController < Admin::BaseController
+      include Pagy::Backend
+
       before_action :set_tag, only: [:show, :edit, :update, :destroy]
 
       def index
-        @tags = BlogTag.order(name: :asc)
-                       .page(params[:page])
-                       .per(20)
+        tags = BlogTag.order(name: :asc)
+        @pagy, @tags = pagy(tags, limit: 20)
       end
 
       def show
