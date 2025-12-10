@@ -1,0 +1,34 @@
+<% if @is_overdue %>
+PAYMENT REMINDER - INVOICE OVERDUE
+===================================
+<% else %>
+PAYMENT REMINDER - DUE SOON
+===========================
+<% end %>
+
+Dear <%= @client.name %>,
+
+<% if @is_overdue %>
+Invoice <%= @invoice.invoice_number %> is <%= @days_overdue %> days past due.
+
+This is a friendly reminder that your payment of <%= number_to_currency(@invoice.total_amount) %> was due on <%= @invoice.due_date.strftime('%B %d, %Y') %>.
+<% else %>
+Invoice <%= @invoice.invoice_number %> is due in <%= @days_until_due %> days.
+
+This is a friendly reminder that your payment of <%= number_to_currency(@invoice.total_amount) %> is due on <%= @invoice.due_date.strftime('%B %d, %Y') %>.
+<% end %>
+
+INVOICE DETAILS
+---------------
+Invoice Number: <%= @invoice.invoice_number %>
+Issue Date: <%= @invoice.issue_date.strftime('%B %d, %Y') %>
+Due Date: <%= @invoice.due_date.strftime('%B %d, %Y') %>
+Total Amount: <%= number_to_currency(@invoice.total_amount) %>
+
+From: <%= @account.name %>
+
+---
+
+If you have already made this payment, please disregard this reminder. If you have any questions about this invoice, please don't hesitate to contact us.
+
+Thank you for your business!
