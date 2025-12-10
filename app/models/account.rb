@@ -75,7 +75,7 @@ class Account < ApplicationRecord
 
   # Billing methods
   def current_plan
-    plan || Plan.free.first
+    plan || Plan.free_plan
   end
 
   def subscribed?
@@ -102,12 +102,13 @@ class Account < ApplicationRecord
   end
 
   def billing_email
-    owner&.email
+    owner&.email || users.first&.email
   end
 
   # Pay gem requires an email method for the billable model
+  # Returns a fallback email if no owner exists to prevent nil errors
   def email
-    billing_email
+    billing_email || "billing@#{slug}.local"
   end
 
   private
