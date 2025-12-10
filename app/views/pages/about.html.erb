@@ -1,0 +1,359 @@
+<%# Premium About Page %>
+<div class="min-h-screen bg-white" data-controller="scroll-reveal">
+
+  <%# ==================== HERO SECTION ==================== %>
+  <section class="relative pt-32 pb-24 overflow-hidden">
+    <%# Animated gradient background %>
+    <div class="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900">
+      <%# Animated mesh gradient %>
+      <div class="absolute inset-0 opacity-30">
+        <div class="absolute top-0 -left-40 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob"></div>
+        <div class="absolute top-0 -right-40 w-96 h-96 bg-amber-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-2000"></div>
+        <div class="absolute -bottom-40 left-40 w-96 h-96 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl animate-blob animation-delay-4000"></div>
+      </div>
+      <%# Grid pattern overlay %>
+      <div class="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNCI+PHBhdGggZD0iTTM2IDM0djItSDI0di0yaDEyek0zNiAyNHYySDI0di0yaDEyeiIvPjwvZz48L2c+PC9zdmc+')] opacity-40"></div>
+    </div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="text-center" data-scroll-reveal-target="item">
+        <%# Badge %>
+        <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-white/10 backdrop-blur-sm border border-white/20 mb-8">
+          <span class="relative flex h-2 w-2">
+            <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"></span>
+            <span class="relative inline-flex rounded-full h-2 w-2 bg-amber-500"></span>
+          </span>
+          <span class="text-sm font-medium text-white/90">Our Story</span>
+        </div>
+
+        <%# Main heading with gradient text %>
+        <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold text-white mb-6 tracking-tight">
+          Built by Contractors,
+          <span class="block mt-2 bg-gradient-to-r from-amber-400 via-orange-400 to-amber-500 bg-clip-text text-transparent">
+            For Contractors
+          </span>
+        </h1>
+
+        <p class="text-xl sm:text-2xl text-slate-300 max-w-3xl mx-auto leading-relaxed">
+          We know the hustle. Early mornings, late nights, chasing payments.
+          That's why we built the tool we wished existed.
+        </p>
+      </div>
+
+      <%# Floating stats cards %>
+      <div class="mt-16 grid grid-cols-2 lg:grid-cols-4 gap-4" data-scroll-reveal-target="item">
+        <% @stats.each_with_index do |stat, index| %>
+          <div class="group relative p-6 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10 hover:bg-white/10 hover:border-white/20 transition-all duration-500 hover:-translate-y-1"
+               style="animation-delay: <%= index * 100 %>ms;">
+            <div class="text-3xl sm:text-4xl font-bold text-white mb-1 group-hover:text-amber-400 transition-colors">
+              <%= stat[:value] %>
+            </div>
+            <div class="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
+              <%= stat[:label] %>
+            </div>
+            <%# Decorative gradient line %>
+            <div class="absolute bottom-0 left-6 right-6 h-px bg-gradient-to-r from-transparent via-amber-500/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <%# Scroll indicator %>
+    <div class="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-white/50">
+      <span class="text-xs uppercase tracking-widest">Scroll</span>
+      <div class="w-5 h-8 rounded-full border-2 border-white/30 flex justify-center pt-2">
+        <div class="w-1 h-2 rounded-full bg-white/50 animate-bounce"></div>
+      </div>
+    </div>
+  </section>
+
+  <%# ==================== STORY SECTION ==================== %>
+  <section class="py-24 bg-white relative overflow-hidden">
+    <%# Decorative elements %>
+    <div class="absolute top-0 right-0 w-1/2 h-1/2 bg-gradient-to-bl from-amber-50 to-transparent opacity-50"></div>
+    <div class="absolute bottom-0 left-0 w-1/3 h-1/3 bg-gradient-to-tr from-indigo-50 to-transparent opacity-50"></div>
+
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <div class="grid lg:grid-cols-2 gap-16 items-center">
+        <%# Story content %>
+        <div class="space-y-8" data-scroll-reveal-target="item">
+          <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-amber-100 border border-amber-200">
+            <svg class="w-4 h-4 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"/>
+            </svg>
+            <span class="text-sm font-semibold text-amber-700">Our Story</span>
+          </div>
+
+          <h2 class="text-4xl sm:text-5xl font-bold text-slate-900 leading-tight">
+            From Frustration
+            <span class="text-amber-500">to Innovation</span>
+          </h2>
+
+          <div class="space-y-6 text-lg text-slate-600 leading-relaxed">
+            <p>
+              <span class="font-semibold text-slate-900">It started with a spreadsheet and a shoebox full of receipts.</span>
+              Our founder, Marcus, spent 15 years as an electrician. He was great at his trade, but the business side? That was a nightmare.
+            </p>
+            <p>
+              Chasing down late payments. Losing track of materials. Spending Sunday nights doing paperwork instead of being with family. Sound familiar?
+            </p>
+            <p>
+              Every "business app" he tried was either too complicated, designed for big corporations, or just didn't understand how subcontractors actually work.
+            </p>
+            <p class="font-semibold text-slate-900 text-xl">
+              So he built one that does.
+            </p>
+          </div>
+
+          <%# Quote card %>
+          <div class="relative p-6 rounded-2xl bg-gradient-to-br from-slate-50 to-slate-100 border border-slate-200">
+            <svg class="absolute top-4 left-4 w-8 h-8 text-amber-400 opacity-50" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M14.017 21v-7.391c0-5.704 3.731-9.57 8.983-10.609l.995 2.151c-2.432.917-3.995 3.638-3.995 5.849h4v10h-9.983zm-14.017 0v-7.391c0-5.704 3.748-9.57 9-10.609l.996 2.151c-2.433.917-3.996 3.638-3.996 5.849h3.983v10h-9.983z"/>
+            </svg>
+            <p class="text-slate-700 text-lg italic pl-12">
+              "I didn't want to build a software company. I just wanted to get paid on time and go home to my kids. Turns out, a lot of other contractors felt the same way."
+            </p>
+            <div class="mt-4 pl-12 flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center text-white font-bold">
+                M
+              </div>
+              <div>
+                <div class="font-semibold text-slate-900">Marcus Johnson</div>
+                <div class="text-sm text-slate-500">Founder & CEO</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <%# Visual element %>
+        <div class="relative" data-scroll-reveal-target="item">
+          <div class="relative rounded-3xl overflow-hidden shadow-2xl">
+            <%# Placeholder for image - using gradient placeholder %>
+            <div class="aspect-[4/5] bg-gradient-to-br from-slate-800 via-indigo-900 to-slate-900 relative">
+              <%# Decorative elements inside %>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center p-8">
+                  <div class="w-24 h-24 mx-auto mb-6 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center shadow-xl">
+                    <svg class="w-12 h-12 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                  </div>
+                  <h3 class="text-2xl font-bold text-white mb-2">Built in the Field</h3>
+                  <p class="text-slate-400">Tested on real job sites with real contractors</p>
+                </div>
+              </div>
+              <%# Floating cards %>
+              <div class="absolute top-8 left-8 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white">
+                <div class="text-2xl font-bold">2019</div>
+                <div class="text-sm text-white/70">Founded</div>
+              </div>
+              <div class="absolute bottom-8 right-8 p-4 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 text-white">
+                <div class="text-2xl font-bold">Austin, TX</div>
+                <div class="text-sm text-white/70">Headquarters</div>
+              </div>
+            </div>
+          </div>
+          <%# Decorative background elements %>
+          <div class="absolute -z-10 -top-8 -right-8 w-64 h-64 bg-amber-200 rounded-full blur-3xl opacity-30"></div>
+          <div class="absolute -z-10 -bottom-8 -left-8 w-48 h-48 bg-indigo-200 rounded-full blur-3xl opacity-30"></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# ==================== VALUES SECTION ==================== %>
+  <section class="py-24 bg-slate-50 relative overflow-hidden">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%# Section header %>
+      <div class="text-center mb-16" data-scroll-reveal-target="item">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-indigo-100 border border-indigo-200 mb-6">
+          <svg class="w-4 h-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+          </svg>
+          <span class="text-sm font-semibold text-indigo-700">Our Values</span>
+        </div>
+        <h2 class="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+          What We Stand For
+        </h2>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+          These aren't just words on a wall. They guide every decision we make.
+        </p>
+      </div>
+
+      <%# Values grid %>
+      <div class="grid md:grid-cols-2 gap-6" data-scroll-reveal-target="item">
+        <% @values.each_with_index do |value, index| %>
+          <% gradient_colors = [
+            "from-amber-500 to-orange-600",
+            "from-indigo-500 to-purple-600",
+            "from-emerald-500 to-teal-600",
+            "from-rose-500 to-pink-600"
+          ] %>
+          <div class="group relative p-8 rounded-3xl bg-white border border-slate-200 hover:border-slate-300 shadow-sm hover:shadow-xl transition-all duration-500 hover:-translate-y-1">
+            <%# Icon %>
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br <%= gradient_colors[index % 4] %> flex items-center justify-center mb-6 shadow-lg group-hover:scale-110 transition-transform duration-300">
+              <% case value[:icon] %>
+              <% when "wrench" %>
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
+                </svg>
+              <% when "sparkles" %>
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+              <% when "trophy" %>
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"/>
+                </svg>
+              <% when "rocket" %>
+                <svg class="w-7 h-7 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"/>
+                </svg>
+              <% end %>
+            </div>
+
+            <h3 class="text-xl font-bold text-slate-900 mb-3 group-hover:text-slate-800">
+              <%= value[:title] %>
+            </h3>
+            <p class="text-slate-600 leading-relaxed">
+              <%= value[:description] %>
+            </p>
+
+            <%# Hover effect line %>
+            <div class="absolute bottom-0 left-8 right-8 h-1 rounded-full bg-gradient-to-r <%= gradient_colors[index % 4] %> opacity-0 group-hover:opacity-100 transition-opacity duration-300"></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+  <%# ==================== TEAM SECTION ==================== %>
+  <section class="py-24 bg-white relative overflow-hidden">
+    <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+      <%# Section header %>
+      <div class="text-center mb-16" data-scroll-reveal-target="item">
+        <div class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-emerald-100 border border-emerald-200 mb-6">
+          <svg class="w-4 h-4 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/>
+          </svg>
+          <span class="text-sm font-semibold text-emerald-700">Our Team</span>
+        </div>
+        <h2 class="text-4xl sm:text-5xl font-bold text-slate-900 mb-4">
+          Meet the Crew
+        </h2>
+        <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+          A small team with big ambitions - all dedicated to making your work life easier.
+        </p>
+      </div>
+
+      <%# Team grid %>
+      <div class="grid sm:grid-cols-2 lg:grid-cols-4 gap-8" data-scroll-reveal-target="item">
+        <% @team_members.each_with_index do |member, index| %>
+          <% avatar_colors = [
+            "from-amber-400 to-orange-500",
+            "from-indigo-400 to-purple-500",
+            "from-emerald-400 to-teal-500",
+            "from-rose-400 to-pink-500"
+          ] %>
+          <div class="group text-center">
+            <%# Avatar %>
+            <div class="relative mb-6 mx-auto w-40 h-40">
+              <div class="absolute inset-0 rounded-3xl bg-gradient-to-br <%= avatar_colors[index % 4] %> opacity-20 group-hover:opacity-30 transition-opacity rotate-6 group-hover:rotate-12 duration-300"></div>
+              <div class="relative w-full h-full rounded-3xl bg-gradient-to-br <%= avatar_colors[index % 4] %> flex items-center justify-center text-white text-4xl font-bold shadow-xl group-hover:scale-105 transition-transform duration-300">
+                <%= member[:name].split.map(&:first).join %>
+              </div>
+            </div>
+
+            <%# Info %>
+            <h3 class="text-xl font-bold text-slate-900 mb-1">
+              <%= member[:name] %>
+            </h3>
+            <p class="text-amber-600 font-medium mb-3">
+              <%= member[:role] %>
+            </p>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              <%= member[:bio] %>
+            </p>
+
+            <%# Social links %>
+            <div class="flex justify-center gap-3">
+              <a href="<%= member[:linkedin] %>" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z"/>
+                </svg>
+              </a>
+              <a href="<%= member[:twitter] %>" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 flex items-center justify-center text-slate-500 hover:text-slate-700 transition-colors">
+                <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/>
+                </svg>
+              </a>
+            </div>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Join us CTA %>
+      <div class="mt-16 text-center" data-scroll-reveal-target="item">
+        <div class="inline-flex flex-col sm:flex-row items-center gap-4 p-6 rounded-2xl bg-gradient-to-r from-slate-900 to-slate-800">
+          <div class="flex -space-x-3">
+            <% 4.times do |i| %>
+              <div class="w-10 h-10 rounded-full border-2 border-slate-800 bg-gradient-to-br from-slate-600 to-slate-700 flex items-center justify-center text-white text-xs font-medium">
+                +
+              </div>
+            <% end %>
+          </div>
+          <div class="text-center sm:text-left">
+            <p class="text-white font-semibold">Want to join our team?</p>
+            <p class="text-slate-400 text-sm">We're always looking for talented people.</p>
+          </div>
+          <a href="mailto:careers@subcontractorcommand.com" class="px-6 py-3 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-semibold rounded-xl transition-all hover:scale-105 shadow-lg shadow-amber-500/25">
+            View Open Positions
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <%# ==================== CTA SECTION ==================== %>
+  <section class="py-24 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900 relative overflow-hidden">
+    <%# Animated background %>
+    <div class="absolute inset-0">
+      <div class="absolute top-0 right-0 w-96 h-96 bg-amber-500/20 rounded-full blur-3xl"></div>
+      <div class="absolute bottom-0 left-0 w-80 h-80 bg-indigo-500/20 rounded-full blur-3xl"></div>
+    </div>
+
+    <div class="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center" data-scroll-reveal-target="item">
+      <h2 class="text-4xl sm:text-5xl font-bold text-white mb-6">
+        Ready to Take Control?
+      </h2>
+      <p class="text-xl text-slate-300 mb-10 max-w-2xl mx-auto">
+        Join thousands of contractors who've streamlined their business. Start your free trial today - no credit card required.
+      </p>
+      <div class="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <%= link_to sign_up_path, class: "w-full sm:w-auto px-10 py-5 bg-gradient-to-r from-amber-400 to-orange-500 hover:from-amber-500 hover:to-orange-600 text-white font-bold text-lg rounded-xl shadow-xl shadow-amber-500/30 hover:shadow-amber-500/50 transition-all hover:scale-105" do %>
+          Start Free Trial
+          <svg class="inline-block ml-2 w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+          </svg>
+        <% end %>
+        <%= link_to contact_path, class: "w-full sm:w-auto px-10 py-5 bg-white/10 hover:bg-white/20 text-white font-bold text-lg rounded-xl border border-white/20 transition-all" do %>
+          Contact Sales
+        <% end %>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<style>
+  @keyframes blob {
+    0%, 100% { transform: translate(0, 0) scale(1); }
+    25% { transform: translate(20px, -30px) scale(1.1); }
+    50% { transform: translate(-20px, 20px) scale(0.9); }
+    75% { transform: translate(30px, 10px) scale(1.05); }
+  }
+  .animate-blob { animation: blob 8s infinite ease-in-out; }
+  .animation-delay-2000 { animation-delay: 2s; }
+  .animation-delay-4000 { animation-delay: 4s; }
+</style>

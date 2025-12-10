@@ -64,7 +64,7 @@ gem "stripe", "~> 18.0"
 gem "audited", "~> 5.6"
 
 # Pagination
-gem "pagy", "~> 43.2"
+gem "pagy", "~> 9.0"
 
 # OAuth providers
 gem "omniauth", "~> 2.1"

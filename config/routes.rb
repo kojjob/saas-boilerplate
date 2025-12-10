@@ -250,6 +250,13 @@ Rails.application.routes.draw do
   end
 
   # ==================================
+  # Static Pages
+  # ==================================
+  get "about", to: "pages#about", as: :about
+  get "contact", to: "pages#contact", as: :contact
+  post "contact", to: "pages#send_contact", as: :send_contact
+
+  # ==================================
   # Health Check
   # ==================================
   # Reveal health status on /up that returns 200 if the app boots with no exceptions, otherwise 500.
