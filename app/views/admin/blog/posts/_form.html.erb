@@ -1,4 +1,4 @@
-<%= form_with(model: @post, url: @post.persisted? ? admin_blog_post_path(@post) : admin_blog_posts_path, local: true, class: "space-y-6") do |f| %>
+<%= form_with(model: @post, url: @post.persisted? ? admin_blog_post_path(@post) : admin_blog_posts_path, local: true, multipart: true, class: "space-y-6") do |f| %>
   <% if @post.errors.any? %>
     <div class="rounded-md bg-red-50 p-4">
       <div class="flex">
@@ -29,14 +29,14 @@
         <div class="space-y-4">
           <div>
             <%= f.label :title, class: "block text-sm font-medium text-slate-700" %>
-            <%= f.text_field :title, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Enter post title..." %>
+            <%= f.text_field :title, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white", placeholder: "Enter post title..." %>
           </div>
 
           <div>
             <%= f.label :slug, class: "block text-sm font-medium text-slate-700" %>
             <div class="mt-1 flex rounded-md shadow-sm">
               <span class="inline-flex items-center px-3 rounded-l-md border border-r-0 border-slate-300 bg-slate-50 text-slate-500 sm:text-sm">/blog/</span>
-              <%= f.text_field :slug, class: "flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "auto-generated-from-title" %>
+              <%= f.text_field :slug, class: "flex-1 min-w-0 block w-full px-3 py-2 rounded-none rounded-r-md border-slate-300 focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white", placeholder: "auto-generated-from-title" %>
             </div>
             <p class="mt-1 text-xs text-slate-500">Leave blank to auto-generate from title</p>
           </div>
@@ -47,7 +47,7 @@
       <div class="bg-white rounded-lg shadow p-6">
         <div>
           <%= f.label :content, class: "block text-sm font-medium text-slate-700 mb-2" %>
-          <%= f.text_area :content, rows: 20, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono", placeholder: "Write your blog post content here... (Markdown supported)" %>
+          <%= f.text_area :content, rows: 20, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm font-mono text-slate-900 bg-white", placeholder: "Write your blog post content here... (Markdown supported)" %>
           <p class="mt-1 text-xs text-slate-500">Supports Markdown formatting</p>
         </div>
       </div>
@@ -56,7 +56,7 @@
       <div class="bg-white rounded-lg shadow p-6">
         <div>
           <%= f.label :excerpt, class: "block text-sm font-medium text-slate-700" %>
-          <%= f.text_area :excerpt, rows: 3, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Brief summary for search results and social sharing..." %>
+          <%= f.text_area :excerpt, rows: 3, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white", placeholder: "Brief summary for search results and social sharing..." %>
           <p class="mt-1 text-xs text-slate-500">Optional. Will be auto-generated from content if left blank.</p>
         </div>
       </div>
@@ -67,18 +67,18 @@
         <div class="space-y-4">
           <div>
             <%= f.label :meta_title, class: "block text-sm font-medium text-slate-700" %>
-            <%= f.text_field :meta_title, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Custom title for search engines (optional)" %>
+            <%= f.text_field :meta_title, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white", placeholder: "Custom title for search engines (optional)" %>
             <p class="mt-1 text-xs text-slate-500">Leave blank to use post title</p>
           </div>
 
           <div>
             <%= f.label :meta_description, class: "block text-sm font-medium text-slate-700" %>
-            <%= f.text_area :meta_description, rows: 2, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "Description for search results (155-160 characters recommended)" %>
+            <%= f.text_area :meta_description, rows: 2, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white", placeholder: "Description for search results (155-160 characters recommended)" %>
           </div>
 
           <div>
             <%= f.label :meta_keywords, class: "block text-sm font-medium text-slate-700" %>
-            <%= f.text_field :meta_keywords, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "keyword1, keyword2, keyword3" %>
+            <%= f.text_field :meta_keywords, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white", placeholder: "keyword1, keyword2, keyword3" %>
           </div>
         </div>
       </div>
@@ -92,12 +92,12 @@
         <div class="space-y-4">
           <div>
             <%= f.label :status, class: "block text-sm font-medium text-slate-700" %>
-            <%= f.select :status, BlogPost.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <%= f.select :status, BlogPost.statuses.keys.map { |s| [s.titleize, s] }, {}, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white" %>
           </div>
 
           <div>
             <%= f.label :published_at, "Publish Date", class: "block text-sm font-medium text-slate-700" %>
-            <%= f.datetime_local_field :published_at, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+            <%= f.datetime_local_field :published_at, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white" %>
             <p class="mt-1 text-xs text-slate-500">Schedule for future publishing</p>
           </div>
 
@@ -113,7 +113,7 @@
       <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-medium text-slate-900 mb-4">Category</h3>
         <div>
-          <%= f.collection_select :blog_category_id, BlogCategory.ordered, :id, :name, { include_blank: "Select a category..." }, class: "block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm" %>
+          <%= f.collection_select :blog_category_id, BlogCategory.ordered, :id, :name, { include_blank: "Select a category..." }, class: "block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white" %>
         </div>
       </div>
 
@@ -134,21 +134,197 @@
         <%= hidden_field_tag "blog_post[tag_ids][]", "" %>
       </div>
 
-      <%# Featured Image %>
+      <%# Featured Image Upload %>
       <div class="bg-white rounded-lg shadow p-6">
         <h3 class="text-lg font-medium text-slate-900 mb-4">Featured Image</h3>
-        <div>
-          <%= f.label :featured_image_url, "Image URL", class: "block text-sm font-medium text-slate-700" %>
-          <%= f.url_field :featured_image_url, class: "mt-1 block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm", placeholder: "https://..." %>
-          <p class="mt-1 text-xs text-slate-500">Enter URL of featured image</p>
-
-          <% if @post.featured_image_url.present? %>
-            <div class="mt-4">
-              <p class="text-xs text-slate-500 mb-2">Preview:</p>
-              <img src="<%= @post.featured_image_url %>" alt="Featured image preview" class="rounded-lg max-h-40 object-cover">
+        <div class="space-y-4">
+          <%# Show existing featured image if attached %>
+          <% if @post.featured_image.attached? %>
+            <div class="relative group" id="attachment_<%= @post.featured_image.id %>">
+              <%= image_tag @post.featured_image.variant(:medium), class: "rounded-lg max-h-40 object-cover w-full" %>
+              <%= button_to purge_attachment_admin_blog_post_path(@post, attachment_id: @post.featured_image.id),
+                  method: :delete,
+                  class: "absolute top-2 right-2 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity",
+                  data: { turbo_confirm: "Are you sure you want to remove this image?" } do %>
+                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                </svg>
+              <% end %>
             </div>
           <% end %>
+
+          <div>
+            <%= f.label :featured_image, "Upload New Image", class: "block text-sm font-medium text-slate-700" %>
+            <%= f.file_field :featured_image,
+                accept: "image/jpeg,image/png,image/gif,image/webp",
+                class: "mt-1 block w-full text-sm text-slate-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-medium file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100" %>
+            <p class="mt-1 text-xs text-slate-500">JPG, PNG, GIF, or WebP. Max 10MB.</p>
+          </div>
+
+          <div class="border-t border-slate-200 pt-4">
+            <p class="text-xs text-slate-500 mb-2">Or use external URL:</p>
+            <%= f.url_field :featured_image_url,
+                class: "block w-full rounded-md border-slate-300 shadow-sm focus:border-indigo-500 focus:ring-indigo-500 sm:text-sm text-slate-900 bg-white",
+                placeholder: "https://..." %>
+          </div>
         </div>
+      </div>
+
+      <%# Comments Setting %>
+      <div class="bg-white rounded-lg shadow p-6">
+        <h3 class="text-lg font-medium text-slate-900 mb-4">Discussion</h3>
+        <div class="flex items-center">
+          <%= f.check_box :allow_comments, class: "h-4 w-4 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500" %>
+          <%= f.label :allow_comments, "Allow comments", class: "ml-2 text-sm font-medium text-slate-700" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <%# Media Library Section %>
+  <div class="bg-white rounded-lg shadow p-6">
+    <h3 class="text-lg font-medium text-slate-900 mb-4">Media Library</h3>
+    <p class="text-sm text-slate-500 mb-6">Upload images, videos, audio, and documents to use in your post.</p>
+
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <%# Images %>
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-sm font-medium text-slate-700 flex items-center gap-2">
+            <svg class="h-5 w-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+            </svg>
+            Images
+          </h4>
+          <%= f.file_field :images,
+              multiple: true,
+              accept: "image/jpeg,image/png,image/gif,image/webp",
+              class: "mt-2 block w-full text-sm text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-green-50 file:text-green-700 hover:file:bg-green-100" %>
+          <p class="mt-1 text-xs text-slate-400">Max 10MB each</p>
+        </div>
+
+        <% if @post.images.attached? %>
+          <div class="grid grid-cols-2 gap-2">
+            <% @post.images.each do |image| %>
+              <div class="relative group" id="attachment_<%= image.id %>">
+                <%= image_tag image.variant(:thumb), class: "rounded w-full h-16 object-cover" %>
+                <%= button_to purge_attachment_admin_blog_post_path(@post, attachment_id: image.id),
+                    method: :delete,
+                    class: "absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity",
+                    data: { turbo_confirm: "Remove this image?" } do %>
+                  <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Videos %>
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-sm font-medium text-slate-700 flex items-center gap-2">
+            <svg class="h-5 w-5 text-purple-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/>
+            </svg>
+            Videos
+          </h4>
+          <%= f.file_field :videos,
+              multiple: true,
+              accept: "video/mp4,video/webm,video/quicktime",
+              class: "mt-2 block w-full text-sm text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-purple-50 file:text-purple-700 hover:file:bg-purple-100" %>
+          <p class="mt-1 text-xs text-slate-400">MP4, WebM. Max 100MB each</p>
+        </div>
+
+        <% if @post.videos.attached? %>
+          <div class="space-y-2">
+            <% @post.videos.each do |video| %>
+              <div class="flex items-center justify-between bg-slate-50 rounded p-2" id="attachment_<%= video.id %>">
+                <span class="text-xs text-slate-600 truncate flex-1"><%= video.filename %></span>
+                <%= button_to purge_attachment_admin_blog_post_path(@post, attachment_id: video.id),
+                    method: :delete,
+                    class: "text-red-500 hover:text-red-700 ml-2",
+                    data: { turbo_confirm: "Remove this video?" } do %>
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Audio %>
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-sm font-medium text-slate-700 flex items-center gap-2">
+            <svg class="h-5 w-5 text-orange-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"/>
+            </svg>
+            Audio
+          </h4>
+          <%= f.file_field :audio_files,
+              multiple: true,
+              accept: "audio/mpeg,audio/wav,audio/ogg,audio/mp4",
+              class: "mt-2 block w-full text-sm text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-orange-50 file:text-orange-700 hover:file:bg-orange-100" %>
+          <p class="mt-1 text-xs text-slate-400">MP3, WAV, OGG. Max 50MB each</p>
+        </div>
+
+        <% if @post.audio_files.attached? %>
+          <div class="space-y-2">
+            <% @post.audio_files.each do |audio| %>
+              <div class="flex items-center justify-between bg-slate-50 rounded p-2" id="attachment_<%= audio.id %>">
+                <span class="text-xs text-slate-600 truncate flex-1"><%= audio.filename %></span>
+                <%= button_to purge_attachment_admin_blog_post_path(@post, attachment_id: audio.id),
+                    method: :delete,
+                    class: "text-red-500 hover:text-red-700 ml-2",
+                    data: { turbo_confirm: "Remove this audio file?" } do %>
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
+      </div>
+
+      <%# Documents %>
+      <div class="space-y-4">
+        <div>
+          <h4 class="text-sm font-medium text-slate-700 flex items-center gap-2">
+            <svg class="h-5 w-5 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+            </svg>
+            Documents
+          </h4>
+          <%= f.file_field :documents,
+              multiple: true,
+              accept: ".pdf,.doc,.docx,.xls,.xlsx,.ppt,.pptx,.txt,.csv",
+              class: "mt-2 block w-full text-sm text-slate-500 file:mr-2 file:py-1 file:px-3 file:rounded-md file:border-0 file:text-xs file:font-medium file:bg-blue-50 file:text-blue-700 hover:file:bg-blue-100" %>
+          <p class="mt-1 text-xs text-slate-400">PDF, Word, Excel, etc.</p>
+        </div>
+
+        <% if @post.documents.attached? %>
+          <div class="space-y-2">
+            <% @post.documents.each do |doc| %>
+              <div class="flex items-center justify-between bg-slate-50 rounded p-2" id="attachment_<%= doc.id %>">
+                <span class="text-xs text-slate-600 truncate flex-1"><%= doc.filename %></span>
+                <%= button_to purge_attachment_admin_blog_post_path(@post, attachment_id: doc.id),
+                    method: :delete,
+                    class: "text-red-500 hover:text-red-700 ml-2",
+                    data: { turbo_confirm: "Remove this document?" } do %>
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                  </svg>
+                <% end %>
+              </div>
+            <% end %>
+          </div>
+        <% end %>
       </div>
     </div>
   </div>

@@ -5,7 +5,7 @@ module Admin
     class PostsController < Admin::BaseController
       include Pagy::Backend
 
-      before_action :set_post, only: [:show, :edit, :update, :destroy]
+      before_action :set_post, only: [:show, :edit, :update, :destroy, :purge_attachment]
       before_action :load_form_resources, only: [:new, :edit, :create, :update]
 
       def index
@@ -50,6 +50,20 @@ module Admin
         redirect_to admin_blog_posts_path, notice: "Post was successfully deleted."
       end
 
+      def purge_attachment
+        attachment = ActiveStorage::Attachment.find(params[:attachment_id])
+
+        if attachment.record == @post
+          attachment.purge_later
+          respond_to do |format|
+            format.html { redirect_to edit_admin_blog_post_path(@post), notice: "Attachment removed." }
+            format.turbo_stream { render turbo_stream: turbo_stream.remove("attachment_#{attachment.id}") }
+          end
+        else
+          redirect_to edit_admin_blog_post_path(@post), alert: "Unable to remove attachment."
+        end
+      end
+
       private
 
       def set_post
@@ -66,7 +80,8 @@ module Admin
           :title, :slug, :content, :excerpt,
           :meta_title, :meta_description, :meta_keywords,
           :featured_image_url, :blog_category_id,
-          :status, :published_at, :featured, :allow_comments
+          :status, :published_at, :featured, :allow_comments,
+          :featured_image, images: [], videos: [], audio_files: [], documents: []
         )
       end
 

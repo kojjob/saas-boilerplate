@@ -1,6 +1,9 @@
 class BlogPost < ApplicationRecord
   # Constants
   WORDS_PER_MINUTE = 200
+  ALLOWED_IMAGE_TYPES = %w[image/jpeg image/png image/gif image/webp].freeze
+  ALLOWED_VIDEO_TYPES = %w[video/mp4 video/webm video/quicktime].freeze
+  ALLOWED_AUDIO_TYPES = %w[audio/mpeg audio/wav audio/ogg audio/mp4].freeze
 
   # Associations
   belongs_to :author, class_name: 'User'
@@ -10,6 +13,24 @@ class BlogPost < ApplicationRecord
 
   # Alias for convenience in views
   alias_method :tags, :blog_tags
+
+  # Active Storage Attachments
+  has_one_attached :featured_image do |attachable|
+    attachable.variant :thumb, resize_to_fill: [300, 200]
+    attachable.variant :medium, resize_to_fill: [600, 400]
+    attachable.variant :large, resize_to_fill: [1200, 800]
+    attachable.variant :social, resize_to_fill: [1200, 630] # Open Graph
+  end
+
+  has_many_attached :images do |attachable|
+    attachable.variant :thumb, resize_to_fill: [150, 150]
+    attachable.variant :medium, resize_to_limit: [800, 600]
+    attachable.variant :large, resize_to_limit: [1400, 1050]
+  end
+
+  has_many_attached :videos
+  has_many_attached :audio_files
+  has_many_attached :documents
 
   # Enums
   enum :status, { draft: 0, published: 1, scheduled: 2, archived: 3 }
@@ -21,6 +42,20 @@ class BlogPost < ApplicationRecord
   validates :meta_title, length: { maximum: 70 }, allow_blank: true
   validates :meta_description, length: { maximum: 160 }, allow_blank: true
   validates :excerpt, length: { maximum: 500 }, allow_blank: true
+
+  # Media validations
+  validates :featured_image, content_type: ALLOWED_IMAGE_TYPES,
+                             size: { less_than: 10.megabytes },
+                             if: -> { featured_image.attached? }
+  validates :images, content_type: ALLOWED_IMAGE_TYPES,
+                     size: { less_than: 10.megabytes },
+                     if: -> { images.attached? }
+  validates :videos, content_type: ALLOWED_VIDEO_TYPES,
+                     size: { less_than: 100.megabytes },
+                     if: -> { videos.attached? }
+  validates :audio_files, content_type: ALLOWED_AUDIO_TYPES,
+                          size: { less_than: 50.megabytes },
+                          if: -> { audio_files.attached? }
 
   # Callbacks
   before_validation :generate_slug, if: -> { slug.blank? && title.present? }
@@ -73,6 +108,35 @@ class BlogPost < ApplicationRecord
             .where('published_at > ?', published_at)
             .order(published_at: :asc)
             .first
+  end
+
+  # Media helper methods
+  def has_featured_image?
+    featured_image.attached?
+  end
+
+  def has_media?
+    images.attached? || videos.attached? || audio_files.attached? || documents.attached?
+  end
+
+  def media_count
+    images.count + videos.count + audio_files.count + documents.count
+  end
+
+  def purge_image(image_id)
+    images.find(image_id).purge_later
+  end
+
+  def purge_video(video_id)
+    videos.find(video_id).purge_later
+  end
+
+  def purge_audio(audio_id)
+    audio_files.find(audio_id).purge_later
+  end
+
+  def purge_document(document_id)
+    documents.find(document_id).purge_later
   end
 
   private

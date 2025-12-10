@@ -267,7 +267,11 @@ Rails.application.routes.draw do
   # ==================================
   namespace :admin do
     namespace :blog do
-      resources :posts
+      resources :posts do
+        member do
+          delete :purge_attachment
+        end
+      end
       resources :categories
       resources :tags
     end
