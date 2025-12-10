@@ -1,0 +1,135 @@
+<% content_for :title, "#{@project.name} - #{@client.display_name}" %>
+
+<div class="space-y-6">
+  <div class="flex items-center justify-between">
+    <%= link_to portal_projects_path(token: @client.portal_token), class: "inline-flex items-center text-sm text-slate-600 hover:text-slate-800" do %>
+      <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+      </svg>
+      Back to Projects
+    <% end %>
+  </div>
+
+  <div class="bg-white rounded-lg shadow-sm border border-slate-200 overflow-hidden">
+    <div class="px-6 py-5 border-b border-slate-200">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-2xl font-bold text-slate-900"><%= @project.name %></h1>
+          <% if @project.start_date.present? %>
+            <p class="mt-1 text-sm text-slate-600">
+              Started on <%= @project.start_date.strftime("%B %d, %Y") %>
+              <% if @project.end_date.present? %>
+                - Completed <%= @project.end_date.strftime("%B %d, %Y") %>
+              <% end %>
+            </p>
+          <% end %>
+        </div>
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium
+          <%= case @project.status.to_sym
+              when :draft then 'bg-slate-100 text-slate-800'
+              when :active then 'bg-blue-100 text-blue-800'
+              when :on_hold then 'bg-yellow-100 text-yellow-800'
+              when :completed then 'bg-green-100 text-green-800'
+              when :cancelled then 'bg-red-100 text-red-800'
+              else 'bg-slate-100 text-slate-800'
+              end %>">
+          <%= @project.status.humanize %>
+        </span>
+      </div>
+    </div>
+
+    <% if @project.description.present? %>
+      <div class="px-6 py-5 border-b border-slate-200">
+        <h3 class="text-sm font-medium text-slate-500 uppercase tracking-wider mb-2">Description</h3>
+        <p class="text-slate-700"><%= @project.description %></p>
+      </div>
+    <% end %>
+
+    <div class="px-6 py-5 grid grid-cols-2 md:grid-cols-4 gap-6">
+      <div>
+        <p class="text-sm text-slate-500">Budget</p>
+        <p class="mt-1 text-lg font-semibold text-slate-900">
+          <%= @project.budget.present? && @project.budget > 0 ? number_to_currency(@project.budget) : "-" %>
+        </p>
+      </div>
+      <div>
+        <p class="text-sm text-slate-500">Invoices</p>
+        <p class="mt-1 text-lg font-semibold text-slate-900"><%= @invoices.count %></p>
+      </div>
+      <div>
+        <p class="text-sm text-slate-500">Total Invoiced</p>
+        <p class="mt-1 text-lg font-semibold text-slate-900"><%= number_to_currency(@invoices.sum(:total_amount)) %></p>
+      </div>
+      <div>
+        <p class="text-sm text-slate-500">Total Paid</p>
+        <p class="mt-1 text-lg font-semibold text-green-600"><%= number_to_currency(@invoices.paid.sum(:total_amount)) %></p>
+      </div>
+    </div>
+  </div>
+
+  <% if @invoices.any? %>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200">
+      <div class="px-6 py-4 border-b border-slate-200">
+        <h2 class="text-lg font-semibold text-slate-900">Project Invoices</h2>
+      </div>
+      <div class="overflow-x-auto">
+        <table class="min-w-full divide-y divide-slate-200">
+          <thead class="bg-slate-50">
+            <tr>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Invoice #</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Date</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Amount</th>
+              <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-slate-500 uppercase tracking-wider">Status</th>
+              <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-slate-500 uppercase tracking-wider">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="bg-white divide-y divide-slate-200">
+            <% @invoices.each do |invoice| %>
+              <tr class="hover:bg-slate-50 transition-colors">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <%= link_to portal_invoice_path(token: @client.portal_token, id: invoice.id), class: "font-medium text-indigo-600 hover:text-indigo-800" do %>
+                    <%= invoice.invoice_number %>
+                  <% end %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600">
+                  <%= invoice.issue_date&.strftime("%b %d, %Y") %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-slate-900">
+                  <%= number_to_currency(invoice.total_amount) %>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium
+                    <%= case invoice.status.to_sym
+                        when :draft then 'bg-slate-100 text-slate-800'
+                        when :sent then 'bg-blue-100 text-blue-800'
+                        when :viewed then 'bg-yellow-100 text-yellow-800'
+                        when :paid then 'bg-green-100 text-green-800'
+                        when :overdue then 'bg-red-100 text-red-800'
+                        when :cancelled then 'bg-slate-100 text-slate-800'
+                        else 'bg-slate-100 text-slate-800'
+                        end %>">
+                    <%= invoice.status.humanize %>
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+                  <div class="flex items-center justify-end space-x-3">
+                    <%= link_to portal_invoice_path(token: @client.portal_token, id: invoice.id), class: "text-indigo-600 hover:text-indigo-800" do %>
+                      View
+                    <% end %>
+                    <%= link_to portal_download_invoice_path(token: @client.portal_token, id: invoice.id), class: "text-slate-600 hover:text-slate-800" do %>
+                      Download
+                    <% end %>
+                  </div>
+                </td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="bg-white rounded-lg shadow-sm border border-slate-200 px-6 py-8 text-center">
+      <p class="text-slate-500">No invoices for this project yet.</p>
+    </div>
+  <% end %>
+</div>

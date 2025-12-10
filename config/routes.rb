@@ -80,6 +80,22 @@ Rails.application.routes.draw do
   get "pay/:payment_token/cancel", to: "invoice_payments#cancel", as: :pay_invoice_cancel
 
   # ==================================
+  # Client Portal (Token-Based Access)
+  # ==================================
+  # Public routes for clients to view their invoices, estimates, and projects
+  scope :portal, as: :portal do
+    get ":token", to: "portal#dashboard", as: :dashboard
+    get ":token/invoices", to: "portal#invoices", as: :invoices
+    get ":token/invoices/:id", to: "portal#show_invoice", as: :invoice
+    get ":token/invoices/:id/download", to: "portal#download_invoice", as: :download_invoice
+    get ":token/estimates", to: "portal#estimates", as: :estimates
+    get ":token/estimates/:id", to: "portal#show_estimate", as: :estimate
+    get ":token/estimates/:id/download", to: "portal#download_estimate", as: :download_estimate
+    get ":token/projects", to: "portal#projects", as: :projects
+    get ":token/projects/:id", to: "portal#show_project", as: :project
+  end
+
+  # ==================================
   # API V1 Routes
   # ==================================
   namespace :api do
