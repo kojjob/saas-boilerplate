@@ -112,6 +112,14 @@ RSpec.describe InvoiceMailer, type: :mailer do
       expect(mail.body.encoded).to include(invoice.total_amount.to_s).or include(ActionController::Base.helpers.number_to_currency(invoice.total_amount))
     end
 
+    it "includes client name" do
+      expect(mail.body.encoded).to include(client.name)
+    end
+
+    it "includes account name" do
+      expect(mail.body.encoded).to include(account.name)
+    end
+
     context "when invoice is overdue" do
       let(:invoice) { create(:invoice, :overdue, account: account, client: client) }
 
@@ -121,6 +129,29 @@ RSpec.describe InvoiceMailer, type: :mailer do
 
       it "includes days overdue in the body" do
         expect(mail.body.encoded).to include(invoice.days_overdue.to_s)
+      end
+
+      it "includes overdue messaging" do
+        expect(mail.body.encoded).to match(/overdue|past due/i)
+      end
+    end
+
+    context "when invoice is due soon" do
+      let(:invoice) do
+        create(:invoice, :sent,
+          account: account,
+          client: client,
+          due_date: 2.days.from_now,
+          issue_date: Date.current
+        )
+      end
+
+      it "includes upcoming due date messaging" do
+        expect(mail.body.encoded).to match(/due soon|due in/i)
+      end
+
+      it "mentions due soon in subject" do
+        expect(mail.subject).to match(/due soon/i)
       end
     end
   end

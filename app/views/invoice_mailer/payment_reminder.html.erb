@@ -88,10 +88,10 @@
 
   <% if @is_overdue %>
     <div class="overdue-badge">Overdue</div>
-    <p>This is a reminder that payment for Invoice <%= @invoice.invoice_number %> is now <strong><%= @invoice.days_overdue %> days overdue</strong>.</p>
+    <p>This is a reminder that payment for Invoice <%= @invoice.invoice_number %> is now <strong><%= @days_overdue %> days overdue</strong>.</p>
   <% else %>
     <div class="reminder-badge">Payment Due Soon</div>
-    <p>This is a friendly reminder that payment for the following invoice is due soon.</p>
+    <p>This is a friendly reminder that payment for the following invoice is due in <strong><%= @days_until_due %> days</strong>.</p>
   <% end %>
 
   <div class="invoice-details <%= 'overdue' if @is_overdue %>">
@@ -111,7 +111,7 @@
       <% if @is_overdue %>
         <tr>
           <td class="label">Days Overdue:</td>
-          <td><strong><%= @invoice.days_overdue %> days</strong></td>
+          <td><strong><%= @days_overdue %> days</strong></td>
         </tr>
       <% end %>
       <tr>
