@@ -4,14 +4,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Project Overview
 
-**Subcontractor Command** - A vertical SaaS platform for subcontractors in skilled trades (plumbers, electricians, HVAC, etc.) built with Ruby on Rails 8.
+**SoloBiz** - An all-in-one invoicing, accounting, and project tracking platform for freelancers and small business owners, built with Ruby on Rails 8.
+
+**Target Market:** Freelancers earning $2k-20k/month who are frustrated with using 3+ separate tools
 
 **Core Features:**
-- Invoice creation & tracking with payment status
-- Project management dashboard
-- Client communication hub (SMS, email, in-app)
-- Document storage (contracts, photos, receipts)
-- Time & materials logging
+- Invoice creation & tracking with online payments (Stripe)
+- Multi-currency support (19 currencies)
+- Expense tracking with receipt photo uploads
+- Recurring invoices (auto-generate on schedule)
+- Project management & time tracking
+- Client management with portal access
+- Financial dashboard & reports
+- Accountant export (year-end data bundle)
 
 **Tech Stack:**
 - Rails 8.0+ with Ruby 3.3+
@@ -22,6 +27,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Solid Queue (background jobs)
 - Solid Cable (WebSockets)
 - Kamal 2.0 for deployment
+
+**See PRD.md for comprehensive product requirements, feature specifications, and go-to-market strategy.**
 
 ## Development Workflow
 
@@ -55,7 +62,7 @@ bin/rails console
 rails generate migration AddStatusToProjects status:integer
 
 # Generate model with tests
-rails generate model Client user:references name:string email:string
+rails generate model Client account:references name:string email:string
 ```
 
 ### Git Workflow (TDD Required)
@@ -82,6 +89,26 @@ git push -u origin feature/mark-invoice-paid
 ```
 
 ## Architecture Patterns
+
+### Multi-Tenant Architecture
+
+SoloBiz uses account-based multi-tenancy. All business data belongs to an Account, and Users access data through Memberships.
+
+```ruby
+# All business models belong to Account
+class Invoice < ApplicationRecord
+  belongs_to :account
+  belongs_to :client
+  # ...
+end
+
+# Controllers scope queries to current_account
+class InvoicesController < ApplicationController
+  def index
+    @invoices = current_account.invoices.includes(:client)
+  end
+end
+```
 
 ### Service Objects (Complex Business Logic)
 
@@ -121,6 +148,35 @@ class InvoiceSender
 end
 ```
 
+### Shared Concerns
+
+Common functionality is extracted into concerns for reuse across models.
+
+```ruby
+# app/models/concerns/currency_support.rb
+module CurrencySupport
+  extend ActiveSupport::Concern
+
+  SUPPORTED_CURRENCIES = %w[USD EUR GBP CAD AUD NZD CHF JPY CNY INR BRL MXN SGD HKD SEK NOK DKK PLN ZAR].freeze
+
+  class_methods do
+    def validates_currency(attribute, options = {})
+      validates attribute, inclusion: { in: SUPPORTED_CURRENCIES }, allow_nil: options[:allow_nil]
+    end
+  end
+
+  def format_currency(amount, currency_code = nil)
+    # Formats with proper symbol and thousands separator
+  end
+end
+
+# Usage in models
+class Invoice < ApplicationRecord
+  include CurrencySupport
+  validates_currency :currency
+end
+```
+
 ### ViewComponent (Reusable UI)
 
 ```ruby
@@ -148,16 +204,16 @@ end
 # app/policies/invoice_policy.rb
 class InvoicePolicy < ApplicationPolicy
   def update?
-    record.user == user && !record.paid?
+    record.account == user.current_account && !record.paid?
   end
 
   def destroy?
-    record.user == user && record.draft?
+    record.account == user.current_account && record.draft?
   end
 
   class Scope < Scope
     def resolve
-      scope.where(user: user)
+      scope.where(account: user.current_account)
     end
   end
 end
@@ -166,35 +222,61 @@ end
 ## Core Models & Associations
 
 ```ruby
-User
+Account
+├── has_many :memberships
+├── has_many :users, through: :memberships
 ├── has_many :clients
 ├── has_many :projects
 ├── has_many :invoices
-├── has_many :messages
+├── has_many :expenses
+├── has_many :recurring_invoices
 ├── has_many :documents
 ├── has_many :time_entries
-└── has_many :material_entries
+└── default_currency (string, default: "USD")
+
+User
+├── has_many :memberships
+├── has_many :accounts, through: :memberships
+└── current_account (via session/context)
 
 Client
-├── belongs_to :user
+├── belongs_to :account
 ├── has_many :projects
 ├── has_many :invoices
-└── has_many :messages
+├── has_many :expenses
+├── preferred_currency (string, optional)
+└── portal_token (for client portal access)
 
 Project
-├── belongs_to :user
+├── belongs_to :account
 ├── belongs_to :client
 ├── has_many :invoices
-├── has_many :messages
-├── has_many :documents
 ├── has_many :time_entries
-└── has_many :material_entries
+├── has_many :expenses
+└── has_many :documents
 
 Invoice
-├── belongs_to :user
+├── belongs_to :account
 ├── belongs_to :client
 ├── belongs_to :project (optional)
-└── has_many :line_items
+├── has_many :line_items
+├── currency (string, default: "USD")
+└── payment_token (for secure payment links)
+
+Expense
+├── belongs_to :account
+├── belongs_to :client (optional)
+├── belongs_to :project (optional)
+├── has_one_attached :receipt
+├── category (enum)
+└── billable (boolean)
+
+RecurringInvoice
+├── belongs_to :account
+├── belongs_to :client
+├── has_many :invoices
+├── frequency (enum: weekly, biweekly, monthly, quarterly, annually)
+└── status (enum: active, paused, cancelled)
 ```
 
 **Key Model Methods:**
@@ -202,12 +284,17 @@ Invoice
 # Invoice
 invoice.mark_as_paid!(payment_date:, payment_method:)
 invoice.days_overdue  # Returns integer
-invoice.calculate_totals  # Before save callback
+invoice.formatted_total  # Returns "$1,234.56"
+invoice.inherit_currency_from_client!  # Sets currency from client/account
 
-# Project
-project.total_time_cost
-project.total_materials_cost
-project.total_project_cost
+# Account
+account.default_currency  # Returns "USD" or configured currency
+account.within_limit?(:invoices, current_count)  # Plan limit check
+
+# Client
+client.preferred_currency  # Optional currency override
+client.total_revenue  # Sum of paid invoices
+client.outstanding_balance  # Sum of unpaid invoices
 ```
 
 ## Hotwire Best Practices
@@ -249,7 +336,7 @@ export default class extends Controller {
 ```
 spec/
 ├── models/              # Unit tests
-├── controllers/         # Request specs
+├── requests/            # Request/controller specs
 ├── system/              # End-to-end (Capybara)
 ├── services/            # Service object tests
 ├── components/          # ViewComponent tests
@@ -262,10 +349,11 @@ spec/
 # spec/factories/invoices.rb
 FactoryBot.define do
   factory :invoice do
-    association :user
+    association :account
     association :client
-    invoice_number { Faker::Number.unique.number(digits: 5).to_s }
+    invoice_number { "INV-#{Faker::Number.unique.number(digits: 5)}" }
     status { :draft }
+    currency { "USD" }
     issue_date { Date.today }
     due_date { Date.today + 30.days }
     subtotal { 1000.00 }
@@ -279,6 +367,10 @@ FactoryBot.define do
     trait :paid do
       status { :paid }
       paid_at { Time.current }
+    end
+
+    trait :in_euros do
+      currency { "EUR" }
     end
   end
 end
@@ -300,6 +392,21 @@ RSpec.describe Invoice, type: :model do
     it 'sets paid_at timestamp' do
       invoice.mark_as_paid!
       expect(invoice.paid_at).to be_present
+    end
+  end
+
+  describe 'currency' do
+    it 'defaults to USD' do
+      invoice = build(:invoice, currency: nil)
+      invoice.valid?
+      expect(invoice.currency).to eq('USD')
+    end
+
+    it 'inherits from client preferred currency' do
+      client = create(:client, preferred_currency: 'EUR')
+      invoice = build(:invoice, client: client, currency: nil)
+      invoice.valid?
+      expect(invoice.currency).to eq('EUR')
     end
   end
 end
@@ -338,12 +445,18 @@ class InvoiceReminderJob < ApplicationJob
   def perform(invoice)
     return unless invoice.unpaid?
 
-    message = "Reminder: Invoice ##{invoice.invoice_number} for $#{invoice.total_amount} is due on #{invoice.due_date.strftime('%m/%d/%Y')}."
+    InvoiceMailer.payment_reminder(invoice).deliver_now
+  end
+end
 
-    SmsSender.new(
-      to: invoice.client.phone_number,
-      body: message
-    ).send
+# app/jobs/generate_recurring_invoices_job.rb
+class GenerateRecurringInvoicesJob < ApplicationJob
+  queue_as :default
+
+  def perform
+    RecurringInvoice.active.due_today.find_each do |recurring|
+      RecurringInvoiceService.new(recurring).generate_invoice!
+    end
   end
 end
 
@@ -353,30 +466,31 @@ InvoiceReminderJob.perform_later(@invoice)
 
 ## Code Quality Standards
 
-1. **Test-Driven Development**: Write tests before implementation
+1. **Test-Driven Development**: Write tests before implementation (Red-Green-Refactor)
 2. **Rails Conventions**: Follow RESTful routes, MVC pattern, ActiveRecord associations
 3. **Mobile-First**: Use Tailwind responsive classes, optimize for touch
 4. **Security**: Always use Pundit for authorization, sanitize inputs, strong parameters
 5. **Performance**: Use database indexes, implement caching, avoid N+1 queries
-6. **Simplicity**: Target users have low tech savvy - keep UI intuitive and fast
+6. **Simplicity**: Target users value ease-of-use - keep UI intuitive and fast
 
 ## Common Patterns
 
 ### Avoid N+1 Queries
 ```ruby
 # Bad - N+1 queries
-@invoices = Invoice.all
+@invoices = current_account.invoices
 @invoices.each { |i| puts i.client.name }
 
 # Good - Single query
-@invoices = Invoice.includes(:client).all
+@invoices = current_account.invoices.includes(:client)
 @invoices.each { |i| puts i.client.name }
 ```
 
 ### Proper Error Handling
 ```ruby
 def create
-  @invoice = current_user.invoices.build(invoice_params)
+  @invoice = current_account.invoices.build(invoice_params)
+  @invoice.client = current_account.clients.find(params[:invoice][:client_id])
 
   if @invoice.save
     redirect_to @invoice, notice: 'Invoice created successfully.'
@@ -391,19 +505,43 @@ end
 # app/models/invoice.rb
 scope :unpaid, -> { where(status: [:sent, :viewed, :overdue]) }
 scope :overdue, -> { where("due_date < ? AND status NOT IN (?)", Date.today, [:paid]) }
+scope :recent, -> { order(created_at: :desc) }
 
 # Usage
-Invoice.unpaid.overdue.count
+current_account.invoices.unpaid.overdue.count
+```
+
+### Currency Cascade Logic
+```ruby
+# Invoice currency inheritance priority:
+# 1. Explicitly set currency on invoice
+# 2. Client's preferred_currency (if set)
+# 3. Account's default_currency
+# 4. Fallback to "USD"
+
+def set_default_currency
+  return if currency.present?
+  self.currency = client&.preferred_currency || account&.default_currency || "USD"
+end
 ```
 
 ## Project-Specific Notes
 
-- **Target Users**: Solo subcontractors with low-moderate tech skills
+- **Target Users**: Freelancers and solopreneurs ($2k-20k/month revenue)
 - **Priority**: Simplicity and speed over advanced features
 - **UUID Primary Keys**: All tables use UUIDs instead of integers
+- **Multi-Tenant**: All data scoped to Account
 - **File Storage**: AWS S3 for documents/receipts (25MB max per file)
-- **SMS Integration**: Twilio for client communications
+- **Payments**: Stripe for online invoice payments
 - **Payment Terms**: Default "Net 30", customizable per invoice
-- **Invoice Numbering**: Auto-generated sequential (e.g., 10001, 10002)
+- **Invoice Numbering**: Auto-generated sequential (e.g., INV-10001, INV-10002)
+- **Currencies**: 19 supported currencies with proper symbol formatting
 
-See TradeDesk/CLAUDE.md and TradeDesk/PRD.md for comprehensive architecture details and product requirements.
+## Key Files Reference
+
+- **PRD.md**: Complete product requirements and go-to-market strategy
+- **app/models/concerns/currency_support.rb**: Multi-currency formatting and validation
+- **app/services/**: Business logic services (InvoiceSender, RecurringInvoiceService, etc.)
+- **app/policies/**: Pundit authorization policies
+- **config/routes.rb**: RESTful routing configuration
+- **db/schema.rb**: Current database schema
