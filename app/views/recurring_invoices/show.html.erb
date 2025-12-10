@@ -1,0 +1,223 @@
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6">
+    <%= link_to recurring_invoices_path, class: "text-blue-600 hover:text-blue-800 text-sm flex items-center" do %>
+      <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Recurring Invoices
+    <% end %>
+  </div>
+
+  <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+    <div class="px-4 py-5 sm:px-6 flex justify-between items-start">
+      <div>
+        <h3 class="text-lg leading-6 font-medium text-gray-900">
+          <%= @recurring_invoice.name %>
+        </h3>
+        <p class="mt-1 max-w-2xl text-sm text-gray-500">
+          <%= @recurring_invoice.client.name %>
+        </p>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span class="inline-flex items-center px-3 py-0.5 rounded-full text-sm font-medium <%= status_badge_class(@recurring_invoice.status) %>">
+          <%= @recurring_invoice.status.humanize %>
+        </span>
+        <% if @recurring_invoice.active? %>
+          <%= button_to pause_recurring_invoice_path(@recurring_invoice), method: :post, class: "inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+            Pause
+          <% end %>
+        <% elsif @recurring_invoice.paused? %>
+          <%= button_to resume_recurring_invoice_path(@recurring_invoice), method: :post, class: "inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50" do %>
+            Resume
+          <% end %>
+        <% end %>
+        <% if !@recurring_invoice.cancelled? && !@recurring_invoice.completed? %>
+          <%= button_to cancel_recurring_invoice_path(@recurring_invoice), method: :post, data: { confirm: "Are you sure you want to cancel this recurring invoice?" }, class: "inline-flex items-center px-3 py-1.5 border border-red-300 shadow-sm text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50" do %>
+            Cancel
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+    <div class="border-t border-gray-200">
+      <dl>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Frequency</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @recurring_invoice.frequency.humanize %>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Next Invoice Date</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <% if @recurring_invoice.next_occurrence_date %>
+              <%= @recurring_invoice.next_occurrence_date.strftime("%B %d, %Y") %>
+              <% if @recurring_invoice.active? && @recurring_invoice.can_generate? %>
+                <%= button_to generate_now_recurring_invoice_path(@recurring_invoice), method: :post, class: "ml-4 inline-flex items-center px-2.5 py-1 border border-transparent text-xs font-medium rounded text-blue-700 bg-blue-100 hover:bg-blue-200" do %>
+                  Generate Now
+                <% end %>
+              <% end %>
+            <% else %>
+              Not scheduled
+            <% end %>
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Start Date</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @recurring_invoice.start_date.strftime("%B %d, %Y") %>
+          </dd>
+        </div>
+        <% if @recurring_invoice.end_date %>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">End Date</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= @recurring_invoice.end_date.strftime("%B %d, %Y") %>
+            </dd>
+          </div>
+        <% end %>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Invoices Generated</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @recurring_invoice.occurrences_count %>
+            <% if @recurring_invoice.occurrences_limit %>
+              of <%= @recurring_invoice.occurrences_limit %>
+            <% end %>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Payment Terms</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            Net <%= @recurring_invoice.payment_terms %> days
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Currency</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= @recurring_invoice.currency %>
+          </dd>
+        </div>
+        <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Tax Rate</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <%= number_to_percentage(@recurring_invoice.tax_rate, precision: 2) %>
+          </dd>
+        </div>
+        <div class="bg-gray-50 px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+          <dt class="text-sm font-medium text-gray-500">Auto-Send</dt>
+          <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+            <% if @recurring_invoice.auto_send? %>
+              <span class="text-green-600">Enabled</span>
+            <% else %>
+              <span class="text-gray-500">Disabled</span>
+            <% end %>
+          </dd>
+        </div>
+        <% if @recurring_invoice.notes.present? %>
+          <div class="bg-white px-4 py-5 sm:grid sm:grid-cols-3 sm:gap-4 sm:px-6">
+            <dt class="text-sm font-medium text-gray-500">Notes</dt>
+            <dd class="mt-1 text-sm text-gray-900 sm:mt-0 sm:col-span-2">
+              <%= simple_format(@recurring_invoice.notes) %>
+            </dd>
+          </div>
+        <% end %>
+      </dl>
+    </div>
+  </div>
+
+  <div class="mt-8">
+    <h4 class="text-lg font-medium text-gray-900 mb-4">Line Items</h4>
+    <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead class="bg-gray-50">
+          <tr>
+            <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Description</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Quantity</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Unit Price</th>
+            <th scope="col" class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Amount</th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          <% @recurring_invoice.line_items.each do |item| %>
+            <tr>
+              <td class="px-6 py-4 text-sm text-gray-900"><%= item.description %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 text-right"><%= number_with_precision(item.quantity, precision: 2) %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 text-right"><%= number_to_currency(item.unit_price, unit: currency_symbol(@recurring_invoice.currency)) %></td>
+              <td class="px-6 py-4 text-sm text-gray-900 text-right"><%= number_to_currency(item.amount, unit: currency_symbol(@recurring_invoice.currency)) %></td>
+            </tr>
+          <% end %>
+        </tbody>
+        <tfoot class="bg-gray-50">
+          <tr>
+            <td colspan="3" class="px-6 py-3 text-sm font-medium text-gray-900 text-right">Subtotal</td>
+            <td class="px-6 py-3 text-sm font-medium text-gray-900 text-right">
+              <%= number_to_currency(@recurring_invoice.line_items.sum(&:amount), unit: currency_symbol(@recurring_invoice.currency)) %>
+            </td>
+          </tr>
+          <% if @recurring_invoice.tax_rate.to_f > 0 %>
+            <tr>
+              <td colspan="3" class="px-6 py-3 text-sm text-gray-500 text-right">Tax (<%= number_to_percentage(@recurring_invoice.tax_rate, precision: 2) %>)</td>
+              <td class="px-6 py-3 text-sm text-gray-500 text-right">
+                <% subtotal = @recurring_invoice.line_items.sum(&:amount) %>
+                <%= number_to_currency(subtotal * (@recurring_invoice.tax_rate / 100), unit: currency_symbol(@recurring_invoice.currency)) %>
+              </td>
+            </tr>
+            <tr>
+              <td colspan="3" class="px-6 py-3 text-sm font-bold text-gray-900 text-right">Total</td>
+              <td class="px-6 py-3 text-sm font-bold text-gray-900 text-right">
+                <% subtotal = @recurring_invoice.line_items.sum(&:amount) %>
+                <% tax = subtotal * (@recurring_invoice.tax_rate / 100) %>
+                <%= number_to_currency(subtotal + tax, unit: currency_symbol(@recurring_invoice.currency)) %>
+              </td>
+            </tr>
+          <% end %>
+        </tfoot>
+      </table>
+    </div>
+  </div>
+
+  <% if @generated_invoices.any? %>
+    <div class="mt-8">
+      <h4 class="text-lg font-medium text-gray-900 mb-4">Generated Invoices</h4>
+      <div class="bg-white shadow overflow-hidden sm:rounded-lg">
+        <ul role="list" class="divide-y divide-gray-200">
+          <% @generated_invoices.each do |invoice| %>
+            <li>
+              <%= link_to invoice_path(invoice), class: "block hover:bg-gray-50 px-4 py-4" do %>
+                <div class="flex items-center justify-between">
+                  <div>
+                    <span class="text-sm font-medium text-blue-600"><%= invoice.invoice_number %></span>
+                    <span class="ml-2 text-sm text-gray-500"><%= invoice.issue_date.strftime("%b %d, %Y") %></span>
+                  </div>
+                  <div class="flex items-center">
+                    <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium <%= status_badge_class(invoice.status) %>">
+                      <%= invoice.status.humanize %>
+                    </span>
+                    <span class="ml-4 text-sm font-medium text-gray-900">
+                      <%= number_to_currency(invoice.total_amount, unit: currency_symbol(invoice.currency)) %>
+                    </span>
+                  </div>
+                </div>
+              <% end %>
+            </li>
+          <% end %>
+        </ul>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="mt-8 flex justify-between">
+    <%= link_to edit_recurring_invoice_path(@recurring_invoice), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" do %>
+      <svg class="-ml-1 mr-2 h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+      </svg>
+      Edit
+    <% end %>
+
+    <%= button_to recurring_invoice_path(@recurring_invoice), method: :delete, data: { confirm: "Are you sure? This will delete the recurring invoice but not any already generated invoices." }, class: "inline-flex items-center px-4 py-2 border border-red-300 rounded-md shadow-sm text-sm font-medium text-red-700 bg-white hover:bg-red-50" do %>
+      <svg class="-ml-1 mr-2 h-5 w-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+      Delete
+    <% end %>
+  </div>
+</div>

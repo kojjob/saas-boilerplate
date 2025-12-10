@@ -1,0 +1,183 @@
+<%= form_with(model: @recurring_invoice, class: "space-y-6") do |form| %>
+  <% if @recurring_invoice.errors.any? %>
+    <div class="bg-red-50 border border-red-200 rounded-md p-4">
+      <div class="flex">
+        <div class="flex-shrink-0">
+          <svg class="h-5 w-5 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+          </svg>
+        </div>
+        <div class="ml-3">
+          <h3 class="text-sm font-medium text-red-800">
+            There were <%= pluralize(@recurring_invoice.errors.count, "error") %> with your submission
+          </h3>
+          <div class="mt-2 text-sm text-red-700">
+            <ul class="list-disc list-inside space-y-1">
+              <% @recurring_invoice.errors.full_messages.each do |message| %>
+                <li><%= message %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+
+  <div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Basic Information</h3>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-2">
+        <div class="col-span-2 sm:col-span-1">
+          <%= form.label :name, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_field :name, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Monthly Retainer" %>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1">
+          <%= form.label :client_id, "Client", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.collection_select :client_id, current_account.clients.order(:name), :id, :name, { prompt: "Select a client" }, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1">
+          <%= form.label :project_id, "Project (Optional)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.collection_select :project_id, current_account.projects.active.order(:name), :id, :name, { include_blank: "No project" }, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div class="col-span-2 sm:col-span-1">
+          <%= form.label :frequency, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :frequency, RecurringInvoice.frequencies.keys.map { |f| [f.humanize, f] }, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Schedule</h3>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div>
+          <%= form.label :start_date, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.date_field :start_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          <p class="mt-1 text-xs text-gray-500">First invoice will be generated on this date</p>
+        </div>
+
+        <div>
+          <%= form.label :end_date, "End Date (Optional)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.date_field :end_date, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          <p class="mt-1 text-xs text-gray-500">Leave blank for no end date</p>
+        </div>
+
+        <div>
+          <%= form.label :occurrences_limit, "Max Occurrences (Optional)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :occurrences_limit, min: 1, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+          <p class="mt-1 text-xs text-gray-500">Leave blank for unlimited</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Invoice Settings</h3>
+
+      <div class="grid grid-cols-1 gap-6 sm:grid-cols-3">
+        <div>
+          <%= form.label :payment_terms, "Payment Terms (Days)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :payment_terms, min: 0, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div>
+          <%= form.label :currency, class: "block text-sm font-medium text-gray-700" %>
+          <%= form.select :currency, currency_options, {}, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div>
+          <%= form.label :tax_rate, "Tax Rate (%)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.number_field :tax_rate, min: 0, max: 100, step: 0.01, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm" %>
+        </div>
+
+        <div class="col-span-3">
+          <%= form.label :notes, "Invoice Notes (Optional)", class: "block text-sm font-medium text-gray-700" %>
+          <%= form.text_area :notes, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Notes that will appear on each generated invoice" %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Line Items</h3>
+
+      <div id="line-items" data-controller="nested-form">
+        <div class="overflow-x-auto">
+          <table class="min-w-full divide-y divide-gray-200">
+            <thead class="bg-gray-50">
+              <tr>
+                <th scope="col" class="px-4 py-3 text-left text-xs font-medium text-gray-500 uppercase">Description</th>
+                <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase w-24">Qty</th>
+                <th scope="col" class="px-4 py-3 text-right text-xs font-medium text-gray-500 uppercase w-32">Unit Price</th>
+                <th scope="col" class="px-4 py-3 w-12"></th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-gray-200" data-nested-form-target="container">
+              <%= form.fields_for :line_items do |item_form| %>
+                <%= render "line_item_fields", form: item_form %>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+
+        <template data-nested-form-target="template">
+          <%= form.fields_for :line_items, RecurringInvoiceLineItem.new, child_index: "NEW_RECORD" do |item_form| %>
+            <%= render "line_item_fields", form: item_form %>
+          <% end %>
+        </template>
+
+        <div class="mt-4">
+          <button type="button" data-action="nested-form#add" class="inline-flex items-center px-3 py-1.5 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <svg class="-ml-1 mr-2 h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            </svg>
+            Add Line Item
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bg-white shadow sm:rounded-lg">
+    <div class="px-4 py-5 sm:p-6">
+      <h3 class="text-lg font-medium leading-6 text-gray-900 mb-4">Auto-Send Settings</h3>
+
+      <div class="space-y-4">
+        <div class="flex items-start">
+          <div class="flex items-center h-5">
+            <%= form.check_box :auto_send, class: "h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded" %>
+          </div>
+          <div class="ml-3">
+            <%= form.label :auto_send, "Automatically send invoices when generated", class: "text-sm font-medium text-gray-700" %>
+            <p class="text-sm text-gray-500">Invoices will be emailed to the client immediately after generation.</p>
+          </div>
+        </div>
+
+        <div id="auto-send-options" class="ml-7 space-y-4">
+          <div>
+            <%= form.label :email_subject, "Email Subject (Optional)", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.text_field :email_subject, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Invoice from Your Company" %>
+          </div>
+
+          <div>
+            <%= form.label :email_body, "Email Message (Optional)", class: "block text-sm font-medium text-gray-700" %>
+            <%= form.text_area :email_body, rows: 3, class: "mt-1 block w-full rounded-md border-gray-300 shadow-sm focus:border-blue-500 focus:ring-blue-500 sm:text-sm", placeholder: "Please find your invoice attached." %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="flex justify-end space-x-3">
+    <%= link_to "Cancel", (@recurring_invoice.persisted? ? recurring_invoice_path(@recurring_invoice) : recurring_invoices_path), class: "inline-flex items-center px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50" %>
+    <%= form.submit(@recurring_invoice.persisted? ? "Update Recurring Invoice" : "Create Recurring Invoice", class: "inline-flex items-center px-4 py-2 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500") %>
+  </div>
+<% end %>

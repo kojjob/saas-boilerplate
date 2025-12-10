@@ -1,0 +1,25 @@
+<tr data-nested-form-target="row" class="nested-fields">
+  <td class="px-4 py-2">
+    <%= form.text_field :description, class: "w-full px-2 py-1.5 border border-gray-200 rounded text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder: "Service description" %>
+  </td>
+  <td class="px-4 py-2">
+    <%= form.number_field :quantity, step: 0.01, min: 0, class: "w-full px-2 py-1.5 border border-gray-200 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder: "1.00" %>
+  </td>
+  <td class="px-4 py-2">
+    <div class="relative">
+      <div class="absolute inset-y-0 left-0 pl-2 flex items-center pointer-events-none">
+        <span class="text-gray-400 text-sm">$</span>
+      </div>
+      <%= form.number_field :unit_price, step: 0.01, min: 0, class: "w-full pl-6 pr-2 py-1.5 border border-gray-200 rounded text-sm text-right focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent", placeholder: "0.00" %>
+    </div>
+  </td>
+  <td class="px-4 py-2 text-center">
+    <%= form.hidden_field :_destroy %>
+    <%= form.hidden_field :position %>
+    <button type="button" data-action="nested-form#remove" class="p-1 text-gray-400 hover:text-red-500 transition-colors">
+      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+      </svg>
+    </button>
+  </td>
+</tr>

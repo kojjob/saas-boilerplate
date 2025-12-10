@@ -256,6 +256,16 @@ Rails.application.routes.draw do
     end
   end
 
+  # Recurring Invoices
+  resources :recurring_invoices do
+    member do
+      post :pause
+      post :resume
+      post :cancel
+      post :generate_now
+    end
+  end
+
   # ==================================
   # Health Check
   # ==================================

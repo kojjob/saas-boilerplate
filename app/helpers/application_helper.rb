@@ -138,6 +138,83 @@ module ApplicationHelper
     end
   end
 
+  # Generic status badge class (for recurring invoices and other entities)
+  def status_badge_class(status)
+    case status.to_s
+    when "active"
+      "bg-green-100 text-green-800"
+    when "paused"
+      "bg-amber-100 text-amber-800"
+    when "cancelled", "canceled"
+      "bg-red-100 text-red-800"
+    when "completed"
+      "bg-blue-100 text-blue-800"
+    when "draft"
+      "bg-slate-100 text-slate-800"
+    when "sent", "pending"
+      "bg-blue-100 text-blue-800"
+    when "paid"
+      "bg-green-100 text-green-800"
+    when "overdue"
+      "bg-red-100 text-red-800"
+    else
+      "bg-slate-100 text-slate-800"
+    end
+  end
+
+  # Currency options for select fields
+  def currency_options
+    [
+      ["USD - US Dollar", "USD"],
+      ["EUR - Euro", "EUR"],
+      ["GBP - British Pound", "GBP"],
+      ["CAD - Canadian Dollar", "CAD"],
+      ["AUD - Australian Dollar", "AUD"],
+      ["JPY - Japanese Yen", "JPY"],
+      ["CHF - Swiss Franc", "CHF"],
+      ["CNY - Chinese Yuan", "CNY"],
+      ["INR - Indian Rupee", "INR"],
+      ["MXN - Mexican Peso", "MXN"],
+      ["BRL - Brazilian Real", "BRL"],
+      ["SGD - Singapore Dollar", "SGD"],
+      ["NZD - New Zealand Dollar", "NZD"],
+      ["HKD - Hong Kong Dollar", "HKD"],
+      ["SEK - Swedish Krona", "SEK"],
+      ["NOK - Norwegian Krone", "NOK"],
+      ["DKK - Danish Krone", "DKK"],
+      ["ZAR - South African Rand", "ZAR"],
+      ["KRW - South Korean Won", "KRW"],
+      ["PLN - Polish Zloty", "PLN"]
+    ]
+  end
+
+  # Currency symbol for display
+  def currency_symbol(currency_code)
+    symbols = {
+      "USD" => "$",
+      "EUR" => "€",
+      "GBP" => "£",
+      "CAD" => "CA$",
+      "AUD" => "A$",
+      "JPY" => "¥",
+      "CHF" => "CHF",
+      "CNY" => "¥",
+      "INR" => "₹",
+      "MXN" => "MX$",
+      "BRL" => "R$",
+      "SGD" => "S$",
+      "NZD" => "NZ$",
+      "HKD" => "HK$",
+      "SEK" => "kr",
+      "NOK" => "kr",
+      "DKK" => "kr",
+      "ZAR" => "R",
+      "KRW" => "₩",
+      "PLN" => "zł"
+    }
+    symbols[currency_code.to_s.upcase] || currency_code.to_s.upcase
+  end
+
   # Sidebar icon SVG helper
   def sidebar_icon(icon_name, is_active = false)
     icon_class = is_active ? "w-5 h-5 text-white" : "w-5 h-5 text-slate-400 group-hover:text-white"

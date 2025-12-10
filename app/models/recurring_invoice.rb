@@ -9,6 +9,7 @@ class RecurringInvoice < ApplicationRecord
   belongs_to :project, optional: true
   has_many :invoices, dependent: :nullify
   has_many :line_items, class_name: "RecurringInvoiceLineItem", dependent: :destroy
+  accepts_nested_attributes_for :line_items, allow_destroy: true, reject_if: :all_blank
 
   # Enums
   enum :frequency, {

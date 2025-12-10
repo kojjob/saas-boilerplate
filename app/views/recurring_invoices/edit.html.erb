@@ -1,0 +1,17 @@
+<div class="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+  <div class="mb-6">
+    <%= link_to recurring_invoice_path(@recurring_invoice), class: "text-blue-600 hover:text-blue-800 text-sm flex items-center" do %>
+      <svg class="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+      </svg>
+      Back to Recurring Invoice
+    <% end %>
+  </div>
+
+  <div class="mb-6">
+    <h1 class="text-2xl font-bold text-gray-900">Edit Recurring Invoice</h1>
+    <p class="mt-1 text-sm text-gray-500">Update the settings for "<%= @recurring_invoice.name %>"</p>
+  </div>
+
+  <%= render "form" %>
+</div>

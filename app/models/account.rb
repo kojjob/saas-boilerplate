@@ -24,6 +24,7 @@ class Account < ApplicationRecord
   has_many :time_entries, dependent: :destroy
   has_many :material_entries, dependent: :destroy
   has_many :expenses, dependent: :destroy
+  has_many :recurring_invoices, dependent: :destroy
 
   # Validations
   validates :name, presence: true, length: { maximum: 100 }
