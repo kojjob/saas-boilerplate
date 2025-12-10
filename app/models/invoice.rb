@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Invoice < ApplicationRecord
+  include Currencyable
+
   # Secure token for payment links
   has_secure_token :payment_token
 
@@ -30,8 +32,12 @@ class Invoice < ApplicationRecord
   validate :client_belongs_to_same_account
   validate :project_belongs_to_same_account
 
+  # Currency validation (uses Currencyable concern)
+  validate_currency_attribute :currency
+
   # Callbacks
   before_validation :set_default_dates, on: :create
+  before_validation :set_default_currency, on: :create
   before_validation :generate_invoice_number, on: :create, if: -> { invoice_number.blank? }
   before_validation :generate_payment_token, on: :create
   before_save :calculate_totals
@@ -112,7 +118,17 @@ class Invoice < ApplicationRecord
     sent? || viewed? || overdue?
   end
 
+  # Returns formatted total amount with currency symbol
+  def formatted_total
+    format_currency(total_amount || 0)
+  end
+
   private
+
+  def set_default_currency
+    return if currency.present?
+    self.currency = client&.effective_currency || account&.default_currency || "USD"
+  end
 
   def default_url_host
     Rails.application.config.action_mailer.default_url_options&.dig(:host) || "localhost:3000"

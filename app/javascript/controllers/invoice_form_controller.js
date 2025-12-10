@@ -1,5 +1,14 @@
 import { Controller } from "@hotwired/stimulus"
 
+// Currency symbol mapping for supported currencies
+const CURRENCY_SYMBOLS = {
+  "USD": "$", "EUR": "€", "GBP": "£", "CAD": "C$", "AUD": "A$",
+  "JPY": "¥", "CHF": "CHF", "NZD": "NZ$", "SEK": "kr", "NOK": "kr",
+  "DKK": "kr", "SGD": "S$", "HKD": "HK$", "MXN": "MX$", "BRL": "R$",
+  "INR": "₹", "ZAR": "R", "PLN": "zł", "CZK": "Kč", "HUF": "Ft",
+  "ILS": "₪", "AED": "د.إ", "SAR": "﷼", "KRW": "₩"
+}
+
 export default class extends Controller {
   static targets = [
     "lineItems",
@@ -9,11 +18,30 @@ export default class extends Controller {
     "taxAmount",
     "discountAmount",
     "discountDisplay",
-    "total"
+    "total",
+    "currency",
+    "currencySymbol"
   ]
 
   connect() {
     this.calculateTotals()
+  }
+
+  updateCurrencySymbol() {
+    const currency = this.hasCurrencyTarget ? this.currencyTarget.value : "USD"
+    const symbol = CURRENCY_SYMBOLS[currency] || "$"
+
+    // Update all currency symbol targets
+    this.currencySymbolTargets.forEach(target => {
+      target.textContent = symbol
+    })
+
+    // Recalculate totals to update formatted amounts
+    this.calculateTotals()
+  }
+
+  get selectedCurrency() {
+    return this.hasCurrencyTarget ? this.currencyTarget.value : "USD"
   }
 
   addLineItem(event) {
@@ -22,6 +50,8 @@ export default class extends Controller {
     const lineItemsContainer = this.lineItemsTarget
     const existingItems = lineItemsContainer.querySelectorAll('[data-invoice-form-target="lineItem"]')
     const newIndex = existingItems.length
+
+    const currencySymbol = CURRENCY_SYMBOLS[this.selectedCurrency] || "$"
 
     const template = `
       <div class="flex items-start gap-3 p-3 bg-slate-50 rounded-lg" data-invoice-form-target="lineItem">
@@ -35,13 +65,13 @@ export default class extends Controller {
           <div class="col-span-4 md:col-span-3">
             <div class="relative">
               <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <span class="text-slate-500 text-sm">$</span>
+                <span class="text-slate-500 text-sm" data-invoice-form-target="currencySymbol">${currencySymbol}</span>
               </div>
               <input type="number" name="invoice[line_items_attributes][${newIndex}][unit_price]" step="0.01" min="0" placeholder="0.00" class="block w-full pl-7 pr-3 py-2 border border-slate-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500" data-action="change->invoice-form#calculateTotals" />
             </div>
           </div>
           <div class="col-span-4 md:col-span-2 flex items-center">
-            <span class="text-sm font-medium text-slate-700" data-invoice-form-target="lineAmount">$0.00</span>
+            <span class="text-sm font-medium text-slate-700" data-invoice-form-target="lineAmount">${this.formatCurrency(0)}</span>
           </div>
         </div>
         <div class="flex-shrink-0">
@@ -122,9 +152,10 @@ export default class extends Controller {
   }
 
   formatCurrency(amount) {
+    const currency = this.selectedCurrency
     return new Intl.NumberFormat('en-US', {
       style: 'currency',
-      currency: 'USD'
+      currency: currency
     }).format(amount)
   }
 }
