@@ -21,8 +21,9 @@ Rails.application.configure do
   # Enable serving of images, stylesheets, and JavaScripts from an asset server.
   # config.asset_host = "http://assets.example.com"
 
-  # Store uploaded files on the local file system (see config/storage.yml for options).
-  config.active_storage.service = :local
+  # Store uploaded files on AWS S3 (see config/storage.yml for options).
+  # Set ACTIVE_STORAGE_SERVICE=local to use local storage in production
+  config.active_storage.service = ENV.fetch("ACTIVE_STORAGE_SERVICE", "amazon").to_sym
 
   # Assume all access to the app is happening through a SSL-terminating reverse proxy.
   # config.assume_ssl = true
@@ -53,21 +54,28 @@ Rails.application.configure do
   config.active_job.queue_adapter = :solid_queue
   config.solid_queue.connects_to = { database: { writing: :queue } }
 
-  # Ignore bad email addresses and do not raise email delivery errors.
-  # Set this to true and configure the email server for immediate delivery to raise delivery errors.
-  # config.action_mailer.raise_delivery_errors = false
+  # Enable email delivery errors in production for debugging
+  config.action_mailer.raise_delivery_errors = ENV.fetch("RAISE_DELIVERY_ERRORS", "false") == "true"
 
   # Set host to be used by links generated in mailer templates.
-  config.action_mailer.default_url_options = { host: "example.com" }
+  config.action_mailer.default_url_options = { host: ENV.fetch("APP_HOST", "example.com") }
 
-  # Specify outgoing SMTP server. Remember to add smtp/* credentials via bin/rails credentials:edit.
-  # config.action_mailer.smtp_settings = {
-  #   user_name: Rails.application.credentials.dig(:smtp, :user_name),
-  #   password: Rails.application.credentials.dig(:smtp, :password),
-  #   address: "smtp.example.com",
-  #   port: 587,
-  #   authentication: :plain
-  # }
+  # AWS SES SMTP Configuration
+  # Configure credentials via bin/rails credentials:edit:
+  #   ses:
+  #     smtp_username: YOUR_SES_SMTP_USERNAME
+  #     smtp_password: YOUR_SES_SMTP_PASSWORD
+  #     region: us-east-1
+  #     from_email: noreply@yourdomain.com
+  config.action_mailer.delivery_method = :smtp
+  config.action_mailer.smtp_settings = {
+    user_name: Rails.application.credentials.dig(:ses, :smtp_username),
+    password: Rails.application.credentials.dig(:ses, :smtp_password),
+    address: "email-smtp.#{Rails.application.credentials.dig(:ses, :region) || 'us-east-1'}.amazonaws.com",
+    port: 587,
+    authentication: :login,
+    enable_starttls_auto: true
+  }
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
