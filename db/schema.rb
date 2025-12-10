@@ -126,6 +126,72 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
     t.index ["user_id", "user_type"], name: "user_index"
   end
 
+  create_table "blog_categories", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.text "meta_description"
+    t.string "meta_title"
+    t.string "name", null: false
+    t.uuid "parent_id"
+    t.integer "position", default: 0
+    t.integer "posts_count", default: 0
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["parent_id"], name: "index_blog_categories_on_parent_id"
+    t.index ["position"], name: "index_blog_categories_on_position"
+    t.index ["slug"], name: "index_blog_categories_on_slug", unique: true
+  end
+
+  create_table "blog_post_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.uuid "blog_post_id", null: false
+    t.uuid "blog_tag_id", null: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+    t.index ["blog_post_id", "blog_tag_id"], name: "index_blog_post_tags_on_blog_post_id_and_blog_tag_id", unique: true
+    t.index ["blog_post_id"], name: "index_blog_post_tags_on_blog_post_id"
+    t.index ["blog_tag_id"], name: "index_blog_post_tags_on_blog_tag_id"
+  end
+
+  create_table "blog_posts", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.boolean "allow_comments", default: true
+    t.bigint "author_id", null: false
+    t.uuid "blog_category_id"
+    t.text "content"
+    t.datetime "created_at", null: false
+    t.text "excerpt"
+    t.boolean "featured", default: false
+    t.string "featured_image_url"
+    t.text "meta_description"
+    t.string "meta_keywords"
+    t.string "meta_title"
+    t.datetime "published_at"
+    t.integer "reading_time", default: 0
+    t.string "slug", null: false
+    t.integer "status", default: 0, null: false
+    t.string "title", null: false
+    t.datetime "updated_at", null: false
+    t.integer "views_count", default: 0
+    t.index ["author_id"], name: "index_blog_posts_on_author_id"
+    t.index ["blog_category_id", "status"], name: "index_blog_posts_on_blog_category_id_and_status"
+    t.index ["blog_category_id"], name: "index_blog_posts_on_blog_category_id"
+    t.index ["featured"], name: "index_blog_posts_on_featured"
+    t.index ["published_at"], name: "index_blog_posts_on_published_at"
+    t.index ["slug"], name: "index_blog_posts_on_slug", unique: true
+    t.index ["status", "published_at"], name: "index_blog_posts_on_status_and_published_at"
+    t.index ["status"], name: "index_blog_posts_on_status"
+  end
+
+  create_table "blog_tags", id: :uuid, default: -> { "gen_random_uuid()" }, force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.text "description"
+    t.string "name", null: false
+    t.integer "posts_count", default: 0
+    t.string "slug", null: false
+    t.datetime "updated_at", null: false
+    t.index ["name"], name: "index_blog_tags_on_name"
+    t.index ["slug"], name: "index_blog_tags_on_slug", unique: true
+  end
+
   create_table "clients", force: :cascade do |t|
     t.bigint "account_id", null: false
     t.string "address_line1"
@@ -676,6 +742,11 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_01_100857) do
   add_foreign_key "active_storage_variant_records", "active_storage_blobs", column: "blob_id"
   add_foreign_key "alerts", "accounts"
   add_foreign_key "api_tokens", "users"
+  add_foreign_key "blog_categories", "blog_categories", column: "parent_id"
+  add_foreign_key "blog_post_tags", "blog_posts"
+  add_foreign_key "blog_post_tags", "blog_tags"
+  add_foreign_key "blog_posts", "blog_categories"
+  add_foreign_key "blog_posts", "users", column: "author_id"
   add_foreign_key "clients", "accounts"
   add_foreign_key "conversations", "accounts"
   add_foreign_key "conversations", "users", column: "participant_1_id"

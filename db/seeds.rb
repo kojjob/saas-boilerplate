@@ -168,3 +168,37 @@ plans_data.each do |plan_attrs|
 end
 
 puts "✓ Seeded #{Plan.count} plans"
+
+# ==================================
+# Create Site Admin User
+# ==================================
+puts "\nSeeding Site Admin User..."
+
+admin_email = ENV.fetch("ADMIN_EMAIL", "admin@example.com")
+admin_password = ENV.fetch("ADMIN_PASSWORD", "password123")
+
+admin_user = User.find_or_initialize_by(email: admin_email)
+admin_user.assign_attributes(
+  first_name: "Site",
+  last_name: "Admin",
+  password: admin_password,
+  password_confirmation: admin_password,
+  site_admin: true,
+  confirmed_at: Time.current
+)
+
+if admin_user.save
+  puts "  #{admin_user.previously_new_record? ? 'Created' : 'Updated'} site admin: #{admin_user.email}"
+  puts "  Password: #{admin_password}" if admin_user.previously_new_record?
+else
+  puts "  ✗ Failed to create admin: #{admin_user.errors.full_messages.join(', ')}"
+end
+
+# Create an account for the admin user if they don't have one
+if admin_user.persisted? && admin_user.accounts.empty?
+  account = Account.create!(name: "Admin Account")
+  Membership.create!(user: admin_user, account: account, role: :owner)
+  puts "  Created account: #{account.name}"
+end
+
+puts "✓ Site admin seeded"

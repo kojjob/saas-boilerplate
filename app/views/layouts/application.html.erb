@@ -6,6 +6,43 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="application-name" content="Deployable">
     <meta name="mobile-web-app-capable" content="yes">
+
+    <%# SEO Meta Tags %>
+    <% if content_for?(:meta_description) %>
+      <meta name="description" content="<%= content_for(:meta_description) %>">
+    <% end %>
+    <% if content_for?(:meta_keywords) %>
+      <meta name="keywords" content="<%= content_for(:meta_keywords) %>">
+    <% end %>
+    <meta name="robots" content="<%= content_for?(:meta_robots) ? content_for(:meta_robots) : 'index, follow' %>">
+
+    <%# Open Graph Meta Tags %>
+    <meta property="og:title" content="<%= content_for(:title) || 'Deployable' %>">
+    <meta property="og:type" content="<%= content_for?(:og_type) ? content_for(:og_type) : 'website' %>">
+    <meta property="og:url" content="<%= request.original_url %>">
+    <% if content_for?(:meta_description) %>
+      <meta property="og:description" content="<%= content_for(:meta_description) %>">
+    <% end %>
+    <% if content_for?(:og_image) %>
+      <meta property="og:image" content="<%= content_for(:og_image) %>">
+    <% end %>
+    <meta property="og:site_name" content="Deployable">
+
+    <%# Twitter Card Meta Tags %>
+    <meta name="twitter:card" content="<%= content_for?(:twitter_card) ? content_for(:twitter_card) : 'summary_large_image' %>">
+    <meta name="twitter:title" content="<%= content_for(:title) || 'Deployable' %>">
+    <% if content_for?(:meta_description) %>
+      <meta name="twitter:description" content="<%= content_for(:meta_description) %>">
+    <% end %>
+    <% if content_for?(:og_image) %>
+      <meta name="twitter:image" content="<%= content_for(:og_image) %>">
+    <% end %>
+
+    <%# Canonical URL %>
+    <% if content_for?(:canonical_url) %>
+      <link rel="canonical" href="<%= content_for(:canonical_url) %>">
+    <% end %>
+
     <%= csrf_meta_tags %>
     <%= csp_meta_tag %>
 

@@ -35,6 +35,9 @@ class User < ApplicationRecord
   has_many :material_entries, dependent: :destroy
   has_many :uploaded_documents, class_name: "Document", foreign_key: :uploaded_by_id, dependent: :destroy
 
+  # Blog associations
+  has_many :blog_posts, foreign_key: :author_id, dependent: :destroy
+
   # Validations
   validates :first_name, presence: true
   validates :last_name, presence: true
