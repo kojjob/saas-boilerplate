@@ -89,6 +89,10 @@ gem "discard", "~> 1.4"
 # PDF Generation - HTML to PDF using Chrome/Puppeteer
 gem "grover"
 
+# PDF Generation - Native Ruby PDF generation
+gem "prawn", "~> 2.5"
+gem "prawn-table", "~> 0.2.2"
+
 # Active Storage validations
 gem "active_storage_validations", "~> 1.1"
 

@@ -19,6 +19,15 @@ class InvitationsController < ApplicationController
 
     email = invitation_params[:invitation_email]&.downcase&.strip
 
+    # Validate email presence
+    if email.blank?
+      flash.now[:alert] = "Email address is required."
+      @invitation = Membership.new(invitation_params)
+      @available_roles = available_roles
+      render :new, status: :unprocessable_entity
+      return
+    end
+
     # Check for existing membership
     existing_user = User.find_by(email: email)
     if existing_user && @account.memberships.exists?(user: existing_user)

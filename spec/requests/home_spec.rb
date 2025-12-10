@@ -12,7 +12,7 @@ RSpec.describe "Home", type: :request do
 
       it "displays the landing page content" do
         get root_path
-        expect(response.body).to include("Sign in")
+        expect(response.body).to include("Sign In")
       end
     end
 

@@ -78,7 +78,7 @@ RSpec.describe 'Members', type: :request do
       it 'cannot change own owner role' do
         patch account_member_path(owner_membership), params: { membership: { role: 'admin' } }
 
-        expect(response).to redirect_to(dashboard_path)
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(owner_membership.reload.role).to eq('owner')
       end
     end
@@ -98,7 +98,7 @@ RSpec.describe 'Members', type: :request do
       it 'cannot change owner role' do
         patch account_member_path(owner_membership), params: { membership: { role: 'admin' } }
 
-        expect(response).to redirect_to(dashboard_path)
+        expect(response).to have_http_status(:unprocessable_entity)
       end
     end
 
@@ -140,7 +140,7 @@ RSpec.describe 'Members', type: :request do
       it 'cannot remove self as owner' do
         delete account_member_path(owner_membership)
 
-        expect(response).to redirect_to(dashboard_path)
+        expect(response).to have_http_status(:unprocessable_entity)
         expect(Membership.exists?(owner_membership.id)).to be true
       end
     end
