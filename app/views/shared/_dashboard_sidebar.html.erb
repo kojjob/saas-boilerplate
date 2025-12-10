@@ -84,14 +84,18 @@
     </div>
 
     <%# User Profile Section %>
-    <div class="flex-shrink-0 p-3 border-t border-slate-800/50 bg-slate-900/50">
+    <div class="shrink-0 p-3 border-t border-slate-800/50 bg-slate-900/50">
       <div class="flex items-center gap-3">
-        <div class="relative flex-shrink-0">
-          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
-            <span class="text-sm font-bold text-white">
-              <%= current_user&.first_name&.first&.upcase || current_user&.email&.first&.upcase || "U" %><%= current_user&.last_name&.first&.upcase || "" %>
-            </span>
-          </div>
+        <div class="relative shrink-0">
+          <% if current_user&.avatar&.attached? %>
+            <%= image_tag current_user.avatar.variant(:thumb), class: "w-10 h-10 rounded-xl object-cover shadow-lg ring-2 ring-slate-700" %>
+          <% else %>
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center shadow-lg shadow-amber-500/20">
+              <span class="text-sm font-bold text-white">
+                <%= current_user&.first_name&.first&.upcase || current_user&.email&.first&.upcase || "U" %><%= current_user&.last_name&.first&.upcase || "" %>
+              </span>
+            </div>
+          <% end %>
           <%# Online status indicator %>
           <div class="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 border-2 border-slate-900 rounded-full"></div>
         </div>

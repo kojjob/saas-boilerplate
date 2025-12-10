@@ -75,7 +75,7 @@ class Project < ApplicationRecord
 
   def budget_percentage_used
     return 0 unless budget && budget > 0
-    ((total_project_cost / budget) * 100).round(1)
+    ((total_project_cost.to_f / budget) * 100).round(1)
   end
 
   def overdue?

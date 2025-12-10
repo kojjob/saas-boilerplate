@@ -1,0 +1,82 @@
+<%# Notification Preferences Section %>
+<div id="notifications-section" class="bg-white rounded-2xl shadow-sm border border-slate-200 overflow-hidden">
+  <div class="px-6 py-5 border-b border-slate-200 bg-linear-to-r from-slate-50 to-white">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-linear-to-br from-purple-500 to-pink-600 flex items-center justify-center">
+        <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+        </svg>
+      </div>
+      <div>
+        <h3 class="text-lg font-semibold text-slate-900">Notification Preferences</h3>
+        <p class="text-sm text-slate-500">Choose how you want to receive updates and alerts</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="p-6">
+    <%= form_with url: update_notifications_profile_path, method: :patch, data: { turbo: true }, class: "space-y-6" do |form| %>
+      <%# Email Notifications %>
+      <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-linear-to-br from-blue-100 to-blue-200 flex items-center justify-center">
+            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-semibold text-slate-900">Email Notifications</h4>
+            <p class="text-sm text-slate-500">Receive updates about invoices, payments, and messages</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <%= form.check_box :email_notifications, 
+              { checked: user.email_notifications, name: "user[email_notifications]" },
+              "1", "0" %>
+          <div class="toggle-switch w-14 h-7 bg-slate-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
+        </label>
+      </div>
+
+      <%# SMS Notifications %>
+      <div class="flex items-center justify-between p-4 rounded-xl bg-slate-50 border border-slate-200">
+        <div class="flex items-center gap-4">
+          <div class="w-12 h-12 rounded-xl bg-linear-to-br from-green-100 to-green-200 flex items-center justify-center">
+            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2z" />
+            </svg>
+          </div>
+          <div>
+            <h4 class="text-sm font-semibold text-slate-900">SMS Notifications</h4>
+            <p class="text-sm text-slate-500">Get text alerts for urgent updates and payment reminders</p>
+          </div>
+        </div>
+        <label class="relative inline-flex items-center cursor-pointer">
+          <%= form.check_box :sms_notifications, 
+              { checked: user.sms_notifications, name: "user[sms_notifications]" },
+              "1", "0" %>
+          <div class="toggle-switch w-14 h-7 bg-slate-300 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-purple-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-1 after:bg-white after:border-slate-300 after:border after:rounded-full after:h-6 after:w-6 after:transition-all peer-checked:bg-purple-600"></div>
+        </label>
+      </div>
+
+      <%# Info Box %>
+      <div class="rounded-xl bg-purple-50 border border-purple-200 p-4">
+        <div class="flex">
+          <svg class="h-5 w-5 text-purple-500 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+          <div class="ml-3">
+            <p class="text-sm text-purple-700">
+              SMS notifications require a valid phone number. Standard messaging rates may apply.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <%# Submit Button %>
+      <div class="flex justify-end pt-4 border-t border-slate-200">
+        <%= form.submit "Save Preferences", 
+            class: "inline-flex items-center gap-2 px-6 py-3 bg-linear-to-r from-purple-500 to-pink-600 text-white font-semibold rounded-xl shadow-lg shadow-purple-500/30 hover:shadow-purple-500/50 hover:scale-[1.02] transition-all duration-300 cursor-pointer" %>
+      </div>
+    <% end %>
+  </div>
+</div>
