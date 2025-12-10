@@ -1,4 +1,4 @@
-<%= form_with(model: [:admin, :blog, @category], local: true, class: "space-y-6") do |f| %>
+<%= form_with(model: @category, url: @category.persisted? ? admin_blog_category_path(@category) : admin_blog_categories_path, local: true, class: "space-y-6") do |f| %>
   <% if @category.errors.any? %>
     <div class="rounded-md bg-red-50 p-4">
       <div class="flex">

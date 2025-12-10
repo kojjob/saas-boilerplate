@@ -13,6 +13,7 @@ class BlogTag < ApplicationRecord
   # Scopes
   scope :popular, -> { order(posts_count: :desc) }
   scope :alphabetical, -> { order(name: :asc) }
+  scope :ordered, -> { order(name: :asc) }
   scope :with_posts, -> { where('posts_count > 0') }
 
   def to_param
