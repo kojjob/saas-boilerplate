@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
+ActiveRecord::Schema[8.1].define(version: 2025_12_10_132610) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -348,6 +348,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
     t.string "payment_reference"
     t.string "payment_token", null: false
     t.bigint "project_id"
+    t.bigint "recurring_invoice_id"
     t.integer "reminder_count", default: 0, null: false
     t.datetime "reminder_sent_at"
     t.datetime "sent_at"
@@ -366,6 +367,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
     t.index ["issue_date"], name: "index_invoices_on_issue_date"
     t.index ["payment_token"], name: "index_invoices_on_payment_token", unique: true
     t.index ["project_id"], name: "index_invoices_on_project_id"
+    t.index ["recurring_invoice_id"], name: "index_invoices_on_recurring_invoice_id"
     t.index ["status"], name: "index_invoices_on_status"
   end
 
@@ -609,6 +611,48 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
     t.index ["status"], name: "index_projects_on_status"
   end
 
+  create_table "recurring_invoice_line_items", force: :cascade do |t|
+    t.decimal "amount", precision: 10, scale: 2, null: false
+    t.datetime "created_at", null: false
+    t.string "description", null: false
+    t.integer "position"
+    t.decimal "quantity", precision: 10, scale: 2, default: "1.0", null: false
+    t.bigint "recurring_invoice_id", null: false
+    t.decimal "unit_price", precision: 10, scale: 2, null: false
+    t.datetime "updated_at", null: false
+    t.index ["recurring_invoice_id", "position"], name: "idx_recurring_line_items_position"
+    t.index ["recurring_invoice_id"], name: "index_recurring_invoice_line_items_on_recurring_invoice_id"
+  end
+
+  create_table "recurring_invoices", force: :cascade do |t|
+    t.bigint "account_id", null: false
+    t.boolean "auto_send", default: false, null: false
+    t.bigint "client_id", null: false
+    t.datetime "created_at", null: false
+    t.string "currency", default: "USD", null: false
+    t.text "email_body"
+    t.string "email_subject"
+    t.date "end_date"
+    t.integer "frequency", default: 2, null: false
+    t.date "last_generated_at"
+    t.string "name", null: false
+    t.date "next_occurrence_date"
+    t.text "notes"
+    t.integer "occurrences_count", default: 0, null: false
+    t.integer "occurrences_limit"
+    t.integer "payment_terms", default: 30, null: false
+    t.bigint "project_id"
+    t.date "start_date", null: false
+    t.integer "status", default: 0, null: false
+    t.decimal "tax_rate", precision: 5, scale: 2, default: "0.0"
+    t.datetime "updated_at", null: false
+    t.index ["account_id", "next_occurrence_date"], name: "idx_on_account_id_next_occurrence_date_9816b3f180"
+    t.index ["account_id", "status"], name: "index_recurring_invoices_on_account_id_and_status"
+    t.index ["account_id"], name: "index_recurring_invoices_on_account_id"
+    t.index ["client_id"], name: "index_recurring_invoices_on_client_id"
+    t.index ["project_id"], name: "index_recurring_invoices_on_project_id"
+  end
+
   create_table "sessions", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.string "ip_address"
@@ -826,6 +870,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
   add_foreign_key "invoices", "accounts"
   add_foreign_key "invoices", "clients"
   add_foreign_key "invoices", "projects"
+  add_foreign_key "invoices", "recurring_invoices"
   add_foreign_key "material_entries", "accounts"
   add_foreign_key "material_entries", "projects"
   add_foreign_key "material_entries", "users"
@@ -845,6 +890,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_10_130644) do
   add_foreign_key "pay_subscriptions", "pay_customers", column: "customer_id"
   add_foreign_key "projects", "accounts"
   add_foreign_key "projects", "clients"
+  add_foreign_key "recurring_invoice_line_items", "recurring_invoices"
+  add_foreign_key "recurring_invoices", "accounts"
+  add_foreign_key "recurring_invoices", "clients"
+  add_foreign_key "recurring_invoices", "projects"
   add_foreign_key "sessions", "users"
   add_foreign_key "solid_queue_blocked_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade
   add_foreign_key "solid_queue_claimed_executions", "solid_queue_jobs", column: "job_id", on_delete: :cascade

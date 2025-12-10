@@ -8,6 +8,7 @@ class Invoice < ApplicationRecord
   belongs_to :account
   belongs_to :client
   belongs_to :project, optional: true
+  belongs_to :recurring_invoice, optional: true
   has_many :line_items, class_name: "InvoiceLineItem", dependent: :destroy
 
   accepts_nested_attributes_for :line_items, allow_destroy: true, reject_if: :all_blank
