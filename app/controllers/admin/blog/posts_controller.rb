@@ -64,7 +64,7 @@ module Admin
       def post_params
         params.require(:blog_post).permit(
           :title, :slug, :content, :excerpt,
-          :meta_title, :meta_description,
+          :meta_title, :meta_description, :meta_keywords,
           :featured_image_url, :blog_category_id,
           :status, :published_at, :featured, :allow_comments
         )
