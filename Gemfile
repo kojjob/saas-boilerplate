@@ -96,6 +96,12 @@ gem "prawn-table", "~> 0.2.2"
 # Active Storage validations
 gem "active_storage_validations", "~> 1.1"
 
+# ZIP file generation for exports
+gem "rubyzip", "~> 2.3"
+
+# CSV parsing (required explicitly in Ruby 3.4+)
+gem "csv"
+
 # Two-factor authentication
 gem "rotp", "~> 6.3"
 gem "rqrcode", "~> 2.2"
