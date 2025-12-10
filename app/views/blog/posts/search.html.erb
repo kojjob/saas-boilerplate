@@ -25,7 +25,7 @@
         </h1>
         <p class="text-xl text-slate-400">
           <% if @posts.any? %>
-            Found <span class="text-amber-400 font-semibold"><%= @posts.total_count %></span> results for "<span class="text-white"><%= @query %></span>"
+            Found <span class="text-amber-400 font-semibold"><%= @pagy.count %></span> results for "<span class="text-white"><%= @query %></span>"
           <% else %>
             No results found for "<span class="text-white"><%= @query %></span>"
           <% end %>

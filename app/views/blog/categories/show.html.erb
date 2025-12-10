@@ -43,7 +43,7 @@
         <% end %>
 
         <p class="text-slate-500">
-          <%= pluralize(@posts.total_count, 'article') %> in this category
+          <%= pluralize(@pagy.count, 'article') %> in this category
         </p>
       </div>
     </div>

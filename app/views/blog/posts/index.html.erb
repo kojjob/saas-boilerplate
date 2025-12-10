@@ -133,7 +133,7 @@
         <div class="lg:col-span-3">
           <div class="flex items-center justify-between mb-8">
             <h2 class="text-2xl font-bold text-white">Latest Articles</h2>
-            <span class="text-slate-400 text-sm"><%= @posts.total_count %> articles</span>
+            <span class="text-slate-400 text-sm"><%= @pagy.count %> articles</span>
           </div>
 
           <% if @posts.any? %>
