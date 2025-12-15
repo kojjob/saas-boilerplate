@@ -98,7 +98,7 @@ gem "active_storage_validations", "~> 1.1"
 
 # Two-factor authentication
 gem "rotp", "~> 6.3"
-gem "rqrcode", "~> 2.2"
+gem "rqrcode", "~> 3.1"
 
 # AWS SDK for S3 storage and SES email
 gem "aws-sdk-s3", "~> 1.0"
