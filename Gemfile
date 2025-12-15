@@ -94,7 +94,7 @@ gem "prawn", "~> 2.5"
 gem "prawn-table", "~> 0.2.2"
 
 # Active Storage validations
-gem "active_storage_validations", "~> 1.1"
+gem "active_storage_validations", "~> 3.0"
 
 # Two-factor authentication
 gem "rotp", "~> 6.3"
